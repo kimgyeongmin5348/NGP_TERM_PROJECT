@@ -1,0 +1,17 @@
+
+*.vsidx
+C.G_termproject/.vs/C.G_project/v17/.suo
+*.pdb
+*.exe
+*.idb
+*.obj
+*.tlog
+*.recipe
+*.log
+*.ipch
+*.opendb
+*.db-shm
+*.db
+*.db-wal
+*.json
+*.ilk
