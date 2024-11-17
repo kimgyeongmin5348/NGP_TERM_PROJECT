@@ -9,12 +9,12 @@
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <gl/glm/glm.hpp>
+#include <gl/glm/ext.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>
 #include <random>
 #include <string>
-#include <glm/fwd.hpp>
+#include <gl/glm/fwd.hpp>
 #include <chrono>
 #pragma comment(lib,"winmm.lib")
 #include <mmsystem.h>

@@ -38,9 +38,6 @@
   <ItemGroup>
     <Object Include="cube.obj" />
     <Object Include="piramid.obj" />
-    <Object Include="Helicopter.obj">
-      <Filter>헤더 파일</Filter>
-    </Object>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">
