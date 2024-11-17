@@ -794,11 +794,6 @@ void main(int argc, char** argv) {
     glutMainLoop();
 }
 
-GLvoid Setting()
-{
-
-}
-
 GLvoid Timer(int value) // get_events
 {
     if (h_f.x_is_trans) {
