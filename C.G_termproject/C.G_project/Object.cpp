@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Object.h"
 
 Object::Object()
@@ -29,7 +29,7 @@ Bullet::Bullet()
     //glUniform1f(isCheck, false);
     //glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
     //gluSphere(qobj, 0.2, 20, 30);
-    // �ѱ� Ȯ��
+    // 한글 확인 ㅅㅂ
 }
 
 Bullet::~Bullet()
