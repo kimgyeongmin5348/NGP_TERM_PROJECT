@@ -29,7 +29,7 @@ Bullet::Bullet()
     //glUniform1f(isCheck, false);
     //glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
     //gluSphere(qobj, 0.2, 20, 30);
-    // 오브젝트 처리해주는 부분에서 s_program 같은 obj 처리 해줘야할듯
+    // 한글 확인
 }
 
 Bullet::~Bullet()
