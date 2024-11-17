@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Object.h"
 
 Object::Object()
@@ -7,33 +7,72 @@ Object::Object()
 
 Object::~Object()
 {
+    for (auto child : children) {
+        delete child;
+    }
 }
 
+void Object::SetParent(Object* parent)
+{
+    parent = parent;
+}
+
+void Object::AddChild(Object* child)
+{
+    child->SetParent(this);
+    children.push_back(child);
+}
+
+void Object::Render(GLuint program, const glm::mat4& parentTransform) {
+    glm::mat4 transform = glm::mat4(1.0f);
+    transform = glm::translate(transform, position);
+    transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    transform = glm::scale(transform, scale);
+
+    transform = parentTransform * transform;
+
+    GLuint transformLoc = glGetUniformLocation(program, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
+    GLuint colorLoc = glGetUniformLocation(program, "objectColor");
+    glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+
+    glBindVertexArray(0); 
+
+    for (auto child : children) {
+        child->Render(program, transform);
+    }
+}
+void Object::Update(float deltaTime)
+{
+    for (auto child : children) {
+        child->Update(deltaTime);
+    }
+}
 /////////////////////////////////////////////////////////////////////////
 
 Bullet::Bullet()
 {
-    glm::mat4 Bullet = glm::mat4(1.0f);
-    Bullet = glm::translate(Bullet, glm::vec3(x_trans_aoc, y_trans_aoc, z_trans_aoc));
-    Bullet = glm::rotate(Bullet, glm::radians(x_rotate), glm::vec3(1.0f, 0.f, 0.f));
-    Bullet = glm::rotate(Bullet, glm::radians(z_rotate), glm::vec3(0.f, 0.f, 1.0f));
-    Bullet = glm::scale(Bullet, glm::vec3(0.3f, 0.3f, 0.4f));
-
-    //unsigned int StransformLocation = glGetUniformLocation(s_program, "transform");
-    //glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(Bullet));
-    //int objColorLocation = glGetUniformLocation(s_program, "objectColor");
-    //unsigned isCheck = glGetUniformLocation(s_program, "isCheck");
-    //
-    //qobj = gluNewQuadric();
-    //gluQuadricDrawStyle(qobj, obj_type);
-    //glUniform1f(isCheck, false);
-    //glUniform3f(objColorLocation, 1.0f, 1.0f, 1.0f);
-    //gluSphere(qobj, 0.2, 20, 30);
-    // ¿ÀºêÁ§Æ® Ã³¸®ÇØÁÖ´Â ºÎºÐ¿¡¼­ s_program °°Àº obj Ã³¸® ÇØÁà¾ßÇÒµí
+    SetScale(glm::vec3(0.3f, 0.3f, 0.4f));
+    SetColor(glm::vec3(1.0f, 1.0f, 1.0f)); // ë…¸ëž€ìƒ‰
 }
 
 Bullet::~Bullet()
 {
+}
+
+void Bullet::Update(float deltaTime)
+{
+    if (!active) return;
+
+    position +=  deltaTime;
+
+    // ë²”ìœ„ë¥¼ ë²—ì–´ë‚˜ë©´ ë¹„í™œì„±í™”
+    if (position.z > 50.0f || position.z < -50.0f) {
+        active = false;
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -44,4 +83,36 @@ Building::Building()
 
 Building::~Building()
 {
+}
+
+void Building::Setting()
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> random_building_x_pos(-20, 20);
+    std::uniform_real_distribution<float> random_building_hight(1, 25);
+
+    position.x = random_building_x_pos(gen);
+    position.y = 0;
+    position.z = 40.f;
+    scale.y = random_building_hight(gen);
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+Ground::Ground()
+{
+    //glm::mat4 Bottom = glm::mat4(1.0f);
+    //Bottom = glm::scale(Bottom, glm::vec3(1000.0f, 0.f, 1000.0f));
+    //unsigned int StransformLocation = glGetUniformLocation(s_program, "transform");
+    //glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(Bottom));
+    //qobj = gluNewQuadric();
+    //gluQuadricDrawStyle(qobj, obj_type);
+    //unsigned int objColorLocation = glGetUniformLocation(s_program, "objectColor");
+    //unsigned isCheck = glGetUniformLocation(s_program, "isCheck");
+    //glUniform1f(isCheck, false);
+    //glUniform3f(objColorLocation, 0.1f, 0.1f, 0.1f);
+    //glBindVertexArray(VAO[1]);
+    //glDrawArrays(GL_TRIANGLES, 0, 6);
+
 }

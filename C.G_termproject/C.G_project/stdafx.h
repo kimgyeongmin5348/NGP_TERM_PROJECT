@@ -19,3 +19,6 @@
 #pragma comment(lib,"winmm.lib")
 #include <mmsystem.h>
 #include <Digitalv.h>
+
+#define width 1200
+#define height 800
