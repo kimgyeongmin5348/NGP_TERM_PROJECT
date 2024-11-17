@@ -13,7 +13,7 @@ public:
         return &instance;
     }
 
-    void Initialize();
+    void Initialize(Player* pPlayer);
     void BuildObject();
     void Render();
     void Update(float deltaTime);

@@ -13,8 +13,8 @@ void GameFramework::Initialize(int argc, char** argv) {
         exit(-1);
     }
 
-    scene = new Scene();
-    scene->Initialize();
+    scene = Scene::GetInstance();
+    scene->Initialize(new Player());
 }
 
 void GameFramework::Run() {
@@ -26,6 +26,7 @@ void GameFramework::Run() {
     glutTimerFunc(16, [](int value) {
         float currentTime = static_cast<float>(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
         Scene::GetInstance()->Update(currentTime);
+        glutPostRedisplay();
         }, 0);
 
     glutMainLoop();

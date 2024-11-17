@@ -161,8 +161,9 @@ void Scene::InitShader()
     glUseProgram(s_program);
 }
 
-void Scene::Initialize()
+void Scene::Initialize(Player* pPlayer)
 {
+    player = pPlayer;
     InitShader();
     BuildObject();
     glEnable(GL_DEPTH_TEST);
@@ -171,7 +172,6 @@ void Scene::Initialize()
 void Scene::BuildObject()
 {
 	// 플레이어, Ground, 빌딩_Mat
-    player = new Player();
     player->SetPosition(glm::vec3(0.0f, 1.0f, -5.0f));
 
     for (int i = 0; i < 1000; ++i) {
@@ -227,6 +227,7 @@ void Scene::Render()
     for (auto obj : gameObjects) {
         obj->Render(s_program);
     }
+
 
 	glutSwapBuffers();
 	glutPostRedisplay();
