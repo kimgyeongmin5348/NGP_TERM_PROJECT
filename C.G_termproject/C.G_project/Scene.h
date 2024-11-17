@@ -5,15 +5,42 @@
 class Scene
 {
 public:
-	Scene(Player *pPlayer);
+	Scene();
 	~Scene();
 
-	void BuildObject();
+    static Scene* GetInstance() {
+        static Scene instance;
+        return &instance;
+    }
 
-protected:
-	Player* player;
-	Ground* ground;
-	Building* build;
-	//Building* temp_build[1000];
+    void Initialize();
+    void BuildObject();
+    void Render();
+    void Update(float deltaTime);
+    void Resize(int w, int h);
+    void HandleKeyboard(unsigned char key, bool isPressed);
+
+public:
+    GLuint VAO[3], VBO[6];
+    GLuint s_program;
+
+    GLuint shaderID;
+    GLuint vertexShader;
+    GLuint fragmentShader;
+
+    GLint g_window_w, g_window_h;
+
+public:
+    GLchar* filetobuf(const GLchar* file);
+    virtual GLvoid InitBuffer();
+
+    void make_vertexShaders();
+    void make_fragmentShader();
+    void InitShader();
+
+private:
+    Player* player;
+    std::vector<Object*> gameObjects;
+
 };
 

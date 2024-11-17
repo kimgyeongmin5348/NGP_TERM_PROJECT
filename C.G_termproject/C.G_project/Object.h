@@ -5,7 +5,8 @@ public:
 	Object();
 	~Object();
 
-public:
+protected:
+    /*
     float x_trans{}, y_trans{}, z_trans{};
     float x_trans_aoc{}, y_trans_aoc{}, z_trans_aoc{};
 
@@ -18,28 +19,37 @@ public:
     float color_r{}, color_g{}, color_b{};
 
     float r{};
+    */
+
+    glm::vec3 position;
+    glm::vec3 position_aoc;
+    glm::vec3 rotation;
+    glm::vec3 scale;
+    glm::vec3 color;
+
+    Object* parent = nullptr;
+    std::vector<Object*> children;
 
 public:
-    GLuint VAO[3], VBO[6];
-    GLuint s_program;
     GLUquadricObj* qobj;
-
-    GLuint shaderID;
-    GLuint vertexShader;
-    GLuint fragmentShader;
-
     GLenum obj_type{ GL_FILL };
-    GLint g_window_w, g_window_h;
 
 public:
-    GLchar* filetobuf(const GLchar* file);
-    GLvoid InitBuffer();
+    void SetPosition(const glm::vec3& pos) { position = pos; }
+    void SetRotation(const glm::vec3& rot) { rotation = rot; }
+    void SetScale(const glm::vec3& scl) { scale = scl; }
+    void SetColor(const glm::vec3& col) { color = col; }
 
-    void make_vertexShaders();
-    void make_fragmentShader();
-    void InitShader();
+    glm::vec3 GetPosition() const { return position; }
+    glm::vec3 GetRotation() const { return rotation; }
+    glm::vec3 GetScale() const { return scale; }
+    glm::vec3 GetColor() const { return color; }
 
+    void SetParent(Object* parent);
+    void AddChild(Object* child);
 
+    virtual void Render(GLuint program, const glm::mat4& parentTransform = glm::mat4(1.0f));
+    virtual void Update(float deltaTime);
 };
 
 class Bullet : public Object
@@ -47,6 +57,10 @@ class Bullet : public Object
 public:
     Bullet();
     ~Bullet();
+
+    virtual void Update(float deltaTime) override;
+
+    bool active = false;
 };
 
 class Building : public Object
@@ -54,6 +68,8 @@ class Building : public Object
 public:
     Building();
     ~Building();
+
+    void Setting();
 };
 
 class Ground : public Object

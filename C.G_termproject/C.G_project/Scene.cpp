@@ -1,21 +1,193 @@
 ﻿#include "stdafx.h"
 #include "Scene.h"
 
-Scene::Scene(Player* pPlayer)
+#define h_vertex 0.2f
+
+float bottom[] =
 {
-	player = pPlayer;
+    1, 0, -1,
+    -1, 0, 1,
+    1, 0, 1,
+    1, 0, -1,
+    -1, 0, -1,
+    -1, 0, 1
+};
+
+GLfloat hexa[] = {   //육면체
+    //윗면
+    -h_vertex, h_vertex, h_vertex,
+    h_vertex, h_vertex, h_vertex,
+    -h_vertex, h_vertex, -h_vertex,
+
+    h_vertex, h_vertex, h_vertex,
+    h_vertex, h_vertex, -h_vertex,
+    -h_vertex, h_vertex, -h_vertex,
+    //정면
+    -h_vertex, -h_vertex, h_vertex,
+    h_vertex, -h_vertex, h_vertex,
+    -h_vertex, h_vertex, h_vertex,
+
+    h_vertex, -h_vertex, h_vertex,
+    h_vertex, h_vertex, h_vertex,
+    -h_vertex, h_vertex, h_vertex,
+
+    //아랫면
+    -h_vertex, -h_vertex, h_vertex,
+    -h_vertex, -h_vertex, -h_vertex,
+    h_vertex, -h_vertex, -h_vertex,
+
+    -h_vertex, -h_vertex, h_vertex,
+    h_vertex, -h_vertex, -h_vertex,
+    h_vertex, -h_vertex, h_vertex,
+
+    //뒷면
+    h_vertex, -h_vertex, -h_vertex,
+    -h_vertex, -h_vertex, -h_vertex,
+    h_vertex, h_vertex, -h_vertex,
+
+    -h_vertex, -h_vertex, -h_vertex,
+    -h_vertex, h_vertex, -h_vertex,
+    h_vertex, h_vertex, -h_vertex,
+
+
+    //좌측면
+    -h_vertex, -h_vertex, -h_vertex,
+    -h_vertex, h_vertex, h_vertex,
+    -h_vertex, h_vertex, -h_vertex,
+
+    -h_vertex, -h_vertex, -h_vertex,
+    -h_vertex, -h_vertex, h_vertex,
+    -h_vertex, h_vertex, h_vertex,
+
+    //우측면
+    h_vertex, -h_vertex, h_vertex,
+    h_vertex, -h_vertex, -h_vertex,
+    h_vertex, h_vertex, h_vertex,
+
+    h_vertex, -h_vertex, -h_vertex,
+    h_vertex, h_vertex, -h_vertex,
+    h_vertex, h_vertex, h_vertex
+};
+
+Scene::Scene()
+{
 }
 
 Scene::~Scene()
 {
 }
+GLchar* Scene::filetobuf(const GLchar* file)
+{
+    FILE* fptr;
+    long length;
+    GLchar* buf;
 
+    fopen_s(&fptr, file, "rb");
+    if (!fptr)
+        return NULL;
+
+    fseek(fptr, 0, SEEK_END);
+    length = ftell(fptr);
+    buf = (GLchar*)malloc(length + 1);
+    fseek(fptr, 0, SEEK_SET);
+    fread(buf, length, 1, fptr);
+    fclose(fptr);
+    buf[length] = 0;
+
+    return buf;
+}
+
+GLvoid Scene::InitBuffer()
+{
+    glGenVertexArrays(3, VAO);
+
+    glBindVertexArray(VAO[0]);
+    glGenBuffers(2, &VBO[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(hexa), hexa, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(VAO[1]);
+    glGenBuffers(2, &VBO[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(bottom), bottom, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+}
+
+void Scene::make_vertexShaders()
+{
+    GLchar* vertexSource;
+    vertexSource = filetobuf("vertex.glsl");
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexSource, NULL);
+    glCompileShader(vertexShader);
+}
+
+void Scene::make_fragmentShader()
+{
+    GLchar* fragmentSource;
+    fragmentSource = filetobuf("fragment.glsl");
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+    glCompileShader(fragmentShader);
+}
+
+void Scene::InitShader()
+{
+    make_vertexShaders();
+    make_fragmentShader();
+
+    s_program = glCreateProgram();
+
+    glAttachShader(s_program, vertexShader);
+    glAttachShader(s_program, fragmentShader);
+    glLinkProgram(s_program);
+
+    GLint result;
+    GLchar errorLog[512];
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
+    if (!result)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, errorLog);
+        std::cerr << "ERROR :  fragment Shader Fail Compile \n" << errorLog << std::endl;
+        exit(-1);
+    }
+    else
+        std::cout << "good" << std::endl;
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+    glUseProgram(s_program);
+}
+
+void Scene::Initialize()
+{
+    InitShader();
+    BuildObject();
+    glEnable(GL_DEPTH_TEST);
+}
+    
 void Scene::BuildObject()
+{
+	// 플레이어, Ground, 빌딩_Mat
+    player = new Player();
+    player->SetPosition(glm::vec3(0.0f, 1.0f, -5.0f));
+
+    for (int i = 0; i < 1000; ++i) {
+        Building* building = new Building();
+        building->Setting();
+        gameObjects.push_back(building);
+    }
+}
+
+void Scene::Render()
 {
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 깊이 검사 (클리핑)
 	glUseProgram(s_program);
 
+    /*
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
 
@@ -35,6 +207,7 @@ void Scene::BuildObject()
 	unsigned int projectionLocation = glGetUniformLocation(s_program, "projection");
 	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
 
+	// 조명
 	float lightInitialX = 0;
 	float lightInitialY = 10;
 	float lightInitialZ = 20.f;
@@ -46,17 +219,44 @@ void Scene::BuildObject()
 	glUniform3f(lightPosLocation, lightPosition.x, lightPosition.y, lightPosition.z);
 	unsigned int lightColorLocation = glGetUniformLocation(s_program, "lightColor"); //--- lightColor 값 전달: (1.0, 1.0, 1.0) 백색
 	glUniform3f(lightColorLocation, 0.7f, 0.7f, 0.7f);
+    */
 
-	// 플레이어, Ground, 빌딩_Mat
-	player = new Player();
-	ground = new Ground();
-	
-	for (int i = 0; i < 100; ++i) {
-		for (int j = 0; j < 10; ++j) {
-			build = new Building();
-		}
-	}
+    player->Render(s_program);
+
+    // 오브젝트 그리기 - 빌딩, Ground 등
+    for (auto obj : gameObjects) {
+        obj->Render(s_program);
+    }
 
 	glutSwapBuffers();
 	glutPostRedisplay();
+}
+
+void Scene::Update(float deltaTime)
+{
+    player->Update(deltaTime);
+
+    for (auto obj : gameObjects) {
+        obj->Update(deltaTime);
+    }
+}
+
+void Scene::Resize(int w, int h)
+{
+    glViewport(0, 0, w, h);
+}
+
+void Scene::HandleKeyboard(unsigned char key, bool isPressed)
+{
+    if (key == 'q') exit(0);
+    if (key == ' ') { // 스페이스바로 총알 발사
+        for (auto obj : gameObjects) {
+            Bullet* bullet = dynamic_cast<Bullet*>(obj);
+            if (bullet && !bullet->active) {
+                bullet->SetPosition(player->GetPosition()); // 발사 위치 설정
+                bullet->active = true;
+                break;
+            }
+        }
+    }
 }
