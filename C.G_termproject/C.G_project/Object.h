@@ -44,6 +44,7 @@ public:
     void SetColor(const glm::vec3& col) { color = col; }
 
     glm::vec3 GetPosition() const { return position; }
+    glm::vec3 GetPositionAOC() const { return position_aoc; }
     glm::vec3 GetRotation() const { return rotation; }
     glm::vec3 GetScale() const { return scale; }
     glm::vec3 GetColor() const { return color; }

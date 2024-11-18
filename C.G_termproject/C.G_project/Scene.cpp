@@ -118,6 +118,9 @@ void Scene::BuildObject()
 	// 플레이어, Ground, 빌딩_Mat
     player->SetPosition(glm::vec3(0.0f, 1.0f, -5.0f));
 
+    Ground* ground = new Ground();
+    gameObjects.push_back(ground);
+
     for (int i = 0; i < 1000; ++i) {
         Building* building = new Building();
         building->Setting();
@@ -165,13 +168,33 @@ void Scene::Render()
 	glUniform3f(lightColorLocation, 0.7f, 0.7f, 0.7f);
     */
 
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+
+    glm::vec3 cameraPos = glm::vec3(player->GetPosition().x, player->GetPositionAOC().y, player->GetPositionAOC().z - 0.3f);
+    glm::vec3 cameraDirection = glm::vec3(player->GetPosition().x, player->GetPositionAOC().y, player->GetPositionAOC().z);
+    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
+    view = glm::rotate(view, glm::radians(-20.f), glm::vec3(1.0f, 0.0f, 0.0f));
+    //view = glm::rotate(view, glm::radians(camera.y_rotate_aoc), glm::vec3(0.0f, 1.0f, 0.0f));
+    view = glm::translate(view, glm::vec3(-player->GetPosition().x - player->GetPositionAOC().x, 0.0f, player->GetPosition().z));
+
+    projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 50.0f);
+    projection = glm::translate(projection, glm::vec3(0.0, 0.0, -5.0));
+
+    unsigned int viewLocation = glGetUniformLocation(s_program, "view");
+    glUniformMatrix4fv(viewLocation, 1, GL_FALSE, &view[0][0]);
+
+    unsigned int projectionLocation = glGetUniformLocation(s_program, "projection");
+    glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
+
+
     player->Render(s_program);
 
-    // 오브젝트 그리기 - 빌딩, Ground 등
     for (auto obj : gameObjects) {
         obj->Render(s_program);
     }
-
 
 	glutSwapBuffers();
 	glutPostRedisplay();
@@ -203,5 +226,9 @@ void Scene::HandleKeyboard(unsigned char key, bool isPressed)
                 break;
             }
         }
+    }
+    if (key == 'w')
+    {
+        player->SetPosition(glm::vec3(+1.f, 0, 0));
     }
 }

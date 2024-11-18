@@ -29,6 +29,7 @@
 #define HEIGHT 800
 
 #define h_vertex 0.2f
+
 static GLfloat hexa[] = {   //¿∞∏È√º
     //¿≠∏È
     -h_vertex, h_vertex, h_vertex,

@@ -77,7 +77,7 @@ void Object::Update(float deltaTime)
 Bullet::Bullet()
 {
     SetScale(glm::vec3(0.3f, 0.3f, 0.4f));
-    SetColor(glm::vec3(1.0f, 1.0f, 1.0f)); // 노란색
+    SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
 Bullet::~Bullet()
@@ -88,7 +88,7 @@ void Bullet::Update(float deltaTime)
 {
     if (!active) return;
 
-    position +=  deltaTime;
+    position.z += deltaTime;
 
     // 범위를 벗어나면 비활성화
     if (position.z > 50.0f || position.z < -50.0f) {
@@ -136,4 +136,6 @@ Ground::Ground()
     //glBindVertexArray(VAO[1]);
     //glDrawArrays(GL_TRIANGLES, 0, 6);
 
+    SetScale(glm::vec3(1000.0f, 0.f, 1000.0f));
+    SetColor(glm::vec3(0.1f, 0.1f, 0.1f));
 }
