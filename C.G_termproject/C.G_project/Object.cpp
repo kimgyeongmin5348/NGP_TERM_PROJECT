@@ -20,23 +20,9 @@ Object::Object()
 
 Object::~Object()
 {
-    for (auto child : children) {
-        delete child;
-    }
 }
 
-void Object::SetParent(Object* parent)
-{
-    parent = parent;
-}
-
-void Object::AddChild(Object* child)
-{
-    child->SetParent(this);
-    children.push_back(child);
-}
-
-void Object::Render(GLuint program, const glm::mat4& parentTransform) 
+void Object::Render(GLuint program, int type) 
 {
     glm::mat4 transform = glm::mat4(1.0f);
     transform = glm::translate(transform, position);
@@ -44,8 +30,6 @@ void Object::Render(GLuint program, const glm::mat4& parentTransform)
     transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
     transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
     transform = glm::scale(transform, scale);
-
-    transform = parentTransform * transform;
 
     GLuint transformLoc = glGetUniformLocation(program, "transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
@@ -58,21 +42,17 @@ void Object::Render(GLuint program, const glm::mat4& parentTransform)
 
     // glBindVertexArray(0); 
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-
+    if (type == 1) gluSphere(qobj, 1.0, 20, 30);
+    else if (type == 2) gluCylinder(qobj, 0.3f, 1.1f, 0.5, 100, 1);
+    else if (type == 3) gluCylinder(qobj, 0.3f, 0.3f, 1.5, 100, 1);
+    else glDrawArrays(GL_TRIANGLES, 0, 36);
+    
     glBindVertexArray(0);
-
-
-    for (auto child : children) {
-        child->Render(program, transform);
-    }
 }
 
 void Object::Update(float deltaTime)
 {
-    for (auto child : children) {
-        child->Update(deltaTime);
-    }
+
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -103,9 +83,9 @@ void Bullet::Update(float deltaTime)
 
 Building::Building()
 {
-    //SetPosition(glm::vec3(position.x, 0.f, position.z));
-    //SetScale(glm::vec3(2.0f, 12.5f, 4.0f));
-    //SetColor(glm::vec3(1.0f, 0.0f, 0.5f));
+    SetPosition(glm::vec3(position.x, 0.f, position.z));
+    SetScale(glm::vec3(2.0f, 12.5f, 4.0f));
+    SetColor(glm::vec3(1.0f, 0.0f, 0.5f));
 }
 
 Building::~Building()
