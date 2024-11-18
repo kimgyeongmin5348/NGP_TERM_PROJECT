@@ -1,10 +1,11 @@
 #include "GameFramework.h"
 
-void GameFramework::Initialize(int argc, char** argv) {
+void GameFramework::Initialize(int argc, char** argv) 
+{
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowPosition(0, 0);
-    glutInitWindowSize(1200, 800);
+    glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("SkyLine");
 
     glewExperimental = GL_TRUE;
@@ -17,8 +18,8 @@ void GameFramework::Initialize(int argc, char** argv) {
     scene->Initialize(new Player());
 }
 
-void GameFramework::Run() {
-
+void GameFramework::Run() 
+{
     glutDisplayFunc([]() { Scene::GetInstance()->Render(); });
     glutReshapeFunc([](int w, int h) { Scene::GetInstance()->Resize(w, h); });
     glutKeyboardFunc([](unsigned char key, int x, int y) { Scene::GetInstance()->HandleKeyboard(key, true); });
