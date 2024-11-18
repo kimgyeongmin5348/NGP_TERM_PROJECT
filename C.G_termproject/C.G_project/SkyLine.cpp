@@ -34,9 +34,7 @@ int dwID;
 
 #define WIDTH 1200
 #define HEIGHT 800
-#define 
-
-0.2f
+#define h_vertex 0.2f
 #define pi 3.141592
 using namespace std;
 auto start_time = chrono::high_resolution_clock::now();
