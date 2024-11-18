@@ -101,7 +101,7 @@ void Scene::Initialize(Player* pPlayer)
 void Scene::BuildObject()
 {
 	// 플레이어, Ground, 빌딩_Mat
-    player->SetPositionAOC(glm::vec3(0.0f, 0.0f, 0.0f));
+    player->SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
     Ground* ground = new Ground();
     gameObjects.push_back(ground);
@@ -156,14 +156,14 @@ void Scene::Render()
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
 
-    glm::vec3 cameraPos = glm::vec3(player->GetPosition().x, player->GetPositionAOC().y, player->GetPositionAOC().z - 0.3f);
-    glm::vec3 cameraDirection = glm::vec3(player->GetPosition().x, player->GetPositionAOC().y, player->GetPositionAOC().z);
+    glm::vec3 cameraPos = glm::vec3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - 0.3f);
+    glm::vec3 cameraDirection = glm::vec3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z);
     glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
     view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
     view = glm::rotate(view, glm::radians(-20.f), glm::vec3(1.0f, 0.0f, 0.0f));
     //view = glm::rotate(view, glm::radians(camera.y_rotate_aoc), glm::vec3(0.0f, 1.0f, 0.0f));
-    view = glm::translate(view, glm::vec3(-player->GetPosition().x - player->GetPositionAOC().x, 0.0f, player->GetPosition().z));
+    view = glm::translate(view, glm::vec3(-player->GetPosition().x - player->GetPosition().x, 0.0f, player->GetPosition().z));
 
     projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 50.0f);
     projection = glm::translate(projection, glm::vec3(0.0, 0.0, -5.0));
@@ -186,7 +186,7 @@ void Scene::Render()
      player->Render(s_program);
 
     for (auto obj : gameObjects) {
-        obj->Render(s_program);
+        obj->Render(s_program, 0);
     }
         
 	glutSwapBuffers();
@@ -215,19 +215,19 @@ void Scene::HandleKeyboard(unsigned char key, bool isPressed)
         for (auto obj : gameObjects) {
             Bullet* bullet = dynamic_cast<Bullet*>(obj);
             if (bullet && !bullet->active) {
-                bullet->SetPositionAOC(player->GetPositionAOC()); // 발사 위치 설정
+                bullet->SetPosition(player->GetPosition()); // 발사 위치 설정
                 bullet->active = true;
                 break;
             }
         }
     }
     if (key == 'w' || key == 'a' || key == 's' || key == 'd') {
-        glm::vec3 pos = player->GetPositionAOC();
-        if (key == 'w') pos.z -= 1.f;
-        if (key == 'a') pos.x -= 1.f;
-        if (key == 's') pos.z += 1.f;
-        if (key == 'd') pos.x += 1.f;
-        player->SetPositionAOC(pos);
-        std::cerr << player->GetPositionAOC().x << ", " << player->GetPositionAOC().y << ", " << player->GetPositionAOC().z << std::endl;
+        glm::vec3 pos = player->GetPosition();
+        if (key == 'w') pos.z -= 0.1f;
+        if (key == 'a') pos.x -= 0.1f;
+        if (key == 's') pos.z += 0.1f;
+        if (key == 'd') pos.x += 0.1f;
+        player->SetPosition(pos);
+        std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
     }
 }

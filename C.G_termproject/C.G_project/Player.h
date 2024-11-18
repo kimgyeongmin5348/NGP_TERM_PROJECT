@@ -8,12 +8,18 @@ public:
 	~Player();
 
 	virtual void Update(float deltaTime) override;
-	virtual void Render(GLuint program, const glm::mat4& parentTransform = glm::mat4(1.0f)) override;
+	virtual void Render(GLuint program);
 
 private:
 	Object* body;
 	Object* wingLeft;
 	Object* wingRight;
-	Object* tail;
+	Object* wingConnect;
+	Object* bodyFront;
+	Object* bodyBack;
+	Object* tailFront;
+	Object* tailWing;
+	Object* bodyFloorLeft;
+	Object* bodyFloorRight;
 };
 

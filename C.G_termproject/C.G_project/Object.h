@@ -30,30 +30,22 @@ protected:
     glm::vec3 scale;
     glm::vec3 color;
 
-    Object* parent = nullptr;
-    std::vector<Object*> children;
-
 public:
     GLUquadricObj* qobj;
     GLenum obj_type{ GL_FILL };
 
 public:
     void SetPosition(const glm::vec3& pos) { position = pos; }
-    void SetPositionAOC(const glm::vec3& pos) { position_aoc = pos; }
     void SetRotation(const glm::vec3& rot) { rotation = rot; }
     void SetScale(const glm::vec3& scl) { scale = scl; }
     void SetColor(const glm::vec3& col) { color = col; }
 
     glm::vec3 GetPosition() const { return position; }
-    glm::vec3 GetPositionAOC() const { return position_aoc; }
     glm::vec3 GetRotation() const { return rotation; }
     glm::vec3 GetScale() const { return scale; }
     glm::vec3 GetColor() const { return color; }
 
-    void SetParent(Object* parent);
-    void AddChild(Object* child);
-
-    virtual void Render(GLuint program, const glm::mat4& parentTransform = glm::mat4(1.0f));
+    virtual void Render(GLuint program, int type);
     virtual void Update(float deltaTime);
 };
 
