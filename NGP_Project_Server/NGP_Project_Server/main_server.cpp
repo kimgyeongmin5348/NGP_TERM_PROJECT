@@ -58,11 +58,13 @@ void ProcessMove()
 BOOL ColidePlayerToObjects()
 {
 
+    return FALSE;
 }
 
 BOOL ColideBulletToObjects()
 {
 
+    return FALSE;
 }
 
 void DeleteObjects()
@@ -75,10 +77,6 @@ void SendPacketMadebuildings()
 
 }
 
-void SendPacketMadebuildings()
-{
-
-}
 
 DWORD WINAPI ProcessClient(LPVOID arg)
 {

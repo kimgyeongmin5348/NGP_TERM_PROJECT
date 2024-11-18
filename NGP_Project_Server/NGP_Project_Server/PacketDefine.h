@@ -23,6 +23,7 @@
 #define CLIENT_ALL_READY 8
 #define PACKET_PLAYER_MOVE 9
 
+#define TCPPORT			4000
 
 struct ClientLoginUsePacket
 {
@@ -50,12 +51,12 @@ struct StateReady
 	char size;
 	char type;
 	char id;
-	char id;
+	//char id;  <<- 이거 중복 오류 뜬다... 수정 필요
 };
 
 struct AllReady
 {
-	char zise;
+	char size;
 	char type;
 	char id;
 };
