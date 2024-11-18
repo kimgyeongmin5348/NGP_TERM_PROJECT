@@ -7,7 +7,7 @@ Player::Player()
     body = new Object();
     body->SetScale(glm::vec3(0.2f, 0.5f, 0.2f));
     body->SetColor(glm::vec3(0.5f, 0.5f, 0.5f));
-    AddChild(body);
+    SetParent(body);
 
     // 왼쪽 날개
     wingLeft = new Object();

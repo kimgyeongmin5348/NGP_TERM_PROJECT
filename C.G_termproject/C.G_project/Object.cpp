@@ -50,6 +50,9 @@ void Object::Render(GLuint program, const glm::mat4& parentTransform)
     GLuint transformLoc = glGetUniformLocation(program, "transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
+    qobj = gluNewQuadric();
+    gluQuadricDrawStyle(qobj, obj_type);
+
     GLuint colorLoc = glGetUniformLocation(program, "objectColor");
     glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
@@ -100,6 +103,9 @@ void Bullet::Update(float deltaTime)
 
 Building::Building()
 {
+    //SetPosition(glm::vec3(position.x, 0.f, position.z));
+    //SetScale(glm::vec3(2.0f, 12.5f, 4.0f));
+    //SetColor(glm::vec3(1.0f, 0.0f, 0.5f));
 }
 
 Building::~Building()
@@ -123,19 +129,6 @@ void Building::Setting()
 
 Ground::Ground()
 {
-    //glm::mat4 Bottom = glm::mat4(1.0f);
-    //Bottom = glm::scale(Bottom, glm::vec3(1000.0f, 0.f, 1000.0f));
-    //unsigned int StransformLocation = glGetUniformLocation(s_program, "transform");
-    //glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(Bottom));
-    //qobj = gluNewQuadric();
-    //gluQuadricDrawStyle(qobj, obj_type);
-    //unsigned int objColorLocation = glGetUniformLocation(s_program, "objectColor");
-    //unsigned isCheck = glGetUniformLocation(s_program, "isCheck");
-    //glUniform1f(isCheck, false);
-    //glUniform3f(objColorLocation, 0.1f, 0.1f, 0.1f);
-    //glBindVertexArray(VAO[1]);
-    //glDrawArrays(GL_TRIANGLES, 0, 6);
-
     SetScale(glm::vec3(1000.0f, 0.f, 1000.0f));
     SetColor(glm::vec3(0.1f, 0.1f, 0.1f));
 }

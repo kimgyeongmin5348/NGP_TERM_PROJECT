@@ -106,8 +106,8 @@ void Scene::InitShader()
 
 void Scene::Initialize(Player* pPlayer)
 {
-    player = pPlayer;
     InitShader();
+    player = pPlayer;
     BuildObject();
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
@@ -116,7 +116,7 @@ void Scene::Initialize(Player* pPlayer)
 void Scene::BuildObject()
 {
 	// 플레이어, Ground, 빌딩_Mat
-    player->SetPosition(glm::vec3(0.0f, 1.0f, -5.0f));
+    player->SetPositionAOC(glm::vec3(0.0f, 0.0f, 0.0f));
 
     Ground* ground = new Ground();
     gameObjects.push_back(ground);
@@ -189,13 +189,21 @@ void Scene::Render()
     unsigned int projectionLocation = glGetUniformLocation(s_program, "projection");
     glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
 
+    glm::vec4 lightPosition(0.f, 10.f, 20.f, 1.0f);
+    lightPosition = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * lightPosition;
+    
+    unsigned int lightPosLocation = glGetUniformLocation(s_program, "lightPos"); //--- lightPos 값 전달: (0.0, 0.0, 5.0);
+    glUniform3f(lightPosLocation, lightPosition.x, lightPosition.y, lightPosition.z);
+    
+    unsigned int lightColorLocation = glGetUniformLocation(s_program, "lightColor"); //--- lightColor 값 전달: (1.0, 1.0, 1.0) 백색
+    glUniform3f(lightColorLocation, 0.7f, 0.7f, 0.7f);
 
-    player->Render(s_program);
+     player->Render(s_program);
 
     for (auto obj : gameObjects) {
         obj->Render(s_program);
     }
-
+        
 	glutSwapBuffers();
 	glutPostRedisplay();
 }
@@ -221,14 +229,19 @@ void Scene::HandleKeyboard(unsigned char key, bool isPressed)
         for (auto obj : gameObjects) {
             Bullet* bullet = dynamic_cast<Bullet*>(obj);
             if (bullet && !bullet->active) {
-                bullet->SetPosition(player->GetPosition()); // 발사 위치 설정
+                bullet->SetPositionAOC(player->GetPositionAOC()); // 발사 위치 설정
                 bullet->active = true;
                 break;
             }
         }
     }
-    if (key == 'w')
-    {
-        player->SetPosition(glm::vec3(+1.f, 0, 0));
+    if (key == 'w' || key == 'a' || key == 's' || key == 'd') {
+        glm::vec3 pos = player->GetPositionAOC();
+        if (key == 'w') pos.z -= 1.f;
+        if (key == 'a') pos.x -= 1.f;
+        if (key == 's') pos.z += 1.f;
+        if (key == 'd') pos.x += 1.f;
+        player->SetPositionAOC(pos);
+        std::cerr << player->GetPositionAOC().x << ", " << player->GetPositionAOC().y << ", " << player->GetPositionAOC().z << std::endl;
     }
 }

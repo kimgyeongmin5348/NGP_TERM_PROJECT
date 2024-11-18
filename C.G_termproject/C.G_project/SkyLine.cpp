@@ -1,4 +1,4 @@
-//#include "stdafx.h"
+ï»¿//#include "stdafx.h"
 #define _CRT_SECURE_NO_WARNINGS
 
 #define Engin "C:/Users/kimkh/Desktop/C.G_test/C.G_project/C.G_project/sound/engins.mp3"
@@ -25,7 +25,7 @@
 #include <mmsystem.h>
 #include <Digitalv.h>
 
-MCI_OPEN_PARMS openBgm;     // MCI_OPEN_PARMS´Â MCI_OPEN Ä¿¸Çµå¸¦ À§ÇÑ Á¤º¸°¡ ´ã±ä ±¸Á¶Ã¼
+MCI_OPEN_PARMS openBgm;     // MCI_OPEN_PARMSëŠ” MCI_OPEN ì»¤ë§¨ë“œë¥¼ ìœ„í•œ ì •ë³´ê°€ ë‹´ê¸´ êµ¬ì¡°ì²´
 MCI_PLAY_PARMS playBgm;
 MCI_OPEN_PARMS openShuffleSound;
 MCI_PLAY_PARMS playShuffleSound;
@@ -47,7 +47,7 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> random_color(0.1, 1);
 
-// ÄÜ¼Ö¿¡ coutÀ» ÅëÇØ µğ¹ö±ëÀ» ¿ëÀÌÇÏ°Ô ÇÏ±â À§ÇÔ
+// ì½˜ì†”ì— coutì„ í†µí•´ ë””ë²„ê¹…ì„ ìš©ì´í•˜ê²Œ í•˜ê¸° ìœ„í•¨
 bool test = true;
 
 GLvoid drawScene();
@@ -126,8 +126,8 @@ GLint g_window_w, g_window_h;
 //Camera_Option CO, C1;
 
 //GLvoid Setting();
-GLfloat hexa[] = {   //À°¸éÃ¼
-    //À­¸é
+GLfloat hexa[] = {   //ìœ¡ë©´ì²´
+    //ìœ—ë©´
     -h_vertex, h_vertex, h_vertex,
     h_vertex, h_vertex, h_vertex,
     -h_vertex, h_vertex, -h_vertex,
@@ -135,7 +135,7 @@ GLfloat hexa[] = {   //À°¸éÃ¼
     h_vertex, h_vertex, h_vertex,
     h_vertex, h_vertex, -h_vertex,
     -h_vertex, h_vertex, -h_vertex,
-    //Á¤¸é
+    //ì •ë©´
     -h_vertex, -h_vertex, h_vertex,
     h_vertex, -h_vertex, h_vertex,
     -h_vertex, h_vertex, h_vertex,
@@ -144,7 +144,7 @@ GLfloat hexa[] = {   //À°¸éÃ¼
     h_vertex, h_vertex, h_vertex,
     -h_vertex, h_vertex, h_vertex,
 
-    //¾Æ·§¸é
+    //ì•„ë«ë©´
     -h_vertex, -h_vertex, h_vertex,
     -h_vertex, -h_vertex, -h_vertex,
     h_vertex, -h_vertex, -h_vertex,
@@ -153,7 +153,7 @@ GLfloat hexa[] = {   //À°¸éÃ¼
     h_vertex, -h_vertex, -h_vertex,
     h_vertex, -h_vertex, h_vertex,
 
-    //µŞ¸é
+    //ë’·ë©´
     h_vertex, -h_vertex, -h_vertex,
     -h_vertex, -h_vertex, -h_vertex,
     h_vertex, h_vertex, -h_vertex,
@@ -163,7 +163,7 @@ GLfloat hexa[] = {   //À°¸éÃ¼
     h_vertex, h_vertex, -h_vertex,
 
 
-    //ÁÂÃø¸é
+    //ì¢Œì¸¡ë©´
     -h_vertex, -h_vertex, -h_vertex,
     -h_vertex, h_vertex, h_vertex,
     -h_vertex, h_vertex, -h_vertex,
@@ -172,7 +172,7 @@ GLfloat hexa[] = {   //À°¸éÃ¼
     -h_vertex, -h_vertex, h_vertex,
     -h_vertex, h_vertex, h_vertex,
 
-    //¿ìÃø¸é
+    //ìš°ì¸¡ë©´
     h_vertex, -h_vertex, h_vertex,
     h_vertex, -h_vertex, -h_vertex,
     h_vertex, h_vertex, h_vertex,
@@ -265,15 +265,15 @@ GLvoid InitBuffer()
 
 
     //glUseProgram(s_program);
-    //unsigned int lightPosLocation = glGetUniformLocation(s_program, "lightPos"); //--- lightPos °ª Àü´Ş: (0.0, 0.0, 5.0);
+    //unsigned int lightPosLocation = glGetUniformLocation(s_program, "lightPos"); //--- lightPos ê°’ ì „ë‹¬: (0.0, 0.0, 5.0);
     //glUniform3f(lightPosLocation, 5.0f, 10.0f, 0.0f);
-    //unsigned int lightColorLocation = glGetUniformLocation(s_program, "lightColor"); //--- lightColor °ª Àü´Ş: (1.0, 1.0, 1.0) ¹é»ö
+    //unsigned int lightColorLocation = glGetUniformLocation(s_program, "lightColor"); //--- lightColor ê°’ ì „ë‹¬: (1.0, 1.0, 1.0) ë°±ìƒ‰
     //glUniform3f(lightColorLocation, 1.0f, 1.0f, 1.0f);
-    //unsigned int objColorLocation = glGetUniformLocation(s_program, "objectColor"); //--- object Color°ª Àü´Ş: (1.0, 0.5, 0.3)ÀÇ »ö
+    //unsigned int objColorLocation = glGetUniformLocation(s_program, "objectColor"); //--- object Colorê°’ ì „ë‹¬: (1.0, 0.5, 0.3)ì˜ ìƒ‰
     //glUniform3f(objColorLocation, 0.7f, 0.7f, 0.4f);
 }
 
-//GLint Collision(float first_x1, float first_x2, float last_x1, float last_x2)  // i'am Ãæµ¹Ã¼Å©¿¡¿ä
+//GLint Collision(float first_x1, float first_x2, float last_x1, float last_x2)  // i'am ì¶©ëŒì²´í¬ì—ìš”
 //{
 //    if (first_x1 <= last_x1 && last_x1 <= first_x2)
 //        return 1;
@@ -286,7 +286,7 @@ GLvoid InitBuffer()
 //    return 0;
 //}
 
-// ÇÃ·¹ÀÌ¾î - °Ç¹° Ãæµ¹ Ã¼Å©
+// í”Œë ˆì´ì–´ - ê±´ë¬¼ ì¶©ëŒ ì²´í¬
 GLvoid CollisionCheckPB(int i, int j)
 {
     if ((build[i][j].x_trans - 0.6f) < pilot.x_trans_aoc && pilot.x_trans_aoc < (build[i][j].x_trans + 0.6f) && pilot.y_trans_aoc < build[i][j].y_scale / 5 - 0.2f) {
@@ -295,23 +295,23 @@ GLvoid CollisionCheckPB(int i, int j)
         memcpy(&h_f, &temp_f, sizeof(h_f));
 
         if (test)
-            cout << "Ãæµ¹" << i << "/" << j << " : " << pilot.x_trans_aoc << ", " << pilot.y_trans_aoc << ", " << build[i][j].y_scale / 5 << '\n';
+            cout << "ì¶©ëŒ" << i << "/" << j << " : " << pilot.x_trans_aoc << ", " << pilot.y_trans_aoc << ", " << build[i][j].y_scale / 5 << '\n';
         
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
         double elapsed_seconds = duration.count() * 1e-6;
-        std::cout << "»ıÁ¸ ½Ã°£: " << elapsed_seconds << " ÃÊ!" << std::endl;
+        std::cerr << "ìƒì¡´ ì‹œê°„: " << elapsed_seconds << " ì´ˆ!" << std::endl;
         start_time = std::chrono::high_resolution_clock::now();
     }
 }
 
-// ÃÑ¾Ë - °Ç¹° Ãæµ¹ Ã¼Å©
+// ì´ì•Œ - ê±´ë¬¼ ì¶©ëŒ ì²´í¬
 GLvoid CollisionCheckBB(int i, int j)
 {
     if ((build[i][j].x_trans - 0.6f) < bullet.x_trans_aoc && bullet.x_trans_aoc < (build[i][j].x_trans + 0.6f) && bullet.y_trans_aoc < build[i][j].y_scale / 5 - 0.2f && bullet.z_trans_aoc < (build[i][j].z_trans + 1) && bullet.z_trans_aoc >(build[i][j].z_trans - 1)) {
         
         if(test)
-            cout << "ÃÑ¾Ë Ãæµ¹" << i << " : " << bullet.x_trans_aoc << ", " << bullet.y_trans_aoc << ", " << build[i][j].y_scale / 5 << "," << bullet.z_trans_aoc << ":::" << build[i][j].z_trans_aoc << '\n';
+            cout << "ì´ì•Œ ì¶©ëŒ" << i << " : " << bullet.x_trans_aoc << ", " << bullet.y_trans_aoc << ", " << build[i][j].y_scale / 5 << "," << bullet.z_trans_aoc << ":::" << build[i][j].z_trans_aoc << '\n';
         
         build[i][j].y_scale = 0;
     }
@@ -335,7 +335,7 @@ GLvoid RenderBuilding()
             int objColorLocation = glGetUniformLocation(s_program, "objectColor");
             unsigned isCheck = glGetUniformLocation(s_program, "isCheck");
             glUniform1f(isCheck, false);
-            glm::vec4 cubeColor = glm::vec4(1.0f, 0.0f, 0.5f, 1.0f); // »ö»óÀ» ¿øÇÏ´Â °ªÀ¸·Î ¼³Á¤
+            glm::vec4 cubeColor = glm::vec4(1.0f, 0.0f, 0.5f, 1.0f); // ìƒ‰ìƒì„ ì›í•˜ëŠ” ê°’ìœ¼ë¡œ ì„¤ì •
             glUniform3f(objColorLocation, cubeColor.r, cubeColor.g, cubeColor.b);
             glBindVertexArray(VAO[0]);
             glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -350,9 +350,9 @@ GLfloat C_R;
 GLfloat arm_rot;
 GLfloat limit;
 
-GLvoid RenderPilot() // i'am Çï±â(Á¶Á¾»ç) ¿¡¿ä
+GLvoid RenderPilot() // i'am í—¬ê¸°(ì¡°ì¢…ì‚¬) ì—ìš”
 {
-    // ³¯°³ ¿¬°áºÎ
+    // ë‚ ê°œ ì—°ê²°ë¶€
     glm::mat4 H_Matrix = glm::mat4(1.0f);
     H_Matrix = glm::translate(H_Matrix, glm::vec3(0.f, pilot.y_trans_aoc, pilot.z_trans_aoc));  // all
     H_Matrix = glm::translate(H_Matrix, glm::vec3(pilot.x_trans_aoc, 0.f, 0.f));  // all
@@ -372,7 +372,7 @@ GLvoid RenderPilot() // i'am Çï±â(Á¶Á¾»ç) ¿¡¿ä
     //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // ³¯°³ 1
+    // ë‚ ê°œ 1
     glm::mat4 H_Matrix1 = glm::mat4(1.0f);
     H_Matrix1 = glm::translate(H_Matrix1, glm::vec3(0.f, pilot.y_trans_aoc, pilot.z_trans_aoc));  // all
     H_Matrix1 = glm::translate(H_Matrix1, glm::vec3(pilot.x_trans_aoc, 0.f, 0.f));  // all
@@ -393,7 +393,7 @@ GLvoid RenderPilot() // i'am Çï±â(Á¶Á¾»ç) ¿¡¿ä
     //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // ³¯°³ 2
+    // ë‚ ê°œ 2
     glm::mat4 H_Matrix2 = glm::mat4(1.0f);
     H_Matrix2 = glm::translate(H_Matrix2, glm::vec3(0.f, pilot.y_trans_aoc, pilot.z_trans_aoc));  // all
     H_Matrix2 = glm::translate(H_Matrix2, glm::vec3(pilot.x_trans_aoc, 0.f, 0.f));  // all
@@ -414,7 +414,7 @@ GLvoid RenderPilot() // i'am Çï±â(Á¶Á¾»ç) ¿¡¿ä
     //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // ¸öÅë Áß°£
+    // ëª¸í†µ ì¤‘ê°„
     glm::mat4 H_Matrix3 = glm::mat4(1.0f);
     H_Matrix3 = glm::translate(H_Matrix3, glm::vec3(0.f, pilot.y_trans_aoc, pilot.z_trans_aoc));  // all
     H_Matrix3 = glm::translate(H_Matrix3, glm::vec3(pilot.x_trans_aoc, 0.f, 0.f));  // all
@@ -433,7 +433,7 @@ GLvoid RenderPilot() // i'am Çï±â(Á¶Á¾»ç) ¿¡¿ä
     //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    // ¸öÅë ¾Õ
+    // ëª¸í†µ ì•
     glm::mat4 H_Matrix4 = glm::mat4(1.0f);
     H_Matrix4 = glm::translate(H_Matrix4, glm::vec3(0.f, pilot.y_trans_aoc, pilot.z_trans_aoc));
     H_Matrix4 = glm::translate(H_Matrix4, glm::vec3(pilot.x_trans_aoc, 0.f, 0.f));
@@ -452,7 +452,7 @@ GLvoid RenderPilot() // i'am Çï±â(Á¶Á¾»ç) ¿¡¿ä
     //glBindVertexArray(VAO[0]);
     gluSphere(qobj, 1.0, 20, 30);
 
-    // ¸öÅë µÚ
+    // ëª¸í†µ ë’¤
     glm::mat4 H_Matrix5 = glm::mat4(1.0f);
     H_Matrix5 = glm::translate(H_Matrix5, glm::vec3(0.f, pilot.y_trans_aoc, pilot.z_trans_aoc));  // all
     H_Matrix5 = glm::translate(H_Matrix5, glm::vec3(pilot.x_trans_aoc, 0.f, 0.f));  // all
@@ -471,7 +471,7 @@ GLvoid RenderPilot() // i'am Çï±â(Á¶Á¾»ç) ¿¡¿ä
     //glBindVertexArray(VAO[0]);
     gluCylinder(qobj, 0.3f, 1.1f, 0.5, 100, 1);
 
-    // ¸öÅë µÚ(²¿¸®¾Õ)
+    // ëª¸í†µ ë’¤(ê¼¬ë¦¬ì•)
     glm::mat4 H_Matrix6 = glm::mat4(1.0f);
     H_Matrix6 = glm::translate(H_Matrix6, glm::vec3(0.f, pilot.y_trans_aoc, pilot.z_trans_aoc));  // all
     H_Matrix6 = glm::translate(H_Matrix6, glm::vec3(pilot.x_trans_aoc, 0.f, 0.f));  // all
@@ -490,7 +490,7 @@ GLvoid RenderPilot() // i'am Çï±â(Á¶Á¾»ç) ¿¡¿ä
     //glBindVertexArray(VAO[0]);
     gluCylinder(qobj, 0.3f, 0.3f, 1.5, 100, 1);
 
-    // ¸öÅë µÚ(²¿¸® ³¯°³)
+    // ëª¸í†µ ë’¤(ê¼¬ë¦¬ ë‚ ê°œ)
     glm::mat4 H_Matrix7 = glm::mat4(1.0f);
     H_Matrix7 = glm::translate(H_Matrix7, glm::vec3(0.f, pilot.y_trans_aoc, pilot.z_trans_aoc));  // all
     H_Matrix7 = glm::translate(H_Matrix7, glm::vec3(pilot.x_trans_aoc, 0.f, 0.f));  // all
@@ -509,7 +509,7 @@ GLvoid RenderPilot() // i'am Çï±â(Á¶Á¾»ç) ¿¡¿ä
     //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    //º»Ã¼ ¹Ù´Ú(¿ŞÂÊ)
+    //ë³¸ì²´ ë°”ë‹¥(ì™¼ìª½)
     H_Matrix = glm::mat4(1.0f);
     H_Matrix = glm::translate(H_Matrix, glm::vec3(0.f, pilot.y_trans_aoc, pilot.z_trans_aoc));
     H_Matrix = glm::translate(H_Matrix, glm::vec3(pilot.x_trans_aoc, 0.f, 0.f));
@@ -528,7 +528,7 @@ GLvoid RenderPilot() // i'am Çï±â(Á¶Á¾»ç) ¿¡¿ä
     //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    //º»Ã¼ ¹Ù´Ú2
+    //ë³¸ì²´ ë°”ë‹¥2
     H_Matrix = glm::mat4(1.0f);
     H_Matrix = glm::translate(H_Matrix, glm::vec3(0.f, pilot.y_trans_aoc, pilot.z_trans_aoc));
     H_Matrix = glm::translate(H_Matrix, glm::vec3(pilot.x_trans_aoc, 0.f, 0.f));
@@ -601,7 +601,7 @@ GLvoid Ground()
 void drawScene()
 {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // ±íÀÌ °Ë»ç (Å¬¸®ÇÎ)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // ê¹Šì´ ê²€ì‚¬ (í´ë¦¬í•‘)
     glUseProgram(s_program);
 
     glm::mat4 view = glm::mat4(1.0f);
@@ -611,7 +611,7 @@ void drawScene()
         if (i == 0) {
             glViewport(0, 0, WIDTH, HEIGHT);
 
-            if (!h_f.first_see) { // 3ÀÎÄª ½ÃÁ¡
+            if (!h_f.first_see) { // 3ì¸ì¹­ ì‹œì 
                 glm::vec3 cameraPos = glm::vec3(pilot.x_trans, pilot.y_trans_aoc, pilot.z_trans_aoc - 0.3f);
                 glm::vec3 cameraDirection = glm::vec3(pilot.x_trans, pilot.y_trans_aoc, pilot.z_trans_aoc);
                 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -621,7 +621,7 @@ void drawScene()
                 view = glm::rotate(view, glm::radians(camera.y_rotate_aoc), glm::vec3(0.0f, 1.0f, 0.0f));
                 view = glm::translate(view, glm::vec3(-pilot.x_trans - pilot.x_trans_aoc, 0.0f, pilot.z_trans));
             }
-            else { // 1ÀÎÄª ½ÃÁ¡
+            else { // 1ì¸ì¹­ ì‹œì 
                 glm::vec3 cameraPos = glm::vec3(0.f, 0.5f, 5.7f);
                 glm::vec3 cameraDirection = glm::vec3(0.0f, 0.5f, 5.95f);
                 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -635,7 +635,7 @@ void drawScene()
             projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 50.0f);
             projection = glm::translate(projection, glm::vec3(0.0, 0.0, -5.0));
         }
-        else { // ¹Ì´Ï¸Ê
+        else { // ë¯¸ë‹ˆë§µ
             glViewport(1050, 550, 150, 150);
             glm::vec3 cameraPos = glm::vec3(pilot.x_trans_aoc, 5.0f, pilot.z_trans);
             glm::vec3 cameraDirection = glm::vec3(pilot.x_trans_aoc, 0.0f, pilot.z_trans);
@@ -659,11 +659,11 @@ void drawScene()
         glm::vec4 lightPosition(lightInitialX, lightInitialY, lightInitialZ, 1.0f);
         lightPosition = glm::rotate(glm::mat4(1.0f), lightRotationAngle, glm::vec3(1.0f, 0.0f, 0.0f)) * lightPosition;
         glUseProgram(s_program);
-        unsigned int lightPosLocation = glGetUniformLocation(s_program, "lightPos"); //--- lightPos °ª Àü´Ş: (0.0, 0.0, 5.0);
+        unsigned int lightPosLocation = glGetUniformLocation(s_program, "lightPos"); //--- lightPos ê°’ ì „ë‹¬: (0.0, 0.0, 5.0);
         glUniform3f(lightPosLocation, lightPosition.x, lightPosition.y, lightPosition.z);
         // glUniform3f(lightPosLocation, 4, 10, 10.f);
         // glUniform3f(lightPosLocation, pilot.x_trans_aoc * 10, pilot.y_trans_aoc * 10, 0.5f);
-        unsigned int lightColorLocation = glGetUniformLocation(s_program, "lightColor"); //--- lightColor °ª Àü´Ş: (1.0, 1.0, 1.0) ¹é»ö
+        unsigned int lightColorLocation = glGetUniformLocation(s_program, "lightColor"); //--- lightColor ê°’ ì „ë‹¬: (1.0, 1.0, 1.0) ë°±ìƒ‰
         glUniform3f(lightColorLocation, 0.7f, 0.7f, 0.7f);
         // cout << pilot.x_trans_aoc << '\n';
 
@@ -732,11 +732,11 @@ GLvoid KeyBoard(unsigned char key, int x, int y)
         break;
     case '1':
         h_f.first_see = true;
-        // cout << "1ÀÎÄª" << endl;
+        // cout << "1ì¸ì¹­" << endl;
         break;
     case '3':
         h_f.first_see = false;
-        // cout << "3ÀÎÄª" << endl;
+        // cout << "3ì¸ì¹­" << endl;
         break;
     case ' ':
         h_f.shoot_bullet = true;
@@ -786,26 +786,26 @@ GLvoid FrameAdvance(int value)
     }
 
     if (h_f.right_walk) {
-        if (pilot.x_trans_aoc > -4)   // pilotÀÌ ÃÖ´ë ¿òÁ÷ÀÏ ¼ö ÀÖ´Â °ø°£
+        if (pilot.x_trans_aoc > -4)   // pilotì´ ìµœëŒ€ ì›€ì§ì¼ ìˆ˜ ìˆëŠ” ê³µê°„
             pilot.x_trans_aoc -= 0.05f;
         if (pilot.z_rotate < 15)
             pilot.z_rotate += 1.0f;
 
     }
     else if (h_f.left_walk) {
-        if (pilot.x_trans_aoc < 4)    // pilotÀÌ ÃÖ´ë ¿òÁ÷ÀÏ ¼ö ÀÖ´Â °ø°£
+        if (pilot.x_trans_aoc < 4)    // pilotì´ ìµœëŒ€ ì›€ì§ì¼ ìˆ˜ ìˆëŠ” ê³µê°„
             pilot.x_trans_aoc += 0.05f;
         if (pilot.z_rotate > -15)
             pilot.z_rotate -= 1.0f;
     }
     else if (h_f.back_walk) {
-        if (pilot.y_trans_aoc > 0)      // pilotÀÌ ÃÖ´ë ³»·Á°¥ ¼ö ÀÖ´Â °ø°£ 
+        if (pilot.y_trans_aoc > 0)      // pilotì´ ìµœëŒ€ ë‚´ë ¤ê°ˆ ìˆ˜ ìˆëŠ” ê³µê°„ 
             pilot.y_trans_aoc -= 0.03f;
         if (pilot.x_rotate > -15)
             pilot.x_rotate -= 1.0f;
     }
     else if (h_f.front_walk) {
-        if (pilot.y_trans_aoc < 4)      // pilotÀÌ ÃÖ´ë ¿Ã¶ó°¥ ¼ö ÀÖ´Â °ø°£ 
+        if (pilot.y_trans_aoc < 4)      // pilotì´ ìµœëŒ€ ì˜¬ë¼ê°ˆ ìˆ˜ ìˆëŠ” ê³µê°„ 
             pilot.y_trans_aoc += 0.03f;
         if (pilot.x_rotate < 15)
             pilot.x_rotate += 1.0f;
@@ -821,10 +821,10 @@ GLvoid FrameAdvance(int value)
             pilot.z_rotate += 1.0f;
     }
 
-    // ÇÁ·ÎÆç·¯ È¸Àü
+    // í”„ë¡œí ëŸ¬ íšŒì „
     pilot.y_rotate_aoc += 10;
 
-    // ÃÑ¾Ë event
+    // ì´ì•Œ event
     if (h_f.shoot_bullet)
         bullet.z_trans_aoc += 0.3f;
     if (bullet.z_trans_aoc > 15) {
@@ -837,7 +837,7 @@ GLvoid FrameAdvance(int value)
     if (h_f.game_start) {
         std::uniform_real_distribution<float> random_building_come(0.000001, 0.4);
 
-        // °Ç¹° ´Ù°¡¿À±â
+        // ê±´ë¬¼ ë‹¤ê°€ì˜¤ê¸°
         for (int i = 0; i < BUILDING_COUNT; ++i) {
             for (int j = 0; j < BUILDING_COUNT_J; ++j) {
                 build[i][j].z_trans -= random_building_come(gen);
@@ -846,7 +846,7 @@ GLvoid FrameAdvance(int value)
                     CollisionCheckPB(i, j);
                 }
 
-                //if (build[i][j].z_trans < -30.8f) {  // Ãæµ¹ °¨Áö ÇØ¾ßÇÏ´Â ½ÃÁ¡
+                //if (build[i][j].z_trans < -30.8f) {  // ì¶©ëŒ ê°ì§€ í•´ì•¼í•˜ëŠ” ì‹œì 
                     //building_setting_flag = false;
                     // Building_Setting();
                     // build[i][j].z_trans = 40.f;
@@ -873,7 +873,7 @@ GLvoid SetBuildings(int value)
             build[i][value].y_scale = random_building_hight(gen);
             build[i][value].z_trans = 40.0f;
 
-            /*cout << "ºôµù »ı¼º À§Ä¡ [" << i << "]" << '\n';
+            /*cout << "ë¹Œë”© ìƒì„± ìœ„ì¹˜ [" << i << "]" << '\n';
             cout << "[x] : " << build[i][j].x_trans << '\n';
             cout << "[y_scale] : " << build[i][j].y_scale << '\n';*/
         }
@@ -889,7 +889,7 @@ GLvoid SetBuildings(int value)
                 build[i][j].y_scale = random_building_hight(gen);
                 build[i][j].z_trans = 40.0f;
 
-                //cout << "ºôµù »ı¼º À§Ä¡ [" << i << "]" << '\n';
+                //cout << "ë¹Œë”© ìƒì„± ìœ„ì¹˜ [" << i << "]" << '\n';
                 //cout << "[x] : " << build[i][j].x_trans << '\n';
                 //cout << "[y_scale] : " << build[i][j].y_scale << '\n';
             }
