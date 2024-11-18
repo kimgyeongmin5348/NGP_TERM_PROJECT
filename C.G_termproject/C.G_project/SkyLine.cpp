@@ -350,7 +350,7 @@ GLfloat C_R;
 GLfloat arm_rot;
 GLfloat limit;
 
-GLvoid RenderPilot() // i'am 헬기(조종사) 에요
+GLvoid tRenderPilot() // i'am 헬기(조종사) 에요
 {
     // 날개 연결부
     glm::mat4 H_Matrix = glm::mat4(1.0f);
@@ -547,6 +547,74 @@ GLvoid RenderPilot() // i'am 헬기(조종사) 에요
     //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
+
+void SetTransformAndDraw(const glm::mat4& matrix, GLuint program, GLuint vao, const glm::vec3& color, bool isCheck) 
+{
+    GLuint transformLoc = glGetUniformLocation(program, "transform");
+    GLuint colorLoc = glGetUniformLocation(program, "objectColor");
+    GLuint checkLoc = glGetUniformLocation(program, "isCheck");
+
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(matrix));
+    glUniform3f(colorLoc, color.r, color.g, color.b);
+    glUniform1f(checkLoc, isCheck);
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void RenderPart(const glm::mat4& baseMatrix, const glm::vec3& translate, const glm::vec3& scale,
+                GLuint program, GLuint vao, const glm::vec3& color, bool isCheck)
+{
+    glm::mat4 matrix = glm::translate(baseMatrix, translate);
+    matrix = glm::scale(matrix, scale);
+    SetTransformAndDraw(matrix, program, vao, color, isCheck);
+}
+
+void RenderRotatingPart(const glm::mat4& baseMatrix, const glm::vec3& translate, const glm::vec3& scale,
+                        const glm::vec3& rotationAxis, float angle, GLuint program, GLuint vao,
+                        const glm::vec3& color, bool isCheck) 
+{
+    glm::mat4 matrix = glm::translate(baseMatrix, translate);
+    matrix = glm::rotate(matrix, glm::radians(angle), rotationAxis); // 회전 적용
+    matrix = glm::scale(matrix, scale);
+    SetTransformAndDraw(matrix, program, vao, color, isCheck);
+}
+
+void RenderPilot() {
+    // 기본 변환 행렬 (헬기 전체)
+    glm::mat4 baseMatrix = glm::mat4(1.0f);
+    baseMatrix = glm::translate(baseMatrix, glm::vec3(0.f, pilot.y_trans_aoc, pilot.z_trans_aoc));
+    baseMatrix = glm::translate(baseMatrix, glm::vec3(pilot.x_trans_aoc, 0.f, 0.f));
+    baseMatrix = glm::rotate(baseMatrix, glm::radians(pilot.x_rotate), glm::vec3(1.0f, 0.f, 0.f));
+    baseMatrix = glm::rotate(baseMatrix, glm::radians(pilot.z_rotate), glm::vec3(0.f, 0.f, 1.0f));
+    //baseMatrix = glm::rotate(baseMatrix, glm::radians(pilot.y_rotate_aoc), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    // VAO와 프로그램, 기본 색상
+    GLuint vao = VAO[0];
+    GLuint program = s_program;
+    glm::vec3 defaultColor = glm::vec3(0.5f, 0.5f, 0.5f);
+
+    // 헬기 본체
+    RenderPart(baseMatrix, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.2f, 0.5f, 0.2f), program, vao, defaultColor, false);
+
+    // 회전하는 날개 1
+    RenderRotatingPart(baseMatrix, glm::vec3(0.0f, 1.1f, 0.0f), glm::vec3(4.5f, 0.2f, 0.2f),
+                        glm::vec3(0.0f, 1.0f, 0.0f), pilot.y_rotate_aoc, program, vao, defaultColor, false);
+
+    // 회전하는 날개 2
+    RenderRotatingPart(baseMatrix, glm::vec3(0.0f, 1.1f, 0.0f), glm::vec3(0.2f, 0.2f, 4.5f),
+                        glm::vec3(0.0f, 1.0f, 0.0f), pilot.y_rotate_aoc, program, vao, defaultColor, false);
+
+    // 기타 부품 (몸통, 꼬리 등)
+    RenderPart(baseMatrix, glm::vec3(0.f, 0.7f, -0.2f), glm::vec3(1.1f, 1.1f, 3.0f), program, vao, defaultColor, false); // 몸통 중간
+    RenderPart(baseMatrix, glm::vec3(0.f, 0.65f, 0.3f), glm::vec3(0.3f, 0.3f, 0.4f), program, vao, defaultColor, false); // 몸통 앞
+    RenderPart(baseMatrix, glm::vec3(0.f, 0.7f, -1.0f), glm::vec3(0.2f, 0.2f, 1.0f), program, vao, defaultColor, false); // 몸통 뒤
+    RenderPart(baseMatrix, glm::vec3(0.f, 0.7f, -1.7f), glm::vec3(0.2f, 0.2f, 1.0f), program, vao, defaultColor, false); // 꼬리 앞
+    RenderPart(baseMatrix, glm::vec3(0.f, 0.8f, -1.6f), glm::vec3(0.1f, 0.7f, 0.5f), program, vao, defaultColor, false); // 꼬리 날개
+    RenderPart(baseMatrix, glm::vec3(0.3f, 0.2f, -0.3f), glm::vec3(0.2f, 0.2f, 2.5f), program, vao, defaultColor, false); // 바닥 왼쪽
+    RenderPart(baseMatrix, glm::vec3(-0.3f, 0.2f, -0.3f), glm::vec3(0.2f, 0.2f, 2.5f), program, vao, defaultColor, false); // 바닥 오른쪽
+}
+
+
 
 bool bullet_flag = false;
 GLvoid RenderBullet()

@@ -56,7 +56,7 @@ void Object::Render(GLuint program, const glm::mat4& parentTransform)
     GLuint colorLoc = glGetUniformLocation(program, "objectColor");
     glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
-    // glBindVertexArray(0); 
+    // glBindVertexArray(0);
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -103,9 +103,9 @@ void Bullet::Update(float deltaTime)
 
 Building::Building()
 {
-    //SetPosition(glm::vec3(position.x, 0.f, position.z));
-    //SetScale(glm::vec3(2.0f, 12.5f, 4.0f));
-    //SetColor(glm::vec3(1.0f, 0.0f, 0.5f));
+    SetPosition(glm::vec3(position.x, 0.f, position.z));
+    SetScale(glm::vec3(2.0f, 12.5f, 4.0f));
+    SetColor(glm::vec3(1.0f, 0.0f, 0.5f));
 }
 
 Building::~Building()
