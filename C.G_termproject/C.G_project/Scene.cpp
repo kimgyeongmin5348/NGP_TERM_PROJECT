@@ -195,6 +195,7 @@ void Scene::Render()
 
 void Scene::Update(float deltaTime)
 {
+    std::cout << deltaTime << '\n';
     player->Update(deltaTime);
 
     for (auto obj : gameObjects) {

@@ -18,17 +18,22 @@ void GameFramework::Initialize(int argc, char** argv)
     scene->Initialize(new Player());
 }
 
+void GameFramework::TimerCallback(int value)
+{
+    float currentTime = static_cast<float>(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+    Scene::GetInstance()->Update(currentTime);
+    glutPostRedisplay();
+    glutTimerFunc(16, TimerCallback, 0); // 타이머를 다시 등록
+}
+
 void GameFramework::Run() 
 {
     glutDisplayFunc([]() { Scene::GetInstance()->Render(); });
     glutReshapeFunc([](int w, int h) { Scene::GetInstance()->Resize(w, h); });
     glutKeyboardFunc([](unsigned char key, int x, int y) { Scene::GetInstance()->HandleKeyboard(key, true); });
     glutKeyboardUpFunc([](unsigned char key, int x, int y) { Scene::GetInstance()->HandleKeyboard(key, false); });
-    glutTimerFunc(16, [](int value) {
-        float currentTime = static_cast<float>(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
-        Scene::GetInstance()->Update(currentTime);
-        glutPostRedisplay();
-        }, 0);
+        
+    glutTimerFunc(16, TimerCallback, 0);
 
     glutMainLoop();
 }

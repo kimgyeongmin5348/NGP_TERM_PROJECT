@@ -8,6 +8,8 @@ public:
     void Run();
     void Shutdown();
 
+    static void TimerCallback(int value);
+
 private:
     Scene* scene;
 };
