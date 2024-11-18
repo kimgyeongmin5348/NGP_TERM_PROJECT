@@ -97,7 +97,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         }
 
         switch (type) {
-        case PACKET_ID:
+        case PACKET_ID: // Login 처리
         {
             char playerid[MAX_ID_SIZE];
             retval = recvn(client_sock, playerid, MAX_ID_SIZE, 0);
@@ -120,7 +120,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
         }
         break;
-        case CLIENT_READY:
+        case CLIENT_READY: // Lobby 준비 상태 처리
         {
             ReadyClientToServer readyPacket;
             retval = recvn(client_sock, (char*)&readyPacket, sizeof(readyPacket), 0);
@@ -131,13 +131,23 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             SendReadyServerToClient();
         }
         break;
+        case PACKET_PLAYER_MOVE:  // 게임 중 플레이어 이동 처리 
+        {
+            PacketPlayerMove movePacket;
+            retval = recvn(client_sock, (char*)&movePacket, sizeof(movePacket), 0);
+            if (retval == SOCKET_ERROR) {
+                err_display("recv()");
+                break;
+            }
+            Player[ClientNum] = movePacket;
+        }
+        break;
         }
 
         if (ClientNum < 2) SetEvent(ClientEvent[ClientNum + 1]);
         if (ClientNum == 2) SetEvent(UpdateEvent);
 
         WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
-        SendObjectList(client_sock);
 
         SetEvent(ClientEvent[(ClientNum + 1) % 3]);
     }
@@ -152,11 +162,29 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
     while (true)
     {
         WaitForSingleObject(UpdateEvent, INFINITE);
-    }
-           
 
-       
-       
+        // 건물 생성
+        MakeBuildings();
+
+        // 오브젝트 이동 처리
+        ProcessMove();
+
+        // 충돌 체크
+        if (ColidePlayerToObjects()) {
+            DeleteObjects();
+        }
+
+        if (ColideBulletToObjects()) {
+            DeleteObjects();
+        }
+
+        // 클라이언트들에게 업데이트된 정보 전송
+        SendPacketMadebuildings();
+
+        SetEvent(ClientEvent[0]);
+    }
+    return 0;
+                
 }
 
 

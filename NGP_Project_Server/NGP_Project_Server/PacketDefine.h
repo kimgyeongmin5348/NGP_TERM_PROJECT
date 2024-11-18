@@ -13,6 +13,7 @@
 
 #define MAX_ID_SIZE 12
 
+#define PACKET_ID 2
 #define ID_USE 3
 #define ID_NOT_USE 4
 
