@@ -5,6 +5,7 @@ Player::Player()
 {
     // 몸통
     body = new Object();
+    body->SetPosition(glm::vec3(0.f, 0.7f, -0.2f));
     body->SetScale(glm::vec3(0.2f, 0.5f, 0.2f));
     body->SetColor(glm::vec3(0.5f, 0.5f, 0.5f));
     SetParent(body);
