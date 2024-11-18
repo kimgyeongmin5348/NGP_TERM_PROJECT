@@ -174,8 +174,10 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="GameFramework.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="PacketDefine.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="ServerToClient.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
