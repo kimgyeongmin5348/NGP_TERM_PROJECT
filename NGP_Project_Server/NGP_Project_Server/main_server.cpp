@@ -28,6 +28,7 @@ bool CheckID(const char* playerid)
     return true;
 }
 
+// Lobby
 void SendReadyServerToClient()
 {
 
@@ -43,6 +44,7 @@ void GoToInGame()
 
 }
 
+// inGame
 void MakeBuildings()
 {
 
@@ -95,14 +97,38 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         }
 
         switch (type) {
-        case ???:
+        case PACKET_ID:
         {
-          
+            char playerid[MAX_ID_SIZE];
+            retval = recvn(client_sock, playerid, MAX_ID_SIZE, 0);
+            if (retval == SOCKET_ERROR) {
+                err_display("recv()");
+                break;
+            }
+            ClientLoginUsePacket loginPacket;
+            loginPacket.size = sizeof(ClientLoginUsePacket);
+
+            if (CheckID(playerid)) {
+                loginPacket.type = ID_USE;
+                SaveID(playerid);
+            }
+            else {
+                loginPacket.type = ID_NOT_USE;
+            }
+
+            send(client_sock, (char*)&loginPacket, sizeof(loginPacket), 0);
+
         }
         break;
-        case ???:
+        case CLIENT_READY:
         {
-           
+            ReadyClientToServer readyPacket;
+            retval = recvn(client_sock, (char*)&readyPacket, sizeof(readyPacket), 0);
+            if (retval == SOCKET_ERROR) {
+                err_display("recv()");
+                break;
+            }
+            SendReadyServerToClient();
         }
         break;
         }
