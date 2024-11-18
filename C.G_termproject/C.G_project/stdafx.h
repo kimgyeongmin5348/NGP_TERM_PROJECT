@@ -1,6 +1,9 @@
+#pragma once
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <stdlib.h>
+#define Engin "C:/Users/kimkh/Desktop/C.G_test/C.G_project/C.G_project/sound/engins.mp3"
+#define SOUND_FILE_NAME_MIS "C:/Users/kimkh/Desktop/C.G_test/C.G_project/C.G_project/sound/missile.wav"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
@@ -9,22 +12,75 @@
 #include <string>
 #include <chrono>
 
-#include <mmsystem.h>
-#include <Digitalv.h>
-
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
-
 #include <gl/glm/glm.hpp>
 #include <gl/glm/ext.hpp>
-#include <gl/glm/gtc/matrix_transform.hpp>
 #include <gl/glm/fwd.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>
 
 #pragma comment(lib,"winmm.lib")
 
-#define width 1200
-#define height 800
+#include <mmsystem.h>
+#include <Digitalv.h>
 
-#define Engin "C:/Users/kimkh/Desktop/C.G_test/C.G_project/C.G_project/sound/engins.mp3"
-#define SOUND_FILE_NAME_MIS "C:/Users/kimkh/Desktop/C.G_test/C.G_project/C.G_project/sound/missile.wav"
+#define WIDTH 1200
+#define HEIGHT 800
+
+#define h_vertex 0.2f
+static GLfloat hexa[] = {   //À°¸éÃ¼
+    //À­¸é
+    -h_vertex, h_vertex, h_vertex,
+    h_vertex, h_vertex, h_vertex,
+    -h_vertex, h_vertex, -h_vertex,
+
+    h_vertex, h_vertex, h_vertex,
+    h_vertex, h_vertex, -h_vertex,
+    -h_vertex, h_vertex, -h_vertex,
+    //Á¤¸é
+    -h_vertex, -h_vertex, h_vertex,
+    h_vertex, -h_vertex, h_vertex,
+    -h_vertex, h_vertex, h_vertex,
+
+    h_vertex, -h_vertex, h_vertex,
+    h_vertex, h_vertex, h_vertex,
+    -h_vertex, h_vertex, h_vertex,
+
+    //¾Æ·§¸é
+    -h_vertex, -h_vertex, h_vertex,
+    -h_vertex, -h_vertex, -h_vertex,
+    h_vertex, -h_vertex, -h_vertex,
+
+    -h_vertex, -h_vertex, h_vertex,
+    h_vertex, -h_vertex, -h_vertex,
+    h_vertex, -h_vertex, h_vertex,
+
+    //µÞ¸é
+    h_vertex, -h_vertex, -h_vertex,
+    -h_vertex, -h_vertex, -h_vertex,
+    h_vertex, h_vertex, -h_vertex,
+
+    -h_vertex, -h_vertex, -h_vertex,
+    -h_vertex, h_vertex, -h_vertex,
+    h_vertex, h_vertex, -h_vertex,
+
+
+    //ÁÂÃø¸é
+    -h_vertex, -h_vertex, -h_vertex,
+    -h_vertex, h_vertex, h_vertex,
+    -h_vertex, h_vertex, -h_vertex,
+
+    -h_vertex, -h_vertex, -h_vertex,
+    -h_vertex, -h_vertex, h_vertex,
+    -h_vertex, h_vertex, h_vertex,
+
+    //¿ìÃø¸é
+    h_vertex, -h_vertex, h_vertex,
+    h_vertex, -h_vertex, -h_vertex,
+    h_vertex, h_vertex, h_vertex,
+
+    h_vertex, -h_vertex, -h_vertex,
+    h_vertex, h_vertex, -h_vertex,
+    h_vertex, h_vertex, h_vertex
+};

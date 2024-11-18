@@ -1,8 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Scene.h"
 
-#define h_vertex 0.2f
-
 float bottom[] =
 {
     1, 0, -1,
@@ -13,62 +11,6 @@ float bottom[] =
     -1, 0, 1
 };
 
-GLfloat hexa[] = {   //육면체
-    //윗면
-    -h_vertex, h_vertex, h_vertex,
-    h_vertex, h_vertex, h_vertex,
-    -h_vertex, h_vertex, -h_vertex,
-
-    h_vertex, h_vertex, h_vertex,
-    h_vertex, h_vertex, -h_vertex,
-    -h_vertex, h_vertex, -h_vertex,
-    //정면
-    -h_vertex, -h_vertex, h_vertex,
-    h_vertex, -h_vertex, h_vertex,
-    -h_vertex, h_vertex, h_vertex,
-
-    h_vertex, -h_vertex, h_vertex,
-    h_vertex, h_vertex, h_vertex,
-    -h_vertex, h_vertex, h_vertex,
-
-    //아랫면
-    -h_vertex, -h_vertex, h_vertex,
-    -h_vertex, -h_vertex, -h_vertex,
-    h_vertex, -h_vertex, -h_vertex,
-
-    -h_vertex, -h_vertex, h_vertex,
-    h_vertex, -h_vertex, -h_vertex,
-    h_vertex, -h_vertex, h_vertex,
-
-    //뒷면
-    h_vertex, -h_vertex, -h_vertex,
-    -h_vertex, -h_vertex, -h_vertex,
-    h_vertex, h_vertex, -h_vertex,
-
-    -h_vertex, -h_vertex, -h_vertex,
-    -h_vertex, h_vertex, -h_vertex,
-    h_vertex, h_vertex, -h_vertex,
-
-
-    //좌측면
-    -h_vertex, -h_vertex, -h_vertex,
-    -h_vertex, h_vertex, h_vertex,
-    -h_vertex, h_vertex, -h_vertex,
-
-    -h_vertex, -h_vertex, -h_vertex,
-    -h_vertex, -h_vertex, h_vertex,
-    -h_vertex, h_vertex, h_vertex,
-
-    //우측면
-    h_vertex, -h_vertex, h_vertex,
-    h_vertex, -h_vertex, -h_vertex,
-    h_vertex, h_vertex, h_vertex,
-
-    h_vertex, -h_vertex, -h_vertex,
-    h_vertex, h_vertex, -h_vertex,
-    h_vertex, h_vertex, h_vertex
-};
-
 Scene::Scene()
 {
 }
@@ -76,6 +18,7 @@ Scene::Scene()
 Scene::~Scene()
 {
 }
+
 GLchar* Scene::filetobuf(const GLchar* file)
 {
     FILE* fptr;
@@ -167,6 +110,7 @@ void Scene::Initialize(Player* pPlayer)
     InitShader();
     BuildObject();
     glEnable(GL_DEPTH_TEST);
+    glFrontFace(GL_CW);
 }
     
 void Scene::BuildObject()

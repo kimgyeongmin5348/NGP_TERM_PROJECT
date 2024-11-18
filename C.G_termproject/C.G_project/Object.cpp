@@ -3,6 +3,19 @@
 
 Object::Object()
 {
+    // VAO 생성 및 바인딩
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(hexa), hexa, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 Object::~Object()
@@ -23,7 +36,8 @@ void Object::AddChild(Object* child)
     children.push_back(child);
 }
 
-void Object::Render(GLuint program, const glm::mat4& parentTransform) {
+void Object::Render(GLuint program, const glm::mat4& parentTransform) 
+{
     glm::mat4 transform = glm::mat4(1.0f);
     transform = glm::translate(transform, position);
     transform = glm::rotate(transform, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -39,18 +53,25 @@ void Object::Render(GLuint program, const glm::mat4& parentTransform) {
     GLuint colorLoc = glGetUniformLocation(program, "objectColor");
     glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
-    glBindVertexArray(0); 
+    // glBindVertexArray(0); 
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glBindVertexArray(0);
+
 
     for (auto child : children) {
         child->Render(program, transform);
     }
 }
+
 void Object::Update(float deltaTime)
 {
     for (auto child : children) {
         child->Update(deltaTime);
     }
 }
+
 /////////////////////////////////////////////////////////////////////////
 
 Bullet::Bullet()

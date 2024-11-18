@@ -1,4 +1,29 @@
-#include "stdafx.h"
+//#include "stdafx.h"
+#define _CRT_SECURE_NO_WARNINGS
+
+#define Engin "C:/Users/kimkh/Desktop/C.G_test/C.G_project/C.G_project/sound/engins.mp3"
+#define SOUND_FILE_NAME_MIS "C:/Users/kimkh/Desktop/C.G_test/C.G_project/C.G_project/sound/missile.wav"
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <iostream>
+#include <fstream>
+#include <random>
+#include <string>
+#include <chrono>
+
+#include <gl/glew.h>
+#include <gl/freeglut.h>
+#include <gl/freeglut_ext.h>
+#include <gl/glm/glm.hpp>
+#include <gl/glm/ext.hpp>
+#include <gl/glm/fwd.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>
+
+#pragma comment(lib,"winmm.lib")
+
+#include <mmsystem.h>
+#include <Digitalv.h>
 
 MCI_OPEN_PARMS openBgm;     // MCI_OPEN_PARMS는 MCI_OPEN 커맨드를 위한 정보가 담긴 구조체
 MCI_PLAY_PARMS playBgm;
@@ -9,7 +34,9 @@ int dwID;
 
 #define WIDTH 1200
 #define HEIGHT 800
-#define h_vertex 0.2f
+#define 
+
+0.2f
 #define pi 3.141592
 using namespace std;
 auto start_time = chrono::high_resolution_clock::now();
@@ -338,13 +365,13 @@ GLvoid RenderPilot() // i'am 헬기(조종사) 에요
     H_Matrix = glm::scale(H_Matrix, glm::vec3(0.2f, 0.5f, 0.2f));
     unsigned int StransformLocation = glGetUniformLocation(s_program, "transform");
     glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(H_Matrix));
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj, obj_type);
+    //qobj = gluNewQuadric();
+    //gluQuadricDrawStyle(qobj, obj_type);
     int objColorLocation = glGetUniformLocation(s_program, "objectColor");
     unsigned isCheck = glGetUniformLocation(s_program, "isCheck");
     glUniform1f(isCheck, false);
     glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
-    glBindVertexArray(VAO[0]);
+    //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // 날개 1
@@ -359,13 +386,13 @@ GLvoid RenderPilot() // i'am 헬기(조종사) 에요
 
     StransformLocation = glGetUniformLocation(s_program, "transform");
     glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(H_Matrix1));
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj, obj_type);
+    //qobj = gluNewQuadric();
+    //gluQuadricDrawStyle(qobj, obj_type);
     objColorLocation = glGetUniformLocation(s_program, "objectColor");
     isCheck = glGetUniformLocation(s_program, "isCheck");
     glUniform1f(isCheck, false);
     glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
-    glBindVertexArray(VAO[0]);
+    //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // 날개 2
@@ -380,13 +407,13 @@ GLvoid RenderPilot() // i'am 헬기(조종사) 에요
 
     StransformLocation = glGetUniformLocation(s_program, "transform");
     glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(H_Matrix2));
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj, obj_type);
+    //qobj = gluNewQuadric();
+    //gluQuadricDrawStyle(qobj, obj_type);
     objColorLocation = glGetUniformLocation(s_program, "objectColor");
     isCheck = glGetUniformLocation(s_program, "isCheck");
     glUniform1f(isCheck, false);
     glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
-    glBindVertexArray(VAO[0]);
+    //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // 몸통 중간
@@ -399,13 +426,13 @@ GLvoid RenderPilot() // i'am 헬기(조종사) 에요
     H_Matrix3 = glm::scale(H_Matrix3, glm::vec3(1.1f, 1.1f, 3.0f));
     StransformLocation = glGetUniformLocation(s_program, "transform");
     glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(H_Matrix3));
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj, obj_type);
+    //qobj = gluNewQuadric();
+    //gluQuadricDrawStyle(qobj, obj_type);
     objColorLocation = glGetUniformLocation(s_program, "objectColor");
     isCheck = glGetUniformLocation(s_program, "isCheck");
     glUniform1f(isCheck, false);
     glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
-    glBindVertexArray(VAO[0]);
+    //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // 몸통 앞
@@ -420,10 +447,11 @@ GLvoid RenderPilot() // i'am 헬기(조종사) 에요
     glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(H_Matrix4));
     objColorLocation = glGetUniformLocation(s_program, "objectColor");
     isCheck = glGetUniformLocation(s_program, "isCheck");
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj, obj_type);
+    //qobj = gluNewQuadric();
+    //gluQuadricDrawStyle(qobj, obj_type);
     glUniform1f(isCheck, false);
     glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
+    //glBindVertexArray(VAO[0]);
     gluSphere(qobj, 1.0, 20, 30);
 
     // 몸통 뒤
@@ -438,10 +466,11 @@ GLvoid RenderPilot() // i'am 헬기(조종사) 에요
     glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(H_Matrix5));
     objColorLocation = glGetUniformLocation(s_program, "objectColor");
     isCheck = glGetUniformLocation(s_program, "isCheck");
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj, obj_type);
+    //qobj = gluNewQuadric();
+    //gluQuadricDrawStyle(qobj, obj_type);
     glUniform1f(isCheck, false);
     glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
+    //glBindVertexArray(VAO[0]);
     gluCylinder(qobj, 0.3f, 1.1f, 0.5, 100, 1);
 
     // 몸통 뒤(꼬리앞)
@@ -456,10 +485,11 @@ GLvoid RenderPilot() // i'am 헬기(조종사) 에요
     glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(H_Matrix6));
     objColorLocation = glGetUniformLocation(s_program, "objectColor");
     isCheck = glGetUniformLocation(s_program, "isCheck");
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj, obj_type);
+    //qobj = gluNewQuadric();
+    //gluQuadricDrawStyle(qobj, obj_type);
     glUniform1f(isCheck, false);
     glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
+    //glBindVertexArray(VAO[0]);
     gluCylinder(qobj, 0.3f, 0.3f, 1.5, 100, 1);
 
     // 몸통 뒤(꼬리 날개)
@@ -472,13 +502,13 @@ GLvoid RenderPilot() // i'am 헬기(조종사) 에요
     H_Matrix7 = glm::scale(H_Matrix7, glm::vec3(0.1f, 0.7f, 0.5f));
     StransformLocation = glGetUniformLocation(s_program, "transform");
     glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(H_Matrix7));
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj, obj_type);
+    //qobj = gluNewQuadric();
+    //gluQuadricDrawStyle(qobj, obj_type);
     objColorLocation = glGetUniformLocation(s_program, "objectColor");
     isCheck = glGetUniformLocation(s_program, "isCheck");
     glUniform1f(isCheck, false);
     glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
-    glBindVertexArray(VAO[0]);
+    //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     //본체 바닥(왼쪽)
@@ -491,13 +521,13 @@ GLvoid RenderPilot() // i'am 헬기(조종사) 에요
     H_Matrix = glm::scale(H_Matrix, glm::vec3(0.2f, 0.2f, 2.5f));
     StransformLocation = glGetUniformLocation(s_program, "transform");
     glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(H_Matrix));
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj, obj_type);
+    //qobj = gluNewQuadric();
+    //gluQuadricDrawStyle(qobj, obj_type);
     objColorLocation = glGetUniformLocation(s_program, "objectColor");
     isCheck = glGetUniformLocation(s_program, "isCheck");
     glUniform1f(isCheck, false);
     glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
-    glBindVertexArray(VAO[0]);
+    //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     //본체 바닥2
@@ -510,13 +540,13 @@ GLvoid RenderPilot() // i'am 헬기(조종사) 에요
     H_Matrix = glm::scale(H_Matrix, glm::vec3(0.2f, 0.2f, 2.5f));
     StransformLocation = glGetUniformLocation(s_program, "transform");
     glUniformMatrix4fv(StransformLocation, 1, GL_FALSE, glm::value_ptr(H_Matrix));
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj, obj_type);
+    //qobj = gluNewQuadric();
+    //gluQuadricDrawStyle(qobj, obj_type);
     objColorLocation = glGetUniformLocation(s_program, "objectColor");
     isCheck = glGetUniformLocation(s_program, "isCheck");
     glUniform1f(isCheck, false);
     glUniform3f(objColorLocation, 0.5f, 0.5f, 0.5f);
-    glBindVertexArray(VAO[0]);
+    //glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
@@ -713,7 +743,7 @@ GLvoid KeyBoard(unsigned char key, int x, int y)
     case ' ':
         h_f.shoot_bullet = true;
         bullet_flag = true;
-        PlaySound(TEXT(SOUND_FILE_NAME_MIS), NULL, SND_ASYNC);
+        // PlaySound(TEXT(SOUND_FILE_NAME_MIS), NULL, SND_ASYNC);
         break;
     }
     glutPostRedisplay();

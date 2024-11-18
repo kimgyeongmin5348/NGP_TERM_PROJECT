@@ -1,4 +1,5 @@
 #pragma once
+
 class Object
 {
 public:
@@ -20,6 +21,8 @@ protected:
 
     float r{};
     */
+
+    GLuint VAO, VBO;
 
     glm::vec3 position;
     glm::vec3 position_aoc;
