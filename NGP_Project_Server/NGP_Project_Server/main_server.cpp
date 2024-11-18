@@ -28,6 +28,56 @@ bool CheckID(const char* playerid)
     return true;
 }
 
+void SendReadyServerToClient()
+{
+
+}
+
+void SendReadyCompleteServerToClient()
+{
+
+}
+
+void GoToInGame()
+{
+
+}
+
+void MakeBuildings()
+{
+
+}
+
+void ProcessMove()
+{
+
+}
+
+BOOL ColidePlayerToObjects()
+{
+
+}
+
+BOOL ColideBulletToObjects()
+{
+
+}
+
+void DeleteObjects()
+{
+
+}
+
+void SendPacketMadebuildings()
+{
+
+}
+
+void SendPacketMadebuildings()
+{
+
+}
+
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
     SOCKET client_sock = (SOCKET)arg;
