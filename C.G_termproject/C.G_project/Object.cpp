@@ -52,7 +52,23 @@ void Object::Render(GLuint program, int type)
 
 void Object::Update(float deltaTime)
 {
+}
 
+/////////////////////////////////////////////////////////////////////////
+
+RotatingObject::RotatingObject()
+{
+}
+
+RotatingObject::~RotatingObject()
+{
+}
+
+void RotatingObject::Update(float deltaTime)
+{
+    float rotationSpeed = 1.0f * deltaTime;
+    rotation.y += rotationSpeed;
+    std::cout << rotation.y << '\n';
 }
 
 /////////////////////////////////////////////////////////////////////////

@@ -10,13 +10,13 @@ Player::Player()
     wingConnect->SetColor(glm::vec3(0.5f, 0.5f, 0.5f));
 
     // 왼쪽 날개
-    wingLeft = new Object();
+    wingLeft = new RotatingObject();
     wingLeft->SetPosition(glm::vec3(0.0f, 1.1f, 0.0f));
     wingLeft->SetScale(glm::vec3(4.5f, 0.2f, 0.2f));
     wingLeft->SetColor(glm::vec3(0.5f, 0.5f, 0.5f));
 
     // 오른쪽 날개
-    wingRight = new Object();
+    wingRight = new RotatingObject();
     wingRight->SetPosition(glm::vec3(0.0f, 1.1f, 0.0f));
     wingRight->SetScale(glm::vec3(0.2f, 0.2f, 4.5f));
     wingRight->SetColor(glm::vec3(0.5f, 0.5f, 0.5f));

@@ -102,6 +102,7 @@ void Scene::BuildObject()
 {
 	// 플레이어, Ground, 빌딩_Mat
     player->SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
+    gameObjects.push_back(player);
 
     Ground* ground = new Ground();
     gameObjects.push_back(ground);
@@ -195,7 +196,6 @@ void Scene::Render()
 
 void Scene::Update(float deltaTime)
 {
-    std::cout << deltaTime << '\n';
     player->Update(deltaTime);
 
     for (auto obj : gameObjects) {
