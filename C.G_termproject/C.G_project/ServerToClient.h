@@ -1,3 +1,5 @@
+#pragma once
+// 여기에 보고 헤더파일 추가해야 할거 있을것 같으면 추가해줘
 #include "PacketDefine.h"
 #include "Player.h"
 #include "Object.h"
