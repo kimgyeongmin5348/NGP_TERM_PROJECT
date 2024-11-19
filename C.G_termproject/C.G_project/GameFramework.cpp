@@ -38,6 +38,7 @@ void GameFramework::Run()
     glutMainLoop();
 }
 
-void GameFramework::Shutdown() {
+void GameFramework::Shutdown() 
+{
     delete scene;
 }
