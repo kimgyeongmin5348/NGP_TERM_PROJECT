@@ -6,6 +6,10 @@ PacketPlayerMove Player[2]; //플레이어 정보?
 int nowID = 0; // 클라당 id
 HANDLE ClientEvent[2];
 HANDLE UpdateEvent;
+SOCKET clientSockets[2];  // 클라이언트 소켓 저장 배열
+
+bool readyState[2] = { false, false }; // 각 플레이어의 준비 상태
+bool gameStarted = false;
 
 void SaveID(const char* NewID)
 {
@@ -31,17 +35,61 @@ bool CheckID(const char* playerid)
 // Lobby
 void SendReadyServerToClient()
 {
+    // 모든 클라이언트에게 현재 준비 상태 전송
+    ReadyClientToServer readyPacket;
+    readyPacket.size = sizeof(ReadyClientToServer);
+    readyPacket.type = CLIENT_READY;
 
+    for (int i = 0; i < 2; i++) {
+        readyPacket.id = i;
+        if (readyState[i]) {
+            // 각 클라이언트의 소켓으로 전송 필요
+             send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
+        }
+    }
 }
 
 void SendReadyCompleteServerToClient()
 {
+    // 모든 플레이어가 준비되었는지 확인
+    bool allReady = true;
+    for (int i = 0; i < 2; i++) {
+        if (!readyState[i]) {
+            allReady = false;
+            break;
+        }
+    }
 
+    if (allReady) {
+        // 모든 클라이언트에게 게임 시작 가능 상태 전송
+        AllReady readyPacket;
+        readyPacket.size = sizeof(AllReady);
+        readyPacket.type = CLIENT_ALL_READY;
+
+        for (int i = 0; i < 2; i++) {
+            // 각 클라이언트의 소켓으로 전송 필요
+            send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
+        }
+
+        // 게임 시작 상태로 전환
+        GoToInGame();
+    }
 }
 
 void GoToInGame()
 {
+    if (!gameStarted) {
+        gameStarted = true;
 
+        // 플레이어 초기 위치 설정
+        for (int i = 0; i < 2; i++) {
+            // Player[i].pos = { 0.0f, 0.0f, 0.0f };                // 초기 위치 설정  이건 클라랑 합의 필요.
+            Player[i].state = 0; // 초기 상태 설정
+        }
+
+        // 게임 시작 이벤트 설정
+        SetEvent(UpdateEvent);
+    }
 }
 
 // inGame
@@ -228,6 +276,9 @@ int main()
             err_display("accept()");
             break;
         }
+        // 클라이언트 소켓 저장
+        clientSockets[nowID] = client_sock;
+
 
         printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
 
