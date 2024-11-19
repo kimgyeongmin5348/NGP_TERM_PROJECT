@@ -3,13 +3,15 @@
 
 #include <winsock2.h> // 윈속2 메인 헤더
 #include <ws2tcpip.h> // 윈속2 확장 헤더
-
+#include <iostream>
 #include <tchar.h> // _T(), ...
 #include <stdio.h> // printf(), ...
 #include <stdlib.h> // exit(), ...
 #include <string.h> // strncpy(), ...
 
 #pragma comment(lib, "ws2_32") // ws2_32.lib 링크
+
+using namespace std;
 
 #define MAX_ID_SIZE 12
 
