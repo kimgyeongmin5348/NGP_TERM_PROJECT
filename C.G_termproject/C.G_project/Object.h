@@ -75,7 +75,9 @@ public:
     Building();
     ~Building();
 
-    void Setting();
+    void Setting(int j);
+    virtual void Update(float deltaTime) override;
+
 };
 
 class Ground : public Object

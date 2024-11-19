@@ -106,7 +106,7 @@ Building::~Building()
 {
 }
 
-void Building::Setting()
+void Building::Setting(int j)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -115,8 +115,13 @@ void Building::Setting()
 
     position.x = random_building_x_pos(gen);
     position.y = 0;
-    position.z = 40.f;
+    position.z = 40.f * (j + 1);
     scale.y = random_building_hight(gen);
+}
+
+void Building::Update(float deltaTime)
+{
+    position.z -= 0.1f;
 }
 
 /////////////////////////////////////////////////////////////////////////
