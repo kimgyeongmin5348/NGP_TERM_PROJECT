@@ -89,10 +89,9 @@ void Scene::InitShader()
     glUseProgram(s_program);
 }
 
-void Scene::Initialize(Player* pPlayer)
+void Scene::Initialize()
 {
     InitShader();
-    player = pPlayer;
     BuildObject();
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
@@ -101,8 +100,9 @@ void Scene::Initialize(Player* pPlayer)
 void Scene::BuildObject()
 {
 	// 플레이어, Ground, 빌딩_Mat
-    player->SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
-    gameObjects.push_back(player);
+    player = new Player(this);
+    //gameObjects.push_back(player);
+    //player->SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
     Ground* ground = new Ground();
     gameObjects.push_back(ground);

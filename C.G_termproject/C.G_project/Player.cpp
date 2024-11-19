@@ -1,7 +1,8 @@
 ﻿#include "stdafx.h"
 #include "Player.h"
+#include "Scene.h"
 
-Player::Player()
+Player::Player(Scene* scene)
 {
     // 날개 연결부
     wingConnect = new Object();
@@ -11,12 +12,14 @@ Player::Player()
 
     // 왼쪽 날개
     wingLeft = new RotatingObject();
+    Scene::GetInstance()->AddGameObject(wingLeft);
     wingLeft->SetPosition(glm::vec3(0.0f, 1.1f, 0.0f));
     wingLeft->SetScale(glm::vec3(4.5f, 0.2f, 0.2f));
     wingLeft->SetColor(glm::vec3(0.5f, 0.5f, 0.5f));
 
     // 오른쪽 날개
     wingRight = new RotatingObject();
+    Scene::GetInstance()->AddGameObject(wingRight);
     wingRight->SetPosition(glm::vec3(0.0f, 1.1f, 0.0f));
     wingRight->SetScale(glm::vec3(0.2f, 0.2f, 4.5f));
     wingRight->SetColor(glm::vec3(0.5f, 0.5f, 0.5f));

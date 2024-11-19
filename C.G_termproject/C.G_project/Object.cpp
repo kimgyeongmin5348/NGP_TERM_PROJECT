@@ -66,9 +66,7 @@ RotatingObject::~RotatingObject()
 
 void RotatingObject::Update(float deltaTime)
 {
-    float rotationSpeed = 1.0f * deltaTime;
-    rotation.y += rotationSpeed;
-    std::cout << rotation.y << '\n';
+    rotation.y += 15.0f;
 }
 
 /////////////////////////////////////////////////////////////////////////
