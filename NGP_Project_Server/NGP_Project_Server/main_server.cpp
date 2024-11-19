@@ -43,7 +43,6 @@ void SendReadyServerToClient()
     for (int i = 0; i < 2; i++) {
         readyPacket.id = i;
         if (readyState[i]) {
-            // 각 클라이언트의 소켓으로 전송 필요
              send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
         }
     }
@@ -67,7 +66,6 @@ void SendReadyCompleteServerToClient()
         readyPacket.type = CLIENT_ALL_READY;
 
         for (int i = 0; i < 2; i++) {
-            // 각 클라이언트의 소켓으로 전송 필요
             send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
         }
 
@@ -76,6 +74,7 @@ void SendReadyCompleteServerToClient()
     }
 }
 
+// 아직 정확하게 미완성 
 void GoToInGame()
 {
     if (!gameStarted) {
@@ -125,7 +124,7 @@ void SendPacketMadebuildings()
 
 }
 
-
+// 메인 스레드
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
     SOCKET client_sock = (SOCKET)arg;
@@ -202,6 +201,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     return 0;
 }
 
+// 업데이트 스레드
 DWORD WINAPI ProcessUpdate(LPVOID arg)
 {
   
