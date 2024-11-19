@@ -52,7 +52,21 @@ void Object::Render(GLuint program, int type)
 
 void Object::Update(float deltaTime)
 {
+}
 
+/////////////////////////////////////////////////////////////////////////
+
+RotatingObject::RotatingObject()
+{
+}
+
+RotatingObject::~RotatingObject()
+{
+}
+
+void RotatingObject::Update(float deltaTime)
+{
+    rotation.y += 15.0f;
 }
 
 /////////////////////////////////////////////////////////////////////////

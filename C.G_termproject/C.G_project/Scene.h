@@ -12,12 +12,16 @@ public:
         return &instance;
     }
 
-    void Initialize(Player* pPlayer);
+    void Initialize();
     void BuildObject();
     void Render();
     void Update(float deltaTime);
     void Resize(int w, int h);
     void HandleKeyboard(unsigned char key, bool isPressed);
+
+    void AddGameObject(Object* obj) {
+        gameObjects.push_back(obj);
+    }
 
 public:
     GLuint VAO[3], VBO[6];
