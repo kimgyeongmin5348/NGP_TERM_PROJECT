@@ -1,5 +1,6 @@
 #pragma once
 #include "Player.h"
+#include "Camera.h"
 
 class Scene
 {
@@ -17,11 +18,16 @@ public:
     void Render();
     void Update(float deltaTime);
     void Resize(int w, int h);
-    void HandleKeyboard(unsigned char key, bool isPressed);
+    //void HandleKeyboard(unsigned char key, bool isPressed);
 
     void AddGameObject(Object* obj) {
         gameObjects.push_back(obj);
     }
+
+    // 키 입력 처리
+    std::unordered_map<unsigned char, bool> keyStates;
+    void KeyDown(unsigned char key) { keyStates[key] = true; }
+    void KeyUp(unsigned char key) { keyStates[key] = false; }
 
 public:
     GLuint VAO[3], VBO[6];
@@ -44,6 +50,6 @@ public:
 private:
     Player* player;
     std::vector<Object*> gameObjects;
-
+    Camera* camera;
 };
 

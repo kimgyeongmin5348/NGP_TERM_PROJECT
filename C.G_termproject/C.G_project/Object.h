@@ -35,7 +35,7 @@ public:
     GLenum obj_type{ GL_FILL };
 
 public:
-    void SetPosition(const glm::vec3& pos) { position = pos; }
+    virtual void SetPosition(const glm::vec3& pos) { position = pos; }
     void SetRotation(const glm::vec3& rot) { rotation = rot; }
     void SetScale(const glm::vec3& scl) { scale = scl; }
     void SetColor(const glm::vec3& col) { color = col; }
