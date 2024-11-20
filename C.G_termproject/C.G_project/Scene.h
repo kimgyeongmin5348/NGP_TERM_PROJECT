@@ -1,5 +1,6 @@
 #pragma once
 #include "Player.h"
+#include "Camera.h"
 
 class Scene
 {
@@ -44,6 +45,6 @@ public:
 private:
     Player* player;
     std::vector<Object*> gameObjects;
-
+    Camera* camera;
 };
 
