@@ -95,34 +95,93 @@ void GoToInGame()
 // inGame
 void MakeBuildings()
 {
+    PacketBuildingMove buildingPacket;
+    buildingPacket.size = sizeof(PacketBuildingMove);
+    buildingPacket.type = PACKET_BUILDING_MOVE;
+    for(int k = 0; k< 2; ++k){}
+    for (int i = 0; i < 100; ++i) {
+        for (int j = 0; j < 10; ++j) {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<float> random_building_x_pos(-20, 20);
+            std::uniform_real_distribution<float> random_building_hight(1, 25);
+
+            buildingPacket.pos.x = random_building_x_pos(gen);
+            buildingPacket.pos.y = 0;
+            buildingPacket.pos.z = 20.f * (j + 1);
+            //scale.y = random_building_hight(gen);
+            send(clientSockets[k], (char*)&buildingPacket, sizeof(buildingPacket), 0);
+        }
+    }
+    }
 
 }
 
 void ProcessMove()
 {
-
+    for (int i = 0; i < 2; ++i) {
+        if (Player[i].state != 0) { // If player is active
+            Player[i].pos.x += Player[i].direction.x * Player[i].speed;
+            Player[i].pos.y += Player[i].direction.y * Player[i].speed;
+            Player[i].pos.z += Player[i].direction.z * Player[i].speed;
+        }
+    }
 }
 
 BOOL ColidePlayerToObjects()
 {
-
+    for (int i = 0; i < 2; ++i) {
+        for (auto& obj : gameObjects) {
+            if (Player[i].BoundingBox.Intersects(obj.BoundingBox)) {
+                cout << "Collision detected between Player " << i << " and Object!" << endl;
+                return TRUE;
+            }
+        }
+    }
     return FALSE;
 }
 
 BOOL ColideBulletToObjects()
 {
+    for (auto& bullet : bullets) {
+        if (!bullet.active) continue;
 
+        for (auto& obj : gameObjects) {
+            if (bullet.BoundingBox.Intersects(obj.BoundingBox)) {
+                cout << "Bullet hit an object!" << endl;
+                bullet.active = false; // Disable bullet
+                return TRUE;
+            }
+        }
+    }
     return FALSE;
 }
 
 void DeleteObjects()
 {
-
+    for (auto it = gameObjects.begin(); it != gameObjects.end(); ) {
+        if (it->isDestroyed) {
+            cout << "Deleting destroyed object" << endl;
+            it = gameObjects.erase(it); // Remove object
+        }
+        else {
+            ++it;
+        }
+    }
 }
 
 void SendPacketMadebuildings()
 {
+    BuildingPacket packet;
+    packet.size = sizeof(BuildingPacket);
+    packet.type = BUILDING_UPDATE;
 
+    for (auto& obj : gameObjects) {
+        if (obj.type == ObjectType::Building) {
+            packet.position = obj.GetPosition();
+            send(clientSockets[0], (char*)&packet, sizeof(packet), 0); // Broadcast to clients
+        }
+    }
 }
 
 // 메인 스레드

@@ -9,6 +9,12 @@
 #include <stdlib.h> // exit(), ...
 #include <string.h> // strncpy(), ...
 
+#include <gl/glm/glm.hpp>
+#include <gl/glm/ext.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/fwd.hpp>
+#include <gl/glm/gtx/io.hpp>
+
 #pragma comment(lib, "ws2_32") // ws2_32.lib 링크
 
 #define MAX_ID_SIZE 12
@@ -22,6 +28,7 @@
 #define CLIENT_STATE_READY 7
 #define CLIENT_ALL_READY 8
 #define PACKET_PLAYER_MOVE 9
+#define PACKET_BUILDING_MOVE 10
 
 #define TCPPORT			4000
 
@@ -65,10 +72,20 @@ struct PacketPlayerMove
 {
 	char size;
 	char type;
-	// Position pos;  <<- ?????
+	glm::vec3 pos;
 	char state;
 	char playerid[MAX_ID_SIZE];
 };
+
+struct PacketBuildingMove
+{
+	char size;
+	char type;
+	glm::vec3 pos;
+	bool is_broken;
+	int num; // 빌딩 번호
+};
+
 
 // 소켓 함수 오류 출력 후 종료
 void err_quit(const char* msg)
