@@ -165,6 +165,25 @@ void Scene::Render()
 
 void Scene::Update(float deltaTime)
 {
+    glm::vec3 pos = player->GetPosition();
+    if (keyStates['w']) pos.y += 0.05f;
+    if (keyStates['a']) pos.x += 0.05f;
+    if (keyStates['s']) pos.y -= 0.05f;
+    if (keyStates['d']) pos.x -= 0.05f;
+    player->SetPosition(pos);
+    std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
+    
+    // 총알 발사 처리
+    if (keyStates[' ']) { // space 키가 눌렸을 때
+        for (auto obj : gameObjects) {
+            Bullet* bullet = dynamic_cast<Bullet*>(obj);
+            if (bullet && !bullet->active) {
+                bullet->SetPosition(player->GetPosition()); // 발사 위치 설정
+                bullet->active = true;
+                break;
+            }
+        }
+    }
     player->Update(deltaTime);
 
     for (auto obj : gameObjects) {
@@ -177,28 +196,28 @@ void Scene::Resize(int w, int h)
     glViewport(0, 0, w, h);
 }
 
-void Scene::HandleKeyboard(unsigned char key, bool isPressed)
-{
-    if (key == 'q') exit(0);
-    if (key == ' ') { // 스페이스바로 총알 발사
-        for (auto obj : gameObjects) {
-            Bullet* bullet = dynamic_cast<Bullet*>(obj);
-            if (bullet && !bullet->active) {
-                bullet->SetPosition(player->GetPosition()); // 발사 위치 설정
-                bullet->active = true;
-                break;
-            }
-        }
-    }
-
-    // 플레이어의 상태 기반으로 수정 필요 (키 입력 시 부자연스러운 움직임)
-    if (key == 'w' || key == 'a' || key == 's' || key == 'd') {
-        glm::vec3 pos = player->GetPosition();
-        if (key == 'w') pos.y += 0.05f;
-        if (key == 'a') pos.x += 0.05f;
-        if (key == 's') pos.y -= 0.05f;
-        if (key == 'd') pos.x -= 0.05f;
-        player->SetPosition(pos);
-        std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
-    }
-}
+//void Scene::HandleKeyboard(unsigned char key, bool isPressed)
+//{
+//    if (key == 'q') exit(0);
+//    if (key == ' ') { // 스페이스바로 총알 발사
+//        for (auto obj : gameObjects) {
+//            Bullet* bullet = dynamic_cast<Bullet*>(obj);
+//            if (bullet && !bullet->active) {
+//                bullet->SetPosition(player->GetPosition()); // 발사 위치 설정
+//                bullet->active = true;
+//                break;
+//            }
+//        }
+//    }
+//
+//    // 플레이어의 상태 기반으로 수정 필요 (키 입력 시 부자연스러운 움직임)
+//    if (key == 'w' || key == 'a' || key == 's' || key == 'd') {
+//        glm::vec3 pos = player->GetPosition();
+//        if (key == 'w') pos.y += 0.05f;
+//        if (key == 'a') pos.x += 0.05f;
+//        if (key == 's') pos.y -= 0.05f;
+//        if (key == 'd') pos.x -= 0.05f;
+//        player->SetPosition(pos);
+//        std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
+//    }
+//}
