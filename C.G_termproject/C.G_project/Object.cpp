@@ -88,7 +88,7 @@ void Bullet::Update(float deltaTime)
     position.z += 0.5f;
 
     // 범위를 벗어나면 비활성화
-    if (position.z > 50.0f || position.z < -50.0f) {
+    if (position.z > 50.0f) {
         active = false;
     }
 }
@@ -121,7 +121,7 @@ void Building::Setting(int j)
 
 void Building::Update(float deltaTime)
 {
-    position.z -= 0.5f;
+    position.z -= 0.1f;
 
     if(position.z < 0.f) {
         Setting(9);
