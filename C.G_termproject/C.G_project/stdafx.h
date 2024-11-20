@@ -11,6 +11,7 @@
 #include <random>
 #include <string>
 #include <chrono>
+#include <unordered_map>
 
 #include <gl/glew.h>
 #include <gl/freeglut.h>
@@ -20,6 +21,7 @@
 #include <gl/glm/ext.hpp>
 #include <gl/glm/gtc/matrix_transform.hpp>
 #include <gl/glm/fwd.hpp>
+#include <gl/glm/gtx/io.hpp>
 
 //#include <glm/glm.hpp>
 //#include <glm/ext.hpp>

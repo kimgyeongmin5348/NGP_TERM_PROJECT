@@ -9,6 +9,9 @@ public:
 	Player(Scene* scene);
 	~Player();
 
+	void SetPosition(const glm::vec3& pos) override;
+
+
 	virtual void Update(float deltaTime) override;
 	virtual void Render(GLuint program);
 

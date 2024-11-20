@@ -73,7 +73,7 @@ Player::~Player()
 
 void Player::Update(float deltaTime)
 {
-    rotation.y += 45.0f * deltaTime;
+    //rotation.y += 45.0f * deltaTime;
 }
 
 void Player::Render(GLuint program)
@@ -88,4 +88,20 @@ void Player::Render(GLuint program)
     tailWing->Render(program, 0);
     bodyFloorLeft->Render(program, 0);
     bodyFloorRight->Render(program, 0);
+}
+
+void Player::SetPosition(const glm::vec3& pos)
+{ 
+    position = pos;
+
+    wingConnect->SetPosition(glm::vec3(pos.x, pos.y + 1.0f, pos.z));
+    wingLeft->SetPosition(glm::vec3(pos.x, pos.y + 1.1f, pos.z));
+    wingRight->SetPosition(glm::vec3(pos.x, pos.y + 1.1f, pos.z));
+    body->SetPosition(glm::vec3(pos.x, pos.y + 0.7f, pos.z - 0.2f));
+    bodyFront->SetPosition(glm::vec3(pos.x, pos.y + 0.65f, pos.z + 0.3f));
+    bodyBack->SetPosition(glm::vec3(pos.x, pos.y + 0.7f, pos.z - 1.0f));
+    tailFront->SetPosition(glm::vec3(pos.x, pos.y + 0.7f, pos.z - 1.7f));
+    tailWing->SetPosition(glm::vec3(pos.x, pos.y + 0.8f, pos.z - 1.6f));
+    bodyFloorLeft->SetPosition(glm::vec3(pos.x + 0.3f, pos.y + 0.2f, pos.z - 0.3f));
+    bodyFloorRight->SetPosition(glm::vec3(pos.x - 0.3f, pos.y + 0.2f, pos.z - 0.3f));
 }

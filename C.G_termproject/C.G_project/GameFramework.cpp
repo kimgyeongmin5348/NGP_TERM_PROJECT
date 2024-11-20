@@ -30,8 +30,8 @@ void GameFramework::Run()
 {
     glutDisplayFunc([]() { Scene::GetInstance()->Render(); });
     glutReshapeFunc([](int w, int h) { Scene::GetInstance()->Resize(w, h); });
-    glutKeyboardFunc([](unsigned char key, int x, int y) { Scene::GetInstance()->HandleKeyboard(key, true); });
-    glutKeyboardUpFunc([](unsigned char key, int x, int y) { Scene::GetInstance()->HandleKeyboard(key, false); });
+    glutKeyboardFunc([](unsigned char key, int x, int y) { Scene::GetInstance()->KeyDown(key); });
+    glutKeyboardUpFunc([](unsigned char key, int x, int y) { Scene::GetInstance()->KeyUp(key); });
         
     glutTimerFunc(16, TimerCallback, 0);
 
