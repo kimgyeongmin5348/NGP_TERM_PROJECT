@@ -73,7 +73,7 @@ void RotatingObject::Update(float deltaTime)
 
 Bullet::Bullet()
 {
-    SetScale(glm::vec3(0.3f, 0.3f, 0.4f));
+    SetScale(glm::vec3(0.5f, 0.5f, 1.0f));
     SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
