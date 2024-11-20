@@ -29,6 +29,7 @@
 #define CLIENT_ALL_READY 8
 #define PACKET_PLAYER_MOVE 9
 #define PACKET_BUILDING_MOVE 10
+#define PACKET_BULLET_MOVE 11
 
 #define TCPPORT			4000
 
@@ -86,6 +87,13 @@ struct PacketBuildingMove
 	int num; // 빌딩 번호
 };
 
+struct PacketBulletMove
+{
+	char size;
+	char type;
+	glm::vec3 pos;
+	int num; // 총알 번호
+};
 
 // 소켓 함수 오류 출력 후 종료
 void err_quit(const char* msg)
