@@ -85,7 +85,7 @@ void Bullet::Update(float deltaTime)
 {
     if (!active) return;
 
-    position.z += deltaTime;
+    position.z += 0.5f;
 
     // 범위를 벗어나면 비활성화
     if (position.z > 50.0f || position.z < -50.0f) {
@@ -115,7 +115,7 @@ void Building::Setting(int j)
 
     position.x = random_building_x_pos(gen);
     position.y = 0;
-    position.z = 40.f * (j + 1);
+    position.z = 20.f * (j + 1);
     scale.y = random_building_hight(gen);
 }
 
