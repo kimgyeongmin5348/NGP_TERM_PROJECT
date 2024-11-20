@@ -126,13 +126,13 @@ void Scene::Render()
     glm::mat4 projection = glm::mat4(1.0f);
 
     glm::vec3 cameraPos = glm::vec3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - 0.3f);
-    glm::vec3 cameraDirection = glm::vec3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z);
+    glm::vec3 cameraDirection = player->GetPosition();
     glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
     view = glm::lookAt(cameraPos, cameraDirection, cameraUp);
     view = glm::rotate(view, glm::radians(-20.f), glm::vec3(1.0f, 0.0f, 0.0f));
     //view = glm::rotate(view, glm::radians(camera.y_rotate_aoc), glm::vec3(0.0f, 1.0f, 0.0f));
-    view = glm::translate(view, glm::vec3(-player->GetPosition().x - player->GetPosition().x, 0.0f, player->GetPosition().z));
+    view = glm::translate(view, glm::vec3(player->GetPosition().x, 0.0f, player->GetPosition().z));
 
     projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 50.0f);
     projection = glm::translate(projection, glm::vec3(0.0, 0.0, -5.0));
@@ -142,6 +142,7 @@ void Scene::Render()
 
     unsigned int projectionLocation = glGetUniformLocation(s_program, "projection");
     glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &projection[0][0]);
+
 
     glm::vec4 lightPosition(0.f, 10.f, 20.f, 1.0f);
     lightPosition = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * lightPosition;
@@ -189,12 +190,14 @@ void Scene::HandleKeyboard(unsigned char key, bool isPressed)
             }
         }
     }
+
+    // 플레이어의 상태 기반으로 수정 필요 (키 입력 시 부자연스러운 움직임)
     if (key == 'w' || key == 'a' || key == 's' || key == 'd') {
         glm::vec3 pos = player->GetPosition();
-        if (key == 'w') pos.z -= 0.1f;
-        if (key == 'a') pos.x -= 0.1f;
-        if (key == 's') pos.z += 0.1f;
-        if (key == 'd') pos.x += 0.1f;
+        if (key == 'w') pos.z -= 0.05f;
+        if (key == 'a') pos.x += 0.05f;
+        if (key == 's') pos.z += 0.05f;
+        if (key == 'd') pos.x -= 0.05f;
         player->SetPosition(pos);
         std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
     }

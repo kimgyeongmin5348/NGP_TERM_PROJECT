@@ -20,6 +20,7 @@
 #include <gl/glm/ext.hpp>
 #include <gl/glm/gtc/matrix_transform.hpp>
 #include <gl/glm/fwd.hpp>
+#include <gl/glm/gtx/io.hpp>
 
 //#include <glm/glm.hpp>
 //#include <glm/ext.hpp>
