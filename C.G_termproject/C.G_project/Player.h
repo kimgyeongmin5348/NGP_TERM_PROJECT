@@ -1,10 +1,12 @@
 #pragma once
 #include "Object.h"
 
+class Scene;
+
 class Player : public Object
 {
 public:
-	Player();
+	Player(Scene* scene);
 	~Player();
 
 	virtual void Update(float deltaTime) override;
@@ -27,5 +29,7 @@ private:
 	Object* tailWing;
 	Object* bodyFloorLeft;
 	Object* bodyFloorRight;
+
+	Scene* scene;
 };
 

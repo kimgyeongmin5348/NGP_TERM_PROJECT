@@ -49,6 +49,15 @@ public:
     virtual void Update(float deltaTime);
 };
 
+class RotatingObject : public Object
+{
+public:
+    RotatingObject();
+    ~RotatingObject();
+
+    void Update(float deltaTime) override;
+};
+
 class Bullet : public Object
 {
 public:
@@ -66,7 +75,9 @@ public:
     Building();
     ~Building();
 
-    void Setting();
+    void Setting(int j);
+    virtual void Update(float deltaTime) override;
+
 };
 
 class Ground : public Object

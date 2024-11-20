@@ -52,7 +52,21 @@ void Object::Render(GLuint program, int type)
 
 void Object::Update(float deltaTime)
 {
+}
 
+/////////////////////////////////////////////////////////////////////////
+
+RotatingObject::RotatingObject()
+{
+}
+
+RotatingObject::~RotatingObject()
+{
+}
+
+void RotatingObject::Update(float deltaTime)
+{
+    rotation.y += 15.0f;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -71,7 +85,7 @@ void Bullet::Update(float deltaTime)
 {
     if (!active) return;
 
-    position.z += deltaTime;
+    position.z += 0.5f;
 
     // 범위를 벗어나면 비활성화
     if (position.z > 50.0f || position.z < -50.0f) {
@@ -92,7 +106,7 @@ Building::~Building()
 {
 }
 
-void Building::Setting()
+void Building::Setting(int j)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -101,8 +115,13 @@ void Building::Setting()
 
     position.x = random_building_x_pos(gen);
     position.y = 0;
-    position.z = 40.f;
+    position.z = 20.f * (j + 1);
     scale.y = random_building_hight(gen);
+}
+
+void Building::Update(float deltaTime)
+{
+    position.z -= 0.1f;
 }
 
 /////////////////////////////////////////////////////////////////////////

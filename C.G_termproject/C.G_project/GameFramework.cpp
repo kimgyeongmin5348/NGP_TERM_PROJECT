@@ -15,7 +15,7 @@ void GameFramework::Initialize(int argc, char** argv)
     }
 
     scene = Scene::GetInstance();
-    scene->Initialize(new Player());
+    scene->Initialize();
 }
 
 void GameFramework::TimerCallback(int value)
