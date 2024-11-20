@@ -84,6 +84,7 @@ void GoToInGame()
         for (int i = 0; i < 2; i++) {
             // Player[i].pos = { 0.0f, 0.0f, 0.0f };                // 초기 위치 설정  이건 클라랑 합의 필요.
             Player[i].state = 0; // 초기 상태 설정
+            readyState[i] = false;  // 게임 시작 시 준비 상태 초기화
         }
 
         // 게임 시작 이벤트 설정
@@ -132,6 +133,15 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     int ClientNum = nowID;
     char type;
 
+    // 클라이언트 연결 해제 시 처리
+    auto cleanup = [&]() {
+        readyState[ClientNum] = false;
+        closesocket(client_sock);
+        clientSockets[ClientNum] = INVALID_SOCKET;
+        
+        SendReadyServerToClient();
+        };
+
     while (true) {
         WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
 
@@ -173,6 +183,23 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 err_display("recv()");
                 break;
             }
+            
+            readyState[ClientNum] = true;
+            SendReadyServerToClient();
+
+            
+            SendReadyCompleteServerToClient();
+        }
+        break;
+        case CLIENT_NOTREADY: // Lobby 준비 해제 처리
+        {
+            NotReadyClientToServer notReadyPacket;
+            retval = recvn(client_sock, (char*)&notReadyPacket, sizeof(notReadyPacket), 0);
+            if (retval == SOCKET_ERROR) {
+                err_display("recv()");
+                break;
+            }
+            readyState[ClientNum] = false;
             SendReadyServerToClient();
         }
         break;
