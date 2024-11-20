@@ -30,6 +30,8 @@
 #define PACKET_PLAYER_MOVE 9
 #define PACKET_BUILDING_MOVE 10
 #define PACKET_BULLET_MOVE 11
+#define PACKET_COLLIDE_BULLET_BUILDING 14
+#define PACKET_COLLIDE_PLAYER_BUILDING 15
 
 #define TCPPORT			4000
 
@@ -93,6 +95,22 @@ struct PacketBulletMove
 	char type;
 	glm::vec3 pos;
 	int num; // 총알 번호
+};
+
+struct PacketCollideBB
+{
+	char size;
+	char type;
+	int building_num;
+	int bullet_num;
+};
+
+struct PacketCollidePB
+{
+	char size;
+	char type;
+	int building_num;
+	char id[MAX_ID_SIZE];
 };
 
 // 소켓 함수 오류 출력 후 종료
