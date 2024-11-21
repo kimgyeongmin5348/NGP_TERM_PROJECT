@@ -1,6 +1,11 @@
 #pragma once
 #include "Object.h"
 
+#define LEFT  0
+#define RIGHT 1
+#define UP    2
+#define DOWN  3
+
 class Scene;
 
 class Player : public Object
@@ -10,6 +15,7 @@ public:
 	~Player();
 
 	void SetPosition(const glm::vec3& pos) override;
+	void SetRotation(const glm::vec3& rot) override;
 
 
 	virtual void Update(float deltaTime) override;

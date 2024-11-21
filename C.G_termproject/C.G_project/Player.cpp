@@ -73,7 +73,42 @@ Player::~Player()
 
 void Player::Update(float deltaTime)
 {
-    //rotation.y += 45.0f * deltaTime;
+    glm::vec3 pos = GetPosition();
+    glm::vec3 rotate = GetRotation();
+    switch (state)
+    {
+    case LEFT:
+        if (pos.x < 4)
+            pos.x += 0.05f;
+        if (rotate.z > -15)
+            rotate.z -= 1.0f;
+        break;
+    case RIGHT:
+        if (pos.x > -4)
+            pos.x -= 0.05f;
+        if (rotate.z < 15)
+            rotate.z += 1.0f;
+        break;
+    case UP:
+        if (pos.y < 4)
+            pos.y += 0.03f;
+        if (rotate.x < 15)
+            rotate.x += 1.0f;
+        break;
+    case DOWN:
+        if (pos.y > 0)
+            pos.y -= 0.03f;
+        if (rotate.x > -15)
+            rotate.x -= 1.0f;
+        break;
+    default:
+        if (rotate.x < 0.f) rotate.x += 1.0f;
+        if (rotate.x > 0.f) rotate.x -= 1.0f;
+        if (rotate.z > 0.f) rotate.z -= 1.0f;
+        if (rotate.z < 0.f) rotate.z += 1.0f;
+    }
+    SetPosition(pos);
+    SetRotation(rotate);
 }
 
 void Player::Render(GLuint program)
@@ -104,4 +139,21 @@ void Player::SetPosition(const glm::vec3& pos)
     tailWing->SetPosition(glm::vec3(pos.x, pos.y + 0.8f, pos.z - 1.6f));
     bodyFloorLeft->SetPosition(glm::vec3(pos.x + 0.3f, pos.y + 0.2f, pos.z - 0.3f));
     bodyFloorRight->SetPosition(glm::vec3(pos.x - 0.3f, pos.y + 0.2f, pos.z - 0.3f));
+}
+
+void Player::SetRotation(const glm::vec3& rot)
+{
+    rotation = rot;
+
+    wingConnect->SetRotation(glm::vec3(rot.x, rot.y, rot.z));
+    wingLeft->SetRotation(glm::vec3(rot.x, wingLeft->GetRotation().y, rot.z));
+    wingRight->SetRotation(glm::vec3(rot.x, wingRight->GetRotation().y, rot.z));
+    body->SetRotation(glm::vec3(rot.x, 0, rot.z));
+    bodyFront->SetRotation(glm::vec3(rot.x, 0, rot.z));
+    bodyBack->SetRotation(glm::vec3(rot.x, 0, rot.z));
+    tailFront->SetRotation(glm::vec3(rot.x, 0, rot.z));
+    tailWing->SetRotation(glm::vec3(rot.x, 0, rot.z));
+    bodyFloorLeft->SetRotation(glm::vec3(rot.x, 0, rot.z));
+    bodyFloorRight->SetRotation(glm::vec3(rot.x, 0, rot.z));
+
 }

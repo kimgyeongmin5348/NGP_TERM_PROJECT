@@ -73,7 +73,7 @@ void RotatingObject::Update(float deltaTime)
 
 Bullet::Bullet()
 {
-    SetScale(glm::vec3(0.3f, 0.3f, 0.4f));
+    SetScale(glm::vec3(0.5f, 0.5f, 1.0f));
     SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
@@ -88,7 +88,7 @@ void Bullet::Update(float deltaTime)
     position.z += 0.5f;
 
     // 범위를 벗어나면 비활성화
-    if (position.z > 50.0f || position.z < -50.0f) {
+    if (position.z > 50.0f) {
         active = false;
     }
 }
@@ -122,6 +122,10 @@ void Building::Setting(int j)
 void Building::Update(float deltaTime)
 {
     position.z -= 0.1f;
+
+    if(position.z < 0.f) {
+        Setting(9);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////

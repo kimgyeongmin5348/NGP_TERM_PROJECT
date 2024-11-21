@@ -26,8 +26,32 @@ public:
 
     // 키 입력 처리
     std::unordered_map<unsigned char, bool> keyStates;
-    void KeyDown(unsigned char key) { keyStates[key] = true; }
-    void KeyUp(unsigned char key) { keyStates[key] = false; }
+    void KeyDown(unsigned char key) { 
+        keyStates[key] = true;
+        if (keyStates['q']) exit(0);
+        if (keyStates['w']) { player->state = UP; }
+        if (keyStates['a']) { player->state = LEFT; }
+        if (keyStates['s']) { player->state = DOWN; }
+        if (keyStates['d']) { player->state = RIGHT; }
+        //std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
+
+        // 총알 발사 처리
+        if (keyStates[' ']) { // space 키가 눌렸을 때
+            for (auto obj : gameObjects) {
+                Bullet* bullet = dynamic_cast<Bullet*>(obj);
+                if (bullet && !bullet->active) {
+                    bullet->SetPosition(player->GetPosition()); // 발사 위치 설정
+                    bullet->active = true;
+                    break;
+                }
+            }
+        }
+
+    }
+    void KeyUp(unsigned char key) { 
+        keyStates[key] = false;
+        player->state = 999;
+    }
 
 public:
     GLuint VAO[3], VBO[6];

@@ -10,6 +10,7 @@ SOCKET clientSockets[2];  // 클라이언트 소켓 저장 배열
 
 bool readyState[2] = { false, false }; // 각 플레이어의 준비 상태
 bool gameStarted = false;
+void GoToInGame();
 
 void SaveID(const char* NewID)
 {
@@ -95,12 +96,57 @@ void GoToInGame()
 // inGame
 void MakeBuildings()
 {
+    PacketBuildingMove buildingPacket;
+    buildingPacket.size = sizeof(PacketBuildingMove);
+    buildingPacket.type = PACKET_BUILDING_MOVE;
+
+    for(int k = 0; k< 2; ++k){
+        for (int i = 0; i < 100; ++i) {
+            for (int j = 0; j < 10; ++j) {
+                std::random_device rd;
+                std::mt19937 gen(rd());
+                std::uniform_real_distribution<float> random_building_x_pos(-20, 20);
+                std::uniform_real_distribution<float> random_building_hight(1, 25);
+
+                buildingPacket.pos.x = random_building_x_pos(gen);
+                buildingPacket.pos.y = 0;
+                buildingPacket.pos.z = 20.f * (j + 1);
+                //scale.y = random_building_hight(gen);
+                buildingPacket.num = i;
+                buildingPacket.is_broken = false;
+            }
+        }
+        send(clientSockets[k], (char*)&buildingPacket, sizeof(buildingPacket), 0);
+    }
 
 }
 
 void ProcessMove()
 {
+    for (int i = 0; i < 2; ++i) {
+        if (Player[i].state != 0) {
+            //총알, 건물, 플레이어의 움직임에 따라 좌표를 수정, 처리하는 함수
+            PacketBulletMove bullet;
+            bullet.size = sizeof(PacketBulletMove);
+            bullet.type = PACKET_BULLET_MOVE;
 
+            PacketBuildingMove building;
+            building.size = sizeof(PacketBuildingMove);
+            building.type = PACKET_BUILDING_MOVE;
+
+            PacketPlayerMove player;
+            player.size = sizeof(PacketPlayerMove);
+            player.type = PACKET_PLAYER_MOVE;
+
+            recvn(clientSockets[i], (char*)&bullet, sizeof(PacketBulletMove), 0);
+            recvn(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
+            recvn(clientSockets[i], (char*)&player, sizeof(PacketPlayerMove), 0);
+
+            Player[i].pos.x += player.pos.x;
+            Player[i].pos.y += player.pos.y;
+            Player[i].pos.z += player.pos.z;
+        }
+    }
 }
 
 BOOL ColidePlayerToObjects()
@@ -122,7 +168,31 @@ void DeleteObjects()
 
 void SendPacketMadebuildings()
 {
+    PacketBuildingMove building;
+    building.size = sizeof(PacketBuildingMove);
+    building.type = PACKET_BUILDING_MOVE;
 
+
+    for (int i = 0; i < 2; ++i) {
+        recv(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
+        if (building.pos.z < 0.f) {
+            MakeBuildings();
+            send(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
+        }
+    }
+    
+
+}
+
+void SendPacketMoveBuildings()
+{
+    PacketBuildingMove building;
+    building.size = sizeof(PacketBuildingMove);
+    building.type = PACKET_BUILDING_MOVE;
+    
+    for (int i = 0; i < 2; ++i) {
+        send(clientSockets[i], (char*)&building.pos, sizeof(building.pos), 0);
+    }
 }
 
 // 메인 스레드

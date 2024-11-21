@@ -99,13 +99,18 @@ void Scene::Initialize()
     
 void Scene::BuildObject()
 {
-	// 플레이어, Ground, 빌딩_Mat
+    // 플레이어, Ground, 빌딩_Mat
     player = new Player(this);
     //gameObjects.push_back(player);
     //player->SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
     Ground* ground = new Ground();
     gameObjects.push_back(ground);
+
+    for (int i = 0; i < 25; ++i) {
+        Bullet* bullet = new Bullet();
+        gameObjects.push_back(bullet);
+    }
 
     for (int i = 0; i < 100; ++i) {
         for (int j = 0; j < 10; ++j) {
@@ -165,25 +170,6 @@ void Scene::Render()
 
 void Scene::Update(float deltaTime)
 {
-    glm::vec3 pos = player->GetPosition();
-    if (keyStates['w']) pos.y += 0.05f;
-    if (keyStates['a']) pos.x += 0.05f;
-    if (keyStates['s']) pos.y -= 0.05f;
-    if (keyStates['d']) pos.x -= 0.05f;
-    player->SetPosition(pos);
-    std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
-    
-    // 총알 발사 처리
-    if (keyStates[' ']) { // space 키가 눌렸을 때
-        for (auto obj : gameObjects) {
-            Bullet* bullet = dynamic_cast<Bullet*>(obj);
-            if (bullet && !bullet->active) {
-                bullet->SetPosition(player->GetPosition()); // 발사 위치 설정
-                bullet->active = true;
-                break;
-            }
-        }
-    }
     player->Update(deltaTime);
 
     for (auto obj : gameObjects) {

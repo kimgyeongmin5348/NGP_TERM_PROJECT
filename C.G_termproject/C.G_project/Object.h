@@ -25,7 +25,7 @@ protected:
     GLuint VAO, VBO;
 
     glm::vec3 position;
-    glm::vec3 position_aoc;
+    //glm::vec3 position_aoc;
     glm::vec3 rotation;
     glm::vec3 scale;
     glm::vec3 color;
@@ -36,7 +36,7 @@ public:
 
 public:
     virtual void SetPosition(const glm::vec3& pos) { position = pos; }
-    void SetRotation(const glm::vec3& rot) { rotation = rot; }
+    virtual void SetRotation(const glm::vec3& rot) { rotation = rot; }
     void SetScale(const glm::vec3& scl) { scale = scl; }
     void SetColor(const glm::vec3& col) { color = col; }
 
