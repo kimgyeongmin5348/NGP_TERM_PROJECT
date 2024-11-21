@@ -17,17 +17,17 @@
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
 
-//#include <gl/glm/glm.hpp>
-//#include <gl/glm/ext.hpp>
-//#include <gl/glm/gtc/matrix_transform.hpp>
-//#include <gl/glm/fwd.hpp>
-//#include <gl/glm/gtx/io.hpp>
+#include <gl/glm/glm.hpp>
+#include <gl/glm/ext.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>
+#include <gl/glm/fwd.hpp>
+#include <gl/glm/gtx/io.hpp>
 
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/fwd.hpp>
-#include <glm/gtx/io.hpp>
+//#include <glm/glm.hpp>
+//#include <glm/ext.hpp>
+//#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/fwd.hpp>
+//#include <glm/gtx/io.hpp>
 
 #pragma comment(lib,"winmm.lib")
 

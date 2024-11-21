@@ -47,5 +47,3 @@ void GameFramework::Shutdown()
 {
     delete scene;
 }
-
-// test;;
