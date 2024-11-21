@@ -36,7 +36,7 @@ public:
 
 public:
     virtual void SetPosition(const glm::vec3& pos) { position = pos; }
-    void SetRotation(const glm::vec3& rot) { rotation = rot; }
+    virtual void SetRotation(const glm::vec3& rot) { rotation = rot; }
     void SetScale(const glm::vec3& scl) { scale = scl; }
     void SetColor(const glm::vec3& col) { color = col; }
 
