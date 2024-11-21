@@ -43,8 +43,8 @@ void SendReadyServerToClient()
 
     WaitForSingleObject(DataEvent, INFINITE);
     for (int i = 0; i < 2; i++) {
-        readyPacket.id = i;
-        if (readyState[i]) {
+        if (clientSockets[i] != INVALID_SOCKET) {
+            readyPacket.id = i;
             send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
         }
     }
@@ -81,7 +81,6 @@ void SendReadyCompleteServerToClient()
     }
     SetEvent(DataEvent);
 }
-
 
 
 // inGame
@@ -277,30 +276,23 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         {
             ReadyClientToServer readyPacket;
             retval = recvn(client_sock, (char*)&readyPacket, sizeof(readyPacket), 0);
-            if (retval == SOCKET_ERROR) {
-                err_display("recv()");
-                break;
-            }
+            if (retval == SOCKET_ERROR) break;
 
             readyState[ClientNum] = true;
             SendReadyServerToClient();
-
-
             SendReadyCompleteServerToClient();
+            break;
         }
-        break;
         case CLIENT_NOTREADY: // Lobby 준비 해제 처리
         {
             NotReadyClientToServer notReadyPacket;
             retval = recvn(client_sock, (char*)&notReadyPacket, sizeof(notReadyPacket), 0);
-            if (retval == SOCKET_ERROR) {
-                err_display("recv()");
-                break;
-            }
+            if (retval == SOCKET_ERROR) break;
+
             readyState[ClientNum] = false;
             SendReadyServerToClient();
+            break;
         }
-        break;
         case PACKET_PLAYER_MOVE:  // 게임 중 플레이어 이동 처리 
         {
             PacketPlayerMove movePacket;

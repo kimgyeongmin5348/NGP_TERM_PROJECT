@@ -5,6 +5,7 @@
 #define RIGHT 1
 #define UP    2
 #define DOWN  3
+#define ARE_YOU_READY 4
 
 class Scene;
 

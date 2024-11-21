@@ -34,16 +34,9 @@ public:
         if (keyStates['a']) { player->state = LEFT; }
         if (keyStates['s']) { player->state = DOWN; }
         if (keyStates['d']) { player->state = RIGHT; }
+        if (keyStates['m'] || keyStates['M']) { player->state = ARE_YOU_READY; }
         //std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
 
-      /*  if (keyStates['m'] || keyStates['M']) {
-            if (!isReady) {
-                SendReadyClientToServer();
-            }
-            else {
-                SendNotReadyClientToServer();
-            }
-        }*/
 
         // 총알 발사 처리
         if (keyStates[' ']) { // space 키가 눌렸을 때

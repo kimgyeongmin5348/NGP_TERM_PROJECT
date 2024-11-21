@@ -165,8 +165,11 @@ void SendNotReadyClientToServer()
 
 void ReadyClient()
 {
-
-
+    if (gameStarted) {
+        cout << "게임을 시작합니다..." << endl;
+        // 여기에 게임 시작 로직 추가
+        // Scene::GetInstance()->Initialize(); 등
+    }
 }
 
 // 서버로부터 패킷을 받아 처리하는 스레드 함수
@@ -207,8 +210,10 @@ DWORD WINAPI ProcessServer(LPVOID arg)
             AllReady packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
+
             cout << "모든 플레이어가 준비되었습니다." << endl;
             gameStarted = true;
+            ReadyClient();
             break;
         }
         }
