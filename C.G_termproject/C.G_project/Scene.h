@@ -3,6 +3,8 @@
 #include "Camera.h"
 #include "ServerToClient.h"
 
+#define MAX_BULLETS 30  // 상수 정의 추가
+
 class Scene
 {
 public:
@@ -29,12 +31,24 @@ public:
     std::unordered_map<unsigned char, bool> keyStates;
     void KeyDown(unsigned char key) { 
         keyStates[key] = true;
+
+        if (key == 'm') {
+            if (!isReady) {
+                cout << "준비 상태 전송 시도..." << '\n';  // 디버깅용 출력 추가
+                SendReadyClientToServer();
+            }
+            else {
+                cout << "준비 해제 상태 전송 시도..." << '\n';  // 디버깅용 출력 추가
+                SendNotReadyClientToServer();
+            }
+        }
+
         if (keyStates['q']) exit(0);
         if (keyStates['w']) { player->state = UP; }
         if (keyStates['a']) { player->state = LEFT; }
         if (keyStates['s']) { player->state = DOWN; }
         if (keyStates['d']) { player->state = RIGHT; }
-        if (keyStates['m'] || keyStates['M']) { player->state = ARE_YOU_READY; }
+        // if (keyStates['m'] || keyStates['M']) { player->state = ARE_YOU_READY; }
         //std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
 
 
@@ -55,6 +69,7 @@ public:
         keyStates[key] = false;
         player->state = 999;
     }
+
 
 public:
     GLuint VAO[3], VBO[6];
@@ -78,6 +93,6 @@ private:
     Player* player;
     std::vector<Object*> gameObjects;
     Camera* camera;
-    //bool isReady = false;
+    bool isReady = false;
 };
 

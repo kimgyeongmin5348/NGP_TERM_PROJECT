@@ -11,6 +11,8 @@ int main(int argc, char** argv) {
 
     // 게임 프레임워크 초기화
     game.Initialize(argc, argv);
+    // 11_20 동기화 위해서 추가한 함수...(로비준비에서 게임 시작을 위해서)
+    // Scene::GetInstance()->InitializePlayer();  // 플레이어만 초기화
 
     // 2. 네트워크 초기화
     if (!InitializeNetwork()) {
@@ -75,6 +77,7 @@ int main(int argc, char** argv) {
             break;
         }
     }
+
 
     // 6. 종료 처리
     game.Shutdown();

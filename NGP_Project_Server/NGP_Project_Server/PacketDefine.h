@@ -88,6 +88,7 @@ struct PacketPlayerMove
 	glm::vec3 pos;
 	char state;
 	char playerid[MAX_ID_SIZE];
+	char id;
 };
 
 struct PacketID
@@ -171,36 +172,19 @@ void err_display(int errcode)
 	LocalFree(lpMsgBuf);
 }
 
-int recvn(SOCKET s, char* buf, int len, int flags)
-{
+int recvn(SOCKET s, char* buf, int len, int flags) {
 	int received;
 	char* ptr = buf;
 	int left = len;
-	fd_set rset;
-	struct timeval tv = { 0, 100000 };  // 0.1초 타임아웃
 
 	while (left > 0) {
-		FD_ZERO(&rset);
-		FD_SET(s, &rset);
-
-		if (select(s + 1, &rset, NULL, NULL, &tv) > 0) {
-			received = recv(s, ptr, left, flags);
-			if (received == SOCKET_ERROR) {
-				if (WSAGetLastError() != WSAEWOULDBLOCK) {
-					return SOCKET_ERROR;
-				}
-				continue;
-			}
-			else if (received == 0) {
-				break;
-			}
-			left -= received;
-			ptr += received;
-		}
-		else {
-			// select 타임아웃 또는 에러
-			return (len - left);
-		}
+		received = recv(s, ptr, left, flags);
+		if (received == SOCKET_ERROR)
+			return SOCKET_ERROR;
+		else if (received == 0)
+			break;
+		left -= received;
+		ptr += received;
 	}
 	return (len - left);
 }

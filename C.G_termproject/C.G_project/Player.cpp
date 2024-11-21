@@ -101,15 +101,15 @@ void Player::Update(float deltaTime)
         if (rotate.x > -15)
             rotate.x -= 1.0f;
         break;
-    case ARE_YOU_READY:
+    /*case ARE_YOU_READY:
         if (!isReady) {
             cout << "ready" << '\n';
-            SendReadyClientToServer();
+            SendReadyClientToServer(); 
         }
         else {
             cout << "not ready" << '\n';
             SendNotReadyClientToServer();
-        }
+        }*/
     default:
         if (rotate.x < 0.f) rotate.x += 1.0f;
         if (rotate.x > 0.f) rotate.x -= 1.0f;
