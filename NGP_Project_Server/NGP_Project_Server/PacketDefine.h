@@ -9,20 +9,28 @@
 #include <stdlib.h> // exit(), ...
 #include <string.h> // strncpy(), ...
 
-#include <gl/glm/glm.hpp>
-#include <gl/glm/ext.hpp>
-#include <gl/glm/gtc/matrix_transform.hpp>
-#include <gl/glm/fwd.hpp>
-#include <gl/glm/gtx/io.hpp>
+//#include <gl/glm/glm.hpp>
+//#include <gl/glm/ext.hpp>
+//#include <gl/glm/gtc/matrix_transform.hpp>
+//#include <gl/glm/fwd.hpp>
+//#include <gl/glm/gtx/io.hpp>
+
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/fwd.hpp>
+#include <glm/gtx/io.hpp>
+
 
 #pragma comment(lib, "ws2_32") // ws2_32.lib 링크
 
-#define MAX_ID_SIZE 12
+using namespace std;
 
-#define PACKET_ID 2
+#define MAX_ID_SIZE 32
+
+
 #define ID_USE 3
 #define ID_NOT_USE 4
-
 #define CLIENT_READY 5
 #define CLIENT_NOTREADY 6
 #define CLIENT_STATE_READY 7
@@ -30,10 +38,12 @@
 #define PACKET_PLAYER_MOVE 9
 #define PACKET_BUILDING_MOVE 10
 #define PACKET_BULLET_MOVE 11
+#define PACKET_ID 12
 #define PACKET_COLLIDE_BULLET_BUILDING 14
 #define PACKET_COLLIDE_PLAYER_BUILDING 15
 
 #define TCPPORT			4000
+
 
 struct ClientLoginUsePacket
 {
@@ -78,6 +88,14 @@ struct PacketPlayerMove
 	glm::vec3 pos;
 	char state;
 	char playerid[MAX_ID_SIZE];
+};
+
+struct PacketID
+{
+	char size;
+	char type;
+	char id[MAX_ID_SIZE];
+
 };
 
 struct PacketBuildingMove
@@ -155,19 +173,34 @@ void err_display(int errcode)
 
 int recvn(SOCKET s, char* buf, int len, int flags)
 {
-    int received;
-    char* ptr = buf;
-    int left = len;
+	int received;
+	char* ptr = buf;
+	int left = len;
+	fd_set rset;
+	struct timeval tv = { 0, 100000 };  // 0.1초 타임아웃
 
-    while (left > 0) {
-        received = recv(s, ptr, left, flags);
-        if (received == SOCKET_ERROR)
-            return SOCKET_ERROR;
-        else if (received == 0)
-            break;
-        left -= received;
-        ptr += received;
-    }
+	while (left > 0) {
+		FD_ZERO(&rset);
+		FD_SET(s, &rset);
 
-    return (len - left);
+		if (select(s + 1, &rset, NULL, NULL, &tv) > 0) {
+			received = recv(s, ptr, left, flags);
+			if (received == SOCKET_ERROR) {
+				if (WSAGetLastError() != WSAEWOULDBLOCK) {
+					return SOCKET_ERROR;
+				}
+				continue;
+			}
+			else if (received == 0) {
+				break;
+			}
+			left -= received;
+			ptr += received;
+		}
+		else {
+			// select 타임아웃 또는 에러
+			return (len - left);
+		}
+	}
+	return (len - left);
 }
