@@ -170,28 +170,6 @@ void Scene::Render()
 
 void Scene::Update(float deltaTime)
 {
-    glm::vec3 pos = player->GetPosition();
-    glm::vec3 rotate = player->GetRotation();
-    if (keyStates['q']) exit(0);
-    if (keyStates['w']) { pos.y += 0.05f;   rotate.x += 1.0f; }
-    if (keyStates['a']) { pos.x += 0.05f;   rotate.z -= 1.0f; }
-    if (keyStates['s']) { pos.y -= 0.05f;   rotate.x -= 1.0f; }
-    if (keyStates['d']) { pos.x -= 0.05f;   rotate.z += 1.0f; }
-    player->SetPosition(pos);
-    player->SetRotation(rotate);
-    //std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
-    
-    // 총알 발사 처리
-    if (keyStates[' ']) { // space 키가 눌렸을 때
-        for (auto obj : gameObjects) {
-            Bullet* bullet = dynamic_cast<Bullet*>(obj);
-            if (bullet && !bullet->active) {
-                bullet->SetPosition(player->GetPosition()); // 발사 위치 설정
-                bullet->active = true;
-                break;
-            }
-        }
-    }
     player->Update(deltaTime);
 
     for (auto obj : gameObjects) {
