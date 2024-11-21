@@ -1,6 +1,7 @@
 #pragma once
 #include "Player.h"
 #include "Camera.h"
+#include "ServerToClient.h"
 
 class Scene
 {
@@ -34,6 +35,15 @@ public:
         if (keyStates['s']) { player->state = DOWN; }
         if (keyStates['d']) { player->state = RIGHT; }
         //std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
+
+      /*  if (keyStates['m'] || keyStates['M']) {
+            if (!isReady) {
+                SendReadyClientToServer();
+            }
+            else {
+                SendNotReadyClientToServer();
+            }
+        }*/
 
         // 총알 발사 처리
         if (keyStates[' ']) { // space 키가 눌렸을 때
@@ -75,5 +85,6 @@ private:
     Player* player;
     std::vector<Object*> gameObjects;
     Camera* camera;
+    //bool isReady = false;
 };
 

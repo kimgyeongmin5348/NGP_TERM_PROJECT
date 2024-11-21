@@ -36,6 +36,9 @@
     <ClCompile Include="GameFramework.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="NetWorkFunction.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="vertex.glsl" />

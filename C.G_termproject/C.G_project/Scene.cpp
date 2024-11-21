@@ -95,6 +95,7 @@ void Scene::Initialize()
     BuildObject();
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
+
 }
     
 void Scene::BuildObject()

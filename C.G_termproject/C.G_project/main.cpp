@@ -2,8 +2,8 @@
 #include "GameFramework.h"
 #include "ServerToClient.h"
 
-int myID = -1;
-extern int nowID;
+// int myID = -1;   // 로그인 때문에 있었음
+// extern int nowID;    // 로그인 때문에 있었음
 
 int main(int argc, char** argv) {
     // 1. 게임 프레임워크 객체 생성

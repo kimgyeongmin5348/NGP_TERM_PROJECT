@@ -1,5 +1,7 @@
+#pragma once
 #define _CRT_SECURE_NO_WARNINGS // 구형 C 함수 사용 시 경고 끄기
 #define _WINSOCK_DEPRECATED_NO_WARNINGS // 구형 소켓 API 사용 시 경고 끄
+#include "stdafx.h"
 
 #include <winsock2.h> // 윈속2 메인 헤더
 #include <ws2tcpip.h> // 윈속2 확장 헤더
@@ -8,21 +10,6 @@
 #include <stdio.h> // printf(), ...
 #include <stdlib.h> // exit(), ...
 #include <string.h> // strncpy(), ...
-
-//#include <gl/glm/glm.hpp>
-//#include <gl/glm/ext.hpp>
-//#include <gl/glm/gtc/matrix_transform.hpp>
-//#include <gl/glm/fwd.hpp>
-//#include <gl/glm/gtx/io.hpp>
-
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/fwd.hpp>
-#include <glm/gtx/io.hpp>
-
-
-#pragma comment(lib, "ws2_32") // ws2_32.lib 링크
 
 using namespace std;
 
@@ -133,75 +120,10 @@ struct PacketCollidePB
 };
 
 // 소켓 함수 오류 출력 후 종료
-void err_quit(const char* msg)
-{
-	LPVOID lpMsgBuf;
-	FormatMessageA(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, WSAGetLastError(),
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(char*)&lpMsgBuf, 0, NULL);
-	MessageBoxA(NULL, (const char*)lpMsgBuf, msg, MB_ICONERROR);
-	LocalFree(lpMsgBuf);
-	exit(1);
-}
-
+void err_quit(const char* msg);
 // 소켓 함수 오류 출력
-void err_display(const char* msg)
-{
-	LPVOID lpMsgBuf;
-	FormatMessageA(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, WSAGetLastError(),
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(char*)&lpMsgBuf, 0, NULL);
-	printf("[%s] %s\n", msg, (char*)lpMsgBuf);
-	LocalFree(lpMsgBuf);
-}
-
+void err_display(const char* msg);
 // 소켓 함수 오류 출력
-void err_display(int errcode)
-{
-	LPVOID lpMsgBuf;
-	FormatMessageA(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, errcode,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(char*)&lpMsgBuf, 0, NULL);
-	printf("[오류] %s\n", (char*)lpMsgBuf);
-	LocalFree(lpMsgBuf);
-}
+void err_display(int errcode);
 
-int recvn(SOCKET s, char* buf, int len, int flags)
-{
-	int received;
-	char* ptr = buf;
-	int left = len;
-	fd_set rset;
-	struct timeval tv = { 0, 100000 };  // 0.1초 타임아웃
-
-	while (left > 0) {
-		FD_ZERO(&rset);
-		FD_SET(s, &rset);
-
-		if (select(s + 1, &rset, NULL, NULL, &tv) > 0) {
-			received = recv(s, ptr, left, flags);
-			if (received == SOCKET_ERROR) {
-				if (WSAGetLastError() != WSAEWOULDBLOCK) {
-					return SOCKET_ERROR;
-				}
-				continue;
-			}
-			else if (received == 0) {
-				break;
-			}
-			left -= received;
-			ptr += received;
-		}
-		else {
-			// select 타임아웃 또는 에러
-			return (len - left);
-		}
-	}
-	return (len - left);
-}
+int recvn(SOCKET s, char* buf, int len, int flags);

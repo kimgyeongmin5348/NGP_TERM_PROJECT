@@ -13,25 +13,25 @@ bool readyState[2] = { false, false }; // 각 플레이어의 준비 상태
 bool gameStarted = false;
 void GoToInGame();
 
-void SaveID(const char* NewID) {
-    strncpy(Player[nowID].playerid, NewID, MAX_ID_SIZE - 1);
-    Player[nowID].playerid[MAX_ID_SIZE - 1] = '\0';
-    nowID++;
-    SetEvent(DataEvent);
-    cout << "ID 저장 완료: " << NewID << endl;
-}
-
-bool CheckID(const char* playerid) {
-    // DataEvent 대기는 제거 (불필요한 동기화 제거)
-    for (int i = 0; i < nowID; ++i) {
-        if (strcmp(Player[i].playerid, playerid) == 0) {
-            cout << "중복된 ID: " << playerid << endl;
-            return false;
-        }
-    }
-    cout << "사용 가능한 ID: " << playerid << endl;
-    return true;
-}
+//void SaveID(const char* NewID) {
+//    strncpy(Player[nowID].playerid, NewID, MAX_ID_SIZE - 1);
+//    Player[nowID].playerid[MAX_ID_SIZE - 1] = '\0';
+//    nowID++;
+//    SetEvent(DataEvent);
+//    cout << "ID 저장 완료: " << NewID << endl;
+//}
+//
+//bool CheckID(const char* playerid) {
+//    // DataEvent 대기는 제거 (불필요한 동기화 제거)
+//    for (int i = 0; i < nowID; ++i) {
+//        if (strcmp(Player[i].playerid, playerid) == 0) {
+//            cout << "중복된 ID: " << playerid << endl;
+//            return false;
+//        }
+//    }
+//    cout << "사용 가능한 ID: " << playerid << endl;
+//    return true;
+//}
 
 // Lobby
 void SendReadyServerToClient()
@@ -53,14 +53,17 @@ void SendReadyServerToClient()
 
 void SendReadyCompleteServerToClient()
 {
+    WaitForSingleObject(DataEvent, INFINITE);
+
     // 모든 플레이어가 준비되었는지 확인
     bool allReady = true;
     for (int i = 0; i < 2; i++) {
-        if (!readyState[i]) {
+        if (!readyState[i] || clientSockets[i] == INVALID_SOCKET) {
             allReady = false;
             break;
         }
     }
+
 
     if (allReady) {
         // 모든 클라이언트에게 게임 시작 가능 상태 전송
@@ -73,27 +76,13 @@ void SendReadyCompleteServerToClient()
         }
 
         // 게임 시작 상태로 전환
+        gameStarted = true;
         GoToInGame();
     }
+    SetEvent(DataEvent);
 }
 
-// 아직 정확하게 미완성 
-void GoToInGame()
-{
-    if (!gameStarted) {
-        gameStarted = true;
 
-        // 플레이어 초기 위치 설정
-        for (int i = 0; i < 2; i++) {
-            // Player[i].pos = { 0.0f, 0.0f, 0.0f };                // 초기 위치 설정  이건 클라랑 합의 필요.
-            Player[i].state = 0; // 초기 상태 설정
-            readyState[i] = false;  // 게임 시작 시 준비 상태 초기화
-        }
-
-        // 게임 시작 이벤트 설정
-        SetEvent(UpdateEvent);
-    }
-}
 
 // inGame
 void MakeBuildings()
@@ -197,6 +186,30 @@ void SendPacketMoveBuildings()
     }
 }
 
+
+// 아직 정확하게 미완성 
+void GoToInGame()
+{
+    if (!gameStarted) {
+        gameStarted = true;
+
+        // 플레이어 초기화
+        for (int i = 0; i < 2; i++) {
+            Player[i].state = 0;
+            readyState[i] = false;
+        }
+
+        MakeBuildings();
+
+        // 빌딩 움직임 시작을 위한 업데이트 이벤트 설정
+        SetEvent(UpdateEvent);
+
+        // 클라이언트에게 빌딩 정보 전송
+        SendPacketMadebuildings();
+    }
+}
+
+
 // 메인 스레드
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
@@ -238,7 +251,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             }
         }
         switch (type) {
-        case PACKET_ID: {
+       /* case PACKET_ID: {
             PacketID loginPacket;
             retval = recvn(client_sock, (char*)&loginPacket, sizeof(loginPacket), 0);
             if (retval == SOCKET_ERROR) {
@@ -259,7 +272,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             send(client_sock, (char*)&response, sizeof(response), 0);
             break;
         }
-        break;
+        break;*/
         case CLIENT_READY: // Lobby 준비 상태 처리
         {
             ReadyClientToServer readyPacket;
