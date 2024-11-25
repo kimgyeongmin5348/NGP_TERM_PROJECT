@@ -72,11 +72,13 @@ public:
 class Building : public Object
 {
 public:
-    Building();
+    Building(int i);
     ~Building();
 
     void Setting(int j);
     virtual void Update(float deltaTime) override;
+
+    bool is_broken = false;
 
 };
 
