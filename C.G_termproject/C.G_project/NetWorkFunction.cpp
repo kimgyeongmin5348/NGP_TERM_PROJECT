@@ -9,7 +9,7 @@ SOCKADDR_IN serveraddr;
 bool isReady = false;
 bool isConnected = false;
 bool gameStarted = false;
-int myID;
+int myID{};
 
 bool InitializeNetwork() {
 
@@ -143,7 +143,7 @@ void SendReadyClientToServer()
 
     // 먼저 타입 전송
     char type = CLIENT_READY;
-    int retval = send(sock, &type, sizeof(char), 0);
+    int retval = send(sock, (char*)&type, sizeof(unsigned char), 0);
     if (retval == SOCKET_ERROR) {
         cout << "준비 상태 타입 전송 실패" << endl;
         return;
@@ -195,96 +195,94 @@ void ReadyClient()
     }
 }
 
-// 서버로부터 패킷을 받아 처리하는 스레드 함수
-DWORD WINAPI ProcessServer(LPVOID arg)
-{
-    char type;
-    int retval;
+void SendPlayerMove(const glm::vec3& pos, int state) {
+    if (!isConnected) return;
 
+    PacketPlayerMove movePacket;
+    movePacket.size = sizeof(PacketPlayerMove);
+    movePacket.type = PACKET_PLAYER_MOVE;
+    movePacket.pos = pos;
+    movePacket.state = state;
+    movePacket.id = myID;
+
+    char type = PACKET_PLAYER_MOVE;
+    send(sock, &type, sizeof(char), 0);
+    send(sock, (char*)&movePacket, sizeof(movePacket), 0);
+}
+
+// 서버로부터 패킷을 받아 처리하는 스레드 함수
+DWORD WINAPI ProcessServer(LPVOID arg) {
     while (isConnected) {
-        if (sock == INVALID_SOCKET) {
+       /* if (sock == INVALID_SOCKET) {
             std::cout << "소켓이 유효하지 않습니다." << std::endl;
             break;
-        }
+        }*/
 
-        // 전체 패킷을 한번에 받도록 수정
-        char packet_buffer[256];  // 충분한 크기의 버퍼
-        int retval = recv(sock, packet_buffer, sizeof(char), 0);
-
-        if (retval == SOCKET_ERROR || retval == 0) {
-            std::cout << "서버와의 연결이 끊어졌습니다." << std::endl;
+        // 1. 먼저 패킷 타입만 수신
+        unsigned char type;
+        int retval = recv(sock, (char*)&type, sizeof(type), 0);
+        if (retval <= 0) {
+            cout << "서버와의 연결이 끊어졌습니다." << endl;
             break;
         }
 
-        char type = packet_buffer[0];
+        // 2. 패킷 타입에 따른 처리
         switch (type) {
-        case CLIENT_READY: {     // 5
+        case CLIENT_READY: {
             ReadyClientToServer packet;
-            retval = recvn(sock, ((char*)&packet) + 1, sizeof(ReadyClientToServer) - 1, 0);
+            retval = recvn(sock, (char*)&packet, sizeof(ReadyClientToServer), 0);
             if (retval == SOCKET_ERROR) break;
             cout << "플레이어 " << (int)packet.id << " 준비완료" << endl;
             break;
         }
-        case CLIENT_NOTREADY: { // 5
-            NotReadyClientToServer packet;
-            retval = recvn(sock, ((char*)&packet) + 1, sizeof(NotReadyClientToServer) - 1, 0);
-            if (retval == SOCKET_ERROR) break;
-            cout << "플레이어 " << (int)packet.id << " 준비해제" << endl;
-            break;
-        }
-        case CLIENT_ALL_READY: {    // 8
+        case CLIENT_ALL_READY: {
             AllReady packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
-
             cout << "모든 플레이어가 준비되었습니다." << endl;
             gameStarted = true;
             break;
         }
-        case PACKET_BUILDING_MOVE: {    // 10
+        case PACKET_BUILDING_MOVE: {
             PacketBuildingMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
-
-            // 서버로부터 받은 건물 위치 정보로 씬 업데이트 해야하는곳
-
-         
+            // 서버로부터 받은 건물 위치 정보로 씬 업데이트
+            Scene::GetInstance()->UpdateBuildingPosition(packet.num, packet.pos);
+            break;
         }
-
-        case PACKET_PLAYER_MOVE: {  // 9
+        case PACKET_PLAYER_MOVE: {
             PacketPlayerMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
-
             // 플레이어 이동 처리
+            Scene::GetInstance()->UpdatePlayerPosition(packet.id, packet.pos);
             break;
         }
-
-        case PACKET_BULLET_MOVE: {  // 11
+        case PACKET_BULLET_MOVE: {
             PacketBulletMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
-
             // 총알 이동 처리
+            //Scene::GetInstance()->UpdateBulletPosition(packet.id, packet.pos);
             break;
         }
-        case PACKET_COLLIDE_BULLET_BUILDING: {  // 14
+        case PACKET_COLLIDE_BULLET_BUILDING: {
             PacketCollideBB packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
-
             // 총알-건물 충돌 처리
+            //Scene::GetInstance()->ProcessBulletBuildingCollision(packet.bullet_id, packet.building_id);
             break;
         }
-        case PACKET_COLLIDE_PLAYER_BUILDING: {  // 15
+        case PACKET_COLLIDE_PLAYER_BUILDING: {
             PacketCollidePB packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
-
             // 플레이어-건물 충돌 처리
+            ////Scene::GetInstance()->ProcessPlayerBuildingCollision(packet.player_id, packet.building_id);
             break;
         }
-
         default:
             cout << "알 수 없는 패킷 타입: " << (int)type << endl;
             break;

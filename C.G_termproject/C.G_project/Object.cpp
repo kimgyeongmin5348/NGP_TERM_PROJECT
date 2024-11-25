@@ -121,7 +121,7 @@ void Building::Setting(int j)
 
 void Building::Update(float deltaTime)
 {
-    position.z -= 0.1f;
+    //position.z -= 0.1f;
 
     if(position.z < 0.f) {
         Setting(9);

@@ -77,6 +77,7 @@ struct PacketPlayerMove
 	glm::vec3 pos;
 	char state;
 	char playerid[MAX_ID_SIZE];
+	char id;
 };
 
 struct PacketID

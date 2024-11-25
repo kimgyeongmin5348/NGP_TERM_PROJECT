@@ -19,8 +19,9 @@ extern bool gameStarted;
 extern int myID;  // 클라이언트의 ID
 // extern int nowID;  // 로그인 부분때문에 추가함
 
+#define SERVERIP "127.0.0.1"  // localhost
 //#define SERVERIP "192.168.45.121"  //  이건 노트북ip 주소 ->192.168.40.29 경민
-#define SERVERIP "172.30.1.72"  //  아연
+//#define SERVERIP "172.30.1.72"  //  아연
 //#define SERVERIP "?"  //  민상
 
 
@@ -49,5 +50,6 @@ void CleanupNetwork();
 void SendReadyClientToServer();
 void SendNotReadyClientToServer();
 void ReadyClient();
+void SendPlayerMove();
 
 DWORD WINAPI ProcessServer(LPVOID arg);

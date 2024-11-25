@@ -3,13 +3,13 @@
 #include "Camera.h"
 #include "ServerToClient.h"
 
-#define MAX_BULLETS 30  // 상수 정의 추가
+#define MAX_BULLETS 30
 
 class Scene
 {
 public:
-	Scene();
-	~Scene();
+    Scene();
+    ~Scene();
 
     static Scene* GetInstance() {
         static Scene instance;
@@ -21,78 +21,85 @@ public:
     void Render();
     void Update(float deltaTime);
     void Resize(int w, int h);
-    //void HandleKeyboard(unsigned char key, bool isPressed);
+
+    void UpdatePlayerPosition(int playerID, const glm::vec3& newPos) {
+        if (playerID >= 0 && playerID < 2 && playerID != myID) {
+            if (otherPlayers[playerID] == nullptr) {
+                otherPlayers[playerID] = new Player();
+            }
+            otherPlayers[playerID]->SetPosition(newPos);
+        }
+    }
+
+    void UpdateBuildingPosition(int buildingNum, const glm::vec3& newPos) {
+        if (buildingNum >= 0 && buildingNum < gameObjects.size()) {
+            Building* building = dynamic_cast<Building*>(gameObjects[buildingNum]);
+            if (building) {
+                building->SetPosition(newPos);
+            }
+        }
+    }
 
     void AddGameObject(Object* obj) {
         gameObjects.push_back(obj);
     }
 
-    // 키 입력 처리
-    std::unordered_map<unsigned char, bool> keyStates;
-    void KeyDown(unsigned char key) { 
+    void KeyDown(unsigned char key) {
         keyStates[key] = true;
 
         if (key == 'm') {
             if (!isReady) {
-                cout << "준비 상태 전송 시도..." << '\n';  // 디버깅용 출력 추가
+                cout << "준비 상태 전송 시도..." << '\n';
                 SendReadyClientToServer();
             }
             else {
-                cout << "준비 해제 상태 전송 시도..." << '\n';  // 디버깅용 출력 추가
+                cout << "준비 해제 상태 전송 시도..." << '\n';
                 SendNotReadyClientToServer();
             }
         }
 
         if (keyStates['q']) exit(0);
-        if (keyStates['w']) { player->state = UP; }
-        if (keyStates['a']) { player->state = LEFT; }
-        if (keyStates['s']) { player->state = DOWN; }
-        if (keyStates['d']) { player->state = RIGHT; }
-        // if (keyStates['m'] || keyStates['M']) { player->state = ARE_YOU_READY; }
-        //std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
+        if (keyStates['w']) { mainPlayer->state = UP; }
+        if (keyStates['a']) { mainPlayer->state = LEFT; }
+        if (keyStates['s']) { mainPlayer->state = DOWN; }
+        if (keyStates['d']) { mainPlayer->state = RIGHT; }
 
-
-        // 총알 발사 처리
-        if (keyStates[' ']) { // space 키가 눌렸을 때
+        if (keyStates[' ']) {
             for (auto obj : gameObjects) {
                 Bullet* bullet = dynamic_cast<Bullet*>(obj);
                 if (bullet && !bullet->active) {
-                    bullet->SetPosition(player->GetPosition()); // 발사 위치 설정
+                    bullet->SetPosition(mainPlayer->GetPosition());
                     bullet->active = true;
                     break;
                 }
             }
         }
-
     }
-    void KeyUp(unsigned char key) { 
+
+    void KeyUp(unsigned char key) {
         keyStates[key] = false;
-        player->state = 999;
+        mainPlayer->state = 999;
     }
-
 
 public:
     GLuint VAO[3], VBO[6];
     GLuint s_program;
-
     GLuint shaderID;
     GLuint vertexShader;
     GLuint fragmentShader;
-
     GLint g_window_w, g_window_h;
 
-public:
     GLchar* filetobuf(const GLchar* file);
     virtual GLvoid InitBuffer();
-
     void make_vertexShaders();
     void make_fragmentShader();
     void InitShader();
 
 private:
-    Player* player;
+    Player* mainPlayer{ nullptr };  // 현재 클라이언트의 플레이어
+    Player* otherPlayers[2]{ nullptr, nullptr };  // 다른 클라이언트들의 플레이어
     std::vector<Object*> gameObjects;
-    Camera* camera;
-    bool isReady = false;
+    Camera* camera{ nullptr };
+    bool isReady{ false };
+    std::unordered_map<unsigned char, bool> keyStates;
 };
-
