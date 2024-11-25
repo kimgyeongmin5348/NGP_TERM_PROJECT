@@ -9,7 +9,6 @@
 #pragma comment(lib, "ws2_32.lib")  // Winsock 라이브러리 링크
 
 
-
 // Player* player[2] = { nullptr, nullptr };  // 동적 할당으로 변경
 
 extern WSADATA wsa;
@@ -28,10 +27,13 @@ extern int myID;  // 클라이언트의 ID
 
 bool InitializeNetwork();
 void CleanupNetwork();
+
 // 로그인 요청 함수
 bool SendLoginRequest(const char* playerid);
 void SendReadyClientToServer();
 void SendNotReadyClientToServer();
 void ReadyClient();
+
+
 
 DWORD WINAPI ProcessServer(LPVOID arg);

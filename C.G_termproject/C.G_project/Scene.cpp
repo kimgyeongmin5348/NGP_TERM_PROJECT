@@ -102,7 +102,7 @@ void Scene::BuildObject()
 {
     // 플레이어, Ground, 빌딩
     player = new Player(this);
-    player->state = 999;
+    player->state = 0;
 
     //gameObjects.push_back(player);
     //player->SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));

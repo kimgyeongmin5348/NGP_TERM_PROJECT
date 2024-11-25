@@ -74,9 +74,11 @@ struct PacketPlayerMove
 {
 	char size;
 	char type;
-	glm::vec3 pos;
+	//glm::vec3 pos;
+	float x, y, z;
 	char state;
-	char playerid[MAX_ID_SIZE];
+	// id 구현 전에는 서버에서 부여한 클라이언트 넘버로 동작
+	// char playerid[MAX_ID_SIZE];
 };
 
 struct PacketID

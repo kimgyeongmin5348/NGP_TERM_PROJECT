@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
 
     cout << "게임 시작..." << endl;
 
-    // 3. 로그인 처리
+    //// 3. 로그인 처리
     //bool loginSuccess = false;
     //while (!loginSuccess && isConnected) {
     //    char playerid[MAX_ID_SIZE];

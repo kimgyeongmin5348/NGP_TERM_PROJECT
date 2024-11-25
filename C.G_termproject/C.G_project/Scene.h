@@ -67,7 +67,7 @@ public:
     }
     void KeyUp(unsigned char key) { 
         keyStates[key] = false;
-        player->state = 999;
+        player->state = 0;
     }
 
 

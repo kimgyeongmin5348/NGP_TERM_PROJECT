@@ -118,6 +118,27 @@ void Player::Update(float deltaTime)
     }
     SetPosition(pos);
     SetRotation(rotate);
+
+    // Player의 Update가 있을 때 마다 서버에게 위치, 상태 정보 전송
+    PacketPlayerMove ppm = {};
+    ppm.size = sizeof(PacketPlayerMove);
+    ppm.type = PACKET_PLAYER_MOVE;
+    //ppm.pos.x = position.x;
+    //ppm.pos.y = position.y;
+    //ppm.pos.z = position.z;
+    ppm.x = position.x;
+    ppm.y = position.y;
+    ppm.z = position.z;
+
+    ppm.state = state;
+    //cout << state << endl;
+    cout << (int)ppm.state << endl;
+
+    int retval;
+    retval = send(sock, (char*)&ppm, sizeof(PacketPlayerMove), 0);
+    if (retval == SOCKET_ERROR) {
+        err_display("send() - PacketPlayerMove");
+    }
 }
 
 void Player::Render(GLuint program)
