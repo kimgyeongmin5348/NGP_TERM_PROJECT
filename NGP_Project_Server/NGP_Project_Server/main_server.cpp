@@ -67,6 +67,8 @@ void SendReadyServerToClient() {
 void SendReadyCompleteServerToClient() {
     WaitForSingleObject(DataEvent, INFINITE);
 
+    cout << "\n=== 게임 시작 신호 전송 시작 ===" << endl;
+
     // 모든 플레이어가 준비되었는지 확인
     bool allReady = true;
     for (int i = 0; i < 2; i++) {
@@ -77,6 +79,8 @@ void SendReadyCompleteServerToClient() {
     }
 
     if (allReady) {
+        cout << "모든 플레이어 준비 완료 확인" << endl;
+
         // 모든 클라이언트에게 게임 시작 가능 상태 전송
         AllReady readyPacket;
         readyPacket.size = sizeof(AllReady);
@@ -84,27 +88,27 @@ void SendReadyCompleteServerToClient() {
 
         for (int i = 0; i < 2; i++) {
             if (clientSockets[i] != INVALID_SOCKET) {
-                // 먼저 타입 전송
                 char type = CLIENT_ALL_READY;
                 int retval = send(clientSockets[i], &type, sizeof(char), 0);
                 if (retval == SOCKET_ERROR) {
-                    cout << "준비 완료 타입 전송 실패: " << WSAGetLastError() << endl;
+                    cout << "준비 완료 타입 전송 실패 (클라이언트 " << i << "): " << WSAGetLastError() << endl;
                     continue;
                 }
 
                 retval = send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
                 if (retval == SOCKET_ERROR) {
-                    cout << "준비 완료 패킷 전송 실패: " << WSAGetLastError() << endl;
+                    cout << "준비 완료 패킷 전송 실패 (클라이언트 " << i << "): " << WSAGetLastError() << endl;
                     continue;
                 }
-                cout << "클라이언트 " << i << "에게 준비 완료 상태 전송 완료" << endl;
+                cout << "클라이언트 " << i << "에게 게임 시작 신호 전송 완료" << endl;
             }
         }
 
-        // 게임 시작 상태로 전환
         gameStarted = true;
+        cout << "\n=== 게임 시작! ===" << endl;
         GoToInGame();
     }
+
     SetEvent(DataEvent);
 }
 
@@ -394,28 +398,28 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         cout << "수신된 타입: " << (int)type << endl;
 
         switch (type) {
-       /* case PACKET_ID: {
-            PacketID loginPacket;
-            retval = recvn(client_sock, (char*)&loginPacket, sizeof(loginPacket), 0);
-            if (retval == SOCKET_ERROR) {
-                err_display("recv()");
-                break;
-            }
+            /* case PACKET_ID: {
+                 PacketID loginPacket;
+                 retval = recvn(client_sock, (char*)&loginPacket, sizeof(loginPacket), 0);
+                 if (retval == SOCKET_ERROR) {
+                     err_display("recv()");
+                     break;
+                 }
 
-            ClientLoginUsePacket response;
-            response.size = sizeof(ClientLoginUsePacket);
-            response.type = CheckID(loginPacket.id) ? ID_USE : ID_NOT_USE;
+                 ClientLoginUsePacket response;
+                 response.size = sizeof(ClientLoginUsePacket);
+                 response.type = CheckID(loginPacket.id) ? ID_USE : ID_NOT_USE;
 
-            if (response.type == ID_USE) {
-                SaveID(loginPacket.id);
-                strncpy(response.playerid, loginPacket.id, MAX_ID_SIZE - 1);
-                response.playerid[MAX_ID_SIZE - 1] = '\0';
-            }
+                 if (response.type == ID_USE) {
+                     SaveID(loginPacket.id);
+                     strncpy(response.playerid, loginPacket.id, MAX_ID_SIZE - 1);
+                     response.playerid[MAX_ID_SIZE - 1] = '\0';
+                 }
 
-            send(client_sock, (char*)&response, sizeof(response), 0);
-            break;
-        }
-        break;*/
+                 send(client_sock, (char*)&response, sizeof(response), 0);
+                 break;
+             }
+             break;*/
         case CLIENT_READY: {
             ReadyClientToServer readyPacket;
             retval = recv(client_sock, (char*)&readyPacket, sizeof(ReadyClientToServer), 0);
@@ -526,15 +530,15 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             break;
         }
         }
-
-        if (ClientNum < 2) {
-            SetEvent(ClientEvent[(ClientNum + 1) % 2]);
+            if (ClientNum < 2) {
+                SetEvent(ClientEvent[(ClientNum + 1) % 2]);
+            }         
         }
+
+        cleanup();
+        return 0;
     }
 
-    cleanup();
-    return 0;
-}
 
 // 업데이트 스레드
 DWORD WINAPI ProcessUpdate(LPVOID arg)
@@ -671,7 +675,6 @@ int main() {
             CloseHandle(hThread);
             cout << "클라이언트 " << nowID - 1 << " 스레드 생성 성공" << endl;
         }
-
 
     }
 
