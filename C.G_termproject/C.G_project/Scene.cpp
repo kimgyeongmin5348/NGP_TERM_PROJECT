@@ -100,12 +100,8 @@ void Scene::Initialize()
     
 void Scene::BuildObject()
 {
-    // 플레이어, Ground, 빌딩_Mat
     player = new Player(this);
     player->state = 999;
-
-    //gameObjects.push_back(player);
-    //player->SetPosition(glm::vec3(0.0f, 5.0f, 0.0f));
 
     Ground* ground = new Ground();
     gameObjects.push_back(ground);
@@ -115,7 +111,6 @@ void Scene::BuildObject()
         gameObjects.push_back(bullet);
     }
 
-    //building = new Building * [100];
     for (int i = 0; i < 100; ++i) {
         Building* buildings = new Building(i);
         gameObjects.push_back(buildings);
