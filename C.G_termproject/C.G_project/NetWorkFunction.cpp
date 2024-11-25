@@ -63,25 +63,25 @@ void CleanupNetwork() {
 }
 
 // 로그인 요청 함수
-//bool SendLoginRequest(const char* playerid) {
-//    if (sock == INVALID_SOCKET) {
-//        cout << "서버에 연결되어 있지 않습니다." << endl;
-//        return false;
-//    }
-//
-//    PacketID loginPacket;
-//    loginPacket.size = sizeof(PacketID);
-//    loginPacket.type = PACKET_ID;
-//    strncpy_s(loginPacket.id, playerid, MAX_ID_SIZE - 1);
-//    loginPacket.id[MAX_ID_SIZE - 1] = '\0';
-//
-//    int retval = send(sock, (char*)&loginPacket, sizeof(loginPacket), 0);
-//    if (retval == SOCKET_ERROR) {
-//        cout << "로그인 패킷 전송 실패: " << WSAGetLastError() << endl;
-//        return false;
-//    }
-//    return true;
-//}
+bool SendLoginRequest(const char* playerid) {
+    if (sock == INVALID_SOCKET) {
+        cout << "서버에 연결되어 있지 않습니다." << endl;
+        return false;
+    }
+
+    PacketID loginPacket;
+    loginPacket.size = sizeof(PacketID);
+    loginPacket.type = PACKET_ID;
+    strncpy_s(loginPacket.id, playerid, MAX_ID_SIZE - 1);
+    loginPacket.id[MAX_ID_SIZE - 1] = '\0';
+
+    int retval = send(sock, (char*)&loginPacket, sizeof(loginPacket), 0);
+    if (retval == SOCKET_ERROR) {
+        cout << "로그인 패킷 전송 실패: " << WSAGetLastError() << endl;
+        return false;
+    }
+    return true;
+}
 
 void err_quit(const char* msg) {
     LPVOID lpMsgBuf;
