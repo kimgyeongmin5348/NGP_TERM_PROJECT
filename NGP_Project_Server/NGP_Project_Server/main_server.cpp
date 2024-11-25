@@ -3,6 +3,7 @@
 
 using namespace std;
 PacketPlayerMove Player[2]; //플레이어 정보?
+PacketBuildingMove Building[100];
 int nowID = 0; // 클라당 id
 HANDLE ClientEvent[2];
 HANDLE UpdateEvent;
@@ -114,31 +115,27 @@ void SendReadyCompleteServerToClient() {
 
 
 // inGame
-void MakeBuildings()
+void MakeBuildings(int i)
 {
-    PacketBuildingMove buildingPacket;
-    buildingPacket.size = sizeof(PacketBuildingMove);
-    buildingPacket.type = PACKET_BUILDING_MOVE;
+    for (int k = 0; k < 100; ++k) {
+        Building[k].size = sizeof(PacketBuildingMove);
+        Building[k].type = PACKET_BUILDING_MOVE;        
 
-    for (int k = 0; k < 2; ++k) {
-        for (int i = 0; i < 100; ++i) {
-            for (int j = 0; j < 10; ++j) {
-                std::random_device rd;
-                std::mt19937 gen(rd());
-                std::uniform_real_distribution<float> random_building_x_pos(-20, 20);
-                std::uniform_real_distribution<float> random_building_hight(1, 25);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<float> random_building_x_pos(-20, 20);
+        std::uniform_real_distribution<float> random_building_hight(1, 25);
 
-                buildingPacket.pos.x = random_building_x_pos(gen);
-                buildingPacket.pos.y = 0;
-                buildingPacket.pos.z = 20.f * (j + 1);
-                //scale.y = random_building_hight(gen);
-                buildingPacket.num = i;
-                buildingPacket.is_broken = false;
-            }
-        }
-        send(clientSockets[k], (char*)&buildingPacket, sizeof(buildingPacket), 0);
+        Building[k].pos.x = random_building_x_pos(gen);
+        Building[k].pos.y = 0;
+        Building[k].pos.z = 20.f;
+        Building[k].scale.y = random_building_hight(gen);
+        Building[k].num = k;
+        Building[k].is_broken = false;      
+
+        send(clientSockets[i], (char*)&Building[k], sizeof(Building[k]), 0);
     }
-
+    cout << "빌딩 생성 완료" << endl;
 }
 
 //void ProcessMove()
@@ -296,30 +293,35 @@ void DeleteObjects()
 
 void SendPacketMadebuildings()
 {
-    PacketBuildingMove building;
-    building.size = sizeof(PacketBuildingMove);
-    building.type = PACKET_BUILDING_MOVE;
-
+    //PacketBuildingMove building;
+    //building.size = sizeof(PacketBuildingMove);
+    //building.type = PACKET_BUILDING_MOVE;
 
     for (int i = 0; i < 2; ++i) {
-        recv(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
-        if (building.pos.z < 0.f) {
-            MakeBuildings();
-            send(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
+        for (int j = 0; j < 100; ++j) {
+            if (Building[j].pos.z < 0.f) {
+                MakeBuildings(i);
+                send(clientSockets[i], (char*)&Building[j], sizeof(PacketBuildingMove), 0);
+                cout << "클라이언트 " << i << "로 빌딩 패킷 전송" << endl;
+
+            }
         }
     }
-
 
 }
 
 void SendPacketMoveBuildings()
 {
-    PacketBuildingMove building;
-    building.size = sizeof(PacketBuildingMove);
-    building.type = PACKET_BUILDING_MOVE;
+    //PacketBuildingMove building;
+    //building.size = sizeof(PacketBuildingMove);
+    //building.type = PACKET_BUILDING_MOVE;
 
     for (int i = 0; i < 2; ++i) {
-        send(clientSockets[i], (char*)&building.pos, sizeof(building.pos), 0);
+        for (int j = 0; j < 100; ++j) {
+            Building[j].pos.z -= 0.1f;
+            send(clientSockets[i], (char*)&Building[j].pos, sizeof(Building[j].pos), 0);
+            cout << "클라이언트 " << i << "로 빌딩 위치 전송" << endl;
+        }
     }
 }
 
@@ -332,8 +334,8 @@ void GoToInGame()
         for (int i = 0; i < 2; i++) {
             Player[i].state = 0;
             readyState[i] = false;
+            MakeBuildings(i);
         }
-        MakeBuildings();
         SetEvent(UpdateEvent);
     }
 }
@@ -549,7 +551,8 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
         WaitForSingleObject(UpdateEvent, INFINITE);
 
         // 건물 생성
-        MakeBuildings();
+        for (int i = 0; i < 2; ++i)
+            MakeBuildings(i);
 
         // 오브젝트 이동 처리
         ProcessMove();
@@ -565,6 +568,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
 
         // 클라이언트들에게 업데이트된 정보 전송
         SendPacketMadebuildings();
+        SendPacketMoveBuildings();
 
         SetEvent(ClientEvent[0]);
     }

@@ -195,6 +195,16 @@ void ReadyClient()
     }
 }
 
+PacketBuildingMove UpdatePacketFromServer(PacketBuildingMove& packet) {
+    PacketBuildingMove UpdatePacket;
+    UpdatePacket.pos.x = packet.pos.x;
+    UpdatePacket.pos.z = packet.pos.z;
+    UpdatePacket.scale.y = packet.scale.y;
+    UpdatePacket.is_broken = packet.is_broken;
+    std::cout << "빌딩 업데이트" << std::endl;
+    return UpdatePacket;
+}
+
 // 서버로부터 패킷을 받아 처리하는 스레드 함수
 DWORD WINAPI ProcessServer(LPVOID arg)
 {
@@ -247,8 +257,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
             if (retval == SOCKET_ERROR) break;
 
             // 서버로부터 받은 건물 위치 정보로 씬 업데이트 해야하는곳
-
-         
+            UpdatePacketFromServer(packet);
         }
 
         case PACKET_PLAYER_MOVE: {  // 9

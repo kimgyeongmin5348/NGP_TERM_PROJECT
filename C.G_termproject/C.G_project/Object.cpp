@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Object.h"
+#include "PacketDefine.h"
 
 Object::Object()
 {
@@ -95,10 +96,19 @@ void Bullet::Update(float deltaTime)
 
 /////////////////////////////////////////////////////////////////////////
 
-Building::Building()
+Building::Building(int i)
 {
-    SetPosition(glm::vec3(position.x, 0.f, position.z));
-    SetScale(glm::vec3(2.0f, 12.5f, 4.0f));
+    PacketBuildingMove packet[100];
+    int retval = recvn(sock, (char*)&packet[i], sizeof(packet[i]), 0);
+    if (retval == SOCKET_ERROR) {
+        std::cerr << "데이터 수신 오류: " << WSAGetLastError() << std::endl;
+        return;
+    }
+    else if (retval == 0) {
+        std::cerr << "서버와의 연결이 끊어졌습니다." << std::endl; return;
+    }
+    SetPosition(glm::vec3(packet[i].pos.x, 0.f, packet[i].pos.z));
+    SetScale(glm::vec3(2.0f, packet[i].scale.y, 4.0f));
     SetColor(glm::vec3(1.0f, 0.0f, 0.5f));
 }
 
@@ -108,24 +118,24 @@ Building::~Building()
 
 void Building::Setting(int j)
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> random_building_x_pos(-20, 20);
-    std::uniform_real_distribution<float> random_building_hight(1, 25);
+    //std::random_device rd;
+    //std::mt19937 gen(rd());
+    //std::uniform_real_distribution<float> random_building_x_pos(-20, 20);
+    //std::uniform_real_distribution<float> random_building_hight(1, 25);
 
-    position.x = random_building_x_pos(gen);
-    position.y = 0;
-    position.z = 20.f * (j + 1);
-    scale.y = random_building_hight(gen);
+    //position.x = random_building_x_pos(gen);
+    //position.y = 0;
+    //position.z = 20.f * (j + 1);
+    //scale.y = random_building_hight(gen);
 }
 
 void Building::Update(float deltaTime)
-{
-    position.z -= 0.1f;
+{   
+    //position.z -= 0.1f;
 
-    if(position.z < 0.f) {
-        Setting(9);
-    }
+    //if(position.z < 0.f) {
+    //    Setting(9);
+    //}
 }
 
 /////////////////////////////////////////////////////////////////////////

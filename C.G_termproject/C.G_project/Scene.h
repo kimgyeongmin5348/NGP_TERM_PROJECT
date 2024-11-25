@@ -91,6 +91,7 @@ public:
 
 private:
     Player* player;
+    //Building** buildings;
     std::vector<Object*> gameObjects;
     Camera* camera;
     bool isReady = false;

@@ -115,12 +115,10 @@ void Scene::BuildObject()
         gameObjects.push_back(bullet);
     }
 
+    //building = new Building * [100];
     for (int i = 0; i < 100; ++i) {
-        for (int j = 0; j < 10; ++j) {
-            Building* building = new Building();
-            building->Setting(j);
-            gameObjects.push_back(building);
-        }
+        Building* buildings = new Building(i);
+        gameObjects.push_back(buildings);
     }
 }
 
