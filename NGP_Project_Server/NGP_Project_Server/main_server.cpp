@@ -165,114 +165,6 @@ void ProcessMove() {
     SetEvent(DataEvent);
 }
 
-//void ProcessMove() {
-//    for (int i = 0; i < 2; ++i) {
-//        if (Player[i].state != 0) {
-//            cout << "\n플레이어 " << i << " 이동 처리 시작" << endl;
-//
-//            PacketBulletMove bullet;
-//            bullet.size = sizeof(PacketBulletMove);
-//            bullet.type = PACKET_BULLET_MOVE;
-//
-//            PacketBuildingMove building;
-//            building.size = sizeof(PacketBuildingMove);
-//            building.type = PACKET_BUILDING_MOVE;
-//
-//            PacketPlayerMove player;
-//            player.size = sizeof(PacketPlayerMove);
-//            player.type = PACKET_PLAYER_MOVE;
-//
-//            // 패킷 수신
-//            int retval;
-//
-//            retval = recvn(clientSockets[i], (char*)&bullet, sizeof(PacketBulletMove), 0);
-//            if (retval == SOCKET_ERROR) {
-//                cout << "총알 패킷 수신 실패 (플레이어 " << i << "): " << WSAGetLastError() << endl;
-//                continue;
-//            }
-//            cout << "총알 패킷 수신 성공 (플레이어 " << i << ")" << endl;
-//
-//            retval = recvn(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
-//            if (retval == SOCKET_ERROR) {
-//                cout << "건물 패킷 수신 실패 (플레이어 " << i << "): " << WSAGetLastError() << endl;
-//                continue;
-//            }
-//            cout << "건물 패킷 수신 성공 (플레이어 " << i << ")" << endl;
-//
-//            retval = recvn(clientSockets[i], (char*)&player, sizeof(PacketPlayerMove), 0);
-//            if (retval == SOCKET_ERROR) {
-//                cout << "플레이어 패킷 수신 실패 (플레이어 " << i << "): " << WSAGetLastError() << endl;
-//                continue;
-//            }
-//            cout << "플레이어 패킷 수신 성공 (플레이어 " << i << ")" << endl;
-//
-//            // 위치 업데이트 전 위치 출력
-//            cout << "플레이어 " << i << " 이동 전 위치: ("
-//                << Player[i].pos.x << ", " << Player[i].pos.y << ", " << Player[i].pos.z << ")" << endl;
-//
-//            // 위치 업데이트
-//            Player[i].pos.x += player.pos.x;
-//            Player[i].pos.y += player.pos.y;
-//            Player[i].pos.z += player.pos.z;
-//
-//            // 업데이트 후 위치 출력
-//            cout << "플레이어 " << i << " 이동 후 위치: ("
-//                << Player[i].pos.x << ", " << Player[i].pos.y << ", " << Player[i].pos.z << ")" << endl;
-//
-//            // 업데이트된 위치 정보를 모든 클라이언트에게 전송
-//            for (int j = 0; j < 2; ++j) {
-//                if (clientSockets[j] != INVALID_SOCKET) {
-//                    cout << "\n클라이언트 " << j << "에게 데이터 전송 시작" << endl;
-//
-//                    // 총알 정보 전송
-//                    char type = PACKET_BULLET_MOVE;
-//                    retval = send(clientSockets[j], &type, sizeof(char), 0);
-//                    if (retval == SOCKET_ERROR) {
-//                        cout << "총알 타입 전송 실패 (클라이언트 " << j << "): " << WSAGetLastError() << endl;
-//                        continue;
-//                    }
-//                    retval = send(clientSockets[j], (char*)&bullet, sizeof(bullet), 0);
-//                    if (retval == SOCKET_ERROR) {
-//                        cout << "총알 패킷 전송 실패 (클라이언트 " << j << "): " << WSAGetLastError() << endl;
-//                        continue;
-//                    }
-//                    cout << "총알 정보 전송 완료 (클라이언트 " << j << ")" << endl;
-//
-//                    // 건물 정보 전송
-//                    type = PACKET_BUILDING_MOVE;
-//                    retval = send(clientSockets[j], &type, sizeof(char), 0);
-//                    if (retval == SOCKET_ERROR) {
-//                        cout << "건물 타입 전송 실패 (클라이언트 " << j << "): " << WSAGetLastError() << endl;
-//                        continue;
-//                    }
-//                    retval = send(clientSockets[j], (char*)&building, sizeof(building), 0);
-//                    if (retval == SOCKET_ERROR) {
-//                        cout << "건물 패킷 전송 실패 (클라이언트 " << j << "): " << WSAGetLastError() << endl;
-//                        continue;
-//                    }
-//                    cout << "건물 정보 전송 완료 (클라이언트 " << j << ")" << endl;
-//
-//                    // 플레이어 정보 전송
-//                    type = PACKET_PLAYER_MOVE;
-//                    retval = send(clientSockets[j], &type, sizeof(char), 0);
-//                    if (retval == SOCKET_ERROR) {
-//                        cout << "플레이어 타입 전송 실패 (클라이언트 " << j << "): " << WSAGetLastError() << endl;
-//                        continue;
-//                    }
-//                    Player[i].id = i;  // 플레이어 ID 설정
-//                    retval = send(clientSockets[j], (char*)&Player[i], sizeof(PacketPlayerMove), 0);
-//                    if (retval == SOCKET_ERROR) {
-//                        cout << "플레이어 패킷 전송 실패 (클라이언트 " << j << "): " << WSAGetLastError() << endl;
-//                        continue;
-//                    }
-//                    cout << "플레이어 정보 전송 완료 (클라이언트 " << j << ")" << endl;
-//                }
-//            }
-//            cout << "플레이어 " << i << " 이동 처리 완료\n" << endl;
-//        }
-//    }
-//}
-
 BOOL ColidePlayerToObjects()
 {
 
@@ -538,7 +430,7 @@ int main() {
     }
 
     // 정리
-    closesocket(listen_sock); 
+    closesocket(listen_sock);
     WSACleanup();
 
     return 0;

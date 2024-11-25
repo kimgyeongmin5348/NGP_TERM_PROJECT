@@ -51,11 +51,7 @@ public:
             if (!isReady) {
                 cout << "준비 상태 전송 시도..." << '\n';
                 SendReadyClientToServer();
-            }
-            else {
-                cout << "준비 해제 상태 전송 시도..." << '\n';
-                SendNotReadyClientToServer();
-            }
+            }           
         }
 
         if (keyStates['q']) exit(0);

@@ -160,41 +160,6 @@ void SendReadyClientToServer()
     isReady = true;
 }
 
-void SendNotReadyClientToServer()
-{
-    NotReadyClientToServer notReadyPacket;
-    notReadyPacket.size = sizeof(NotReadyClientToServer);
-    notReadyPacket.type = CLIENT_NOTREADY;
-    notReadyPacket.id = myID;
-
-    // 먼저 타입 전송
-    char type = CLIENT_NOTREADY;
-    int retval = send(sock, &type, sizeof(char), 0);
-    if (retval == SOCKET_ERROR) {
-        cout << "준비 해제 상태 타입 전송 실패" << endl;
-        return;
-    }
-
-    // 그 다음 패킷 전송
-    retval = send(sock, (char*)&notReadyPacket, sizeof(notReadyPacket), 0);
-    if (retval == SOCKET_ERROR) {
-        cout << "준비 해제 상태 패킷 전송 실패" << endl;
-        return;
-    }
-
-    cout << "준비 해제 상태 전송 완료" << endl;
-    isReady = false;
-}
-
-void ReadyClient()
-{
-    if (gameStarted) {
-        cout << "게임을 시작합니다..." << endl;
-        // 여기에 게임 시작 로직 추가
-        // Scene::GetInstance()->Initialize(); 등
-    }
-}
-
 void SendPlayerMove(const glm::vec3& pos, int state) {
     if (!isConnected) return;
 
