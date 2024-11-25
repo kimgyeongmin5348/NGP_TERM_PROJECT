@@ -234,15 +234,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             if (retval == SOCKET_ERROR) break;
             cout << "플레이어 " << (int)packet.id << " 준비완료" << endl;
             break;
-        }
-        case CLIENT_ALL_READY: {
-            AllReady packet;
-            retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
-            if (retval == SOCKET_ERROR) break;
-            cout << "모든 플레이어가 준비되었습니다." << endl;
-            gameStarted = true;
-            break;
-        }
+        }    
         case PACKET_BUILDING_MOVE: {
             PacketBuildingMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
