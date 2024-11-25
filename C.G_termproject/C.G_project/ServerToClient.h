@@ -1,5 +1,5 @@
 #pragma once
-//#define WIN32_LEAN_AND_MEAN  // Windows.h客 Winsock.h 面倒 规瘤
+#define WIN32_LEAN_AND_MEAN  // Windows.h客 Winsock.h 面倒 规瘤
 #include <WinSock2.h>
 #include <Windows.h>
 #include <ws2tcpip.h>
