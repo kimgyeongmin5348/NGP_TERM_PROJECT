@@ -300,7 +300,6 @@ void SendPacketMadebuildings()
     building.size = sizeof(PacketBuildingMove);
     building.type = PACKET_BUILDING_MOVE;
 
-
     for (int i = 0; i < 2; ++i) {
         recv(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
         if (building.pos.z < 0.f) {
@@ -308,8 +307,6 @@ void SendPacketMadebuildings()
             send(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
         }
     }
-
-
 }
 
 void SendPacketMoveBuildings()
@@ -395,8 +392,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         }
 
         //cout << "\n=== 클라이언트 " << ClientNum << " 패킷 처리 시작 ===" << endl;
-        //cout << "수신된 타입: " << (int)type << endl;
-
         switch (type) {
             /* case PACKET_ID: {
                  PacketID loginPacket;
@@ -517,7 +512,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                     }
 
                     // 위치 정보 패킷 전송
-                    //movePacket.id = ClientNum;  // 어떤 플레이어가 이동했는지 표시
                     retval = send(clientSockets[i], (char*)&movePacket, sizeof(movePacket), 0);
                     if (retval == SOCKET_ERROR) {
                         cout << "플레이어 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
@@ -675,7 +669,6 @@ int main() {
             CloseHandle(hThread);
             cout << "클라이언트 " << nowID - 1 << " 스레드 생성 성공" << endl;
         }
-
     }
 
     // 정리

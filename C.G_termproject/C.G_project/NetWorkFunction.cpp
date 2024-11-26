@@ -247,13 +247,11 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 
             // 서버로부터 받은 건물 위치 정보로 씬 업데이트 해야하는곳
 
-         
         }
-
         case PACKET_PLAYER_MOVE: {  // 9
             PacketPlayerMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
-            cout << "상대 Player : " << packet.pos.x << " " << packet.pos.y << endl;
+            cout << "상대 Player : " << packet.pos.x << ", " << packet.pos.y << "(" << packet.state << ")" << endl;
             if (retval == SOCKET_ERROR) break;
 
             // 상대 플레이어 이동 처리
