@@ -117,13 +117,10 @@ void Scene::BuildObject()
     }
 
     // 빌딩 생성부분 -> 서버에서 하기 때문에 지워봄
-   /* for (int i = 0; i < 100; ++i) {
-        for (int j = 0; j < 10; ++j) {
+    for (int i = 0; i < 100; ++i) {
             Building* building = new Building();
-            building->Setting(j);
             gameObjects.push_back(building);
-        }
-    }*/
+    }
 }
 
 void Scene::Render()
