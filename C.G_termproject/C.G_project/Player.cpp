@@ -118,6 +118,26 @@ void Player::Update(float deltaTime)
     }
     SetPosition(pos);
     SetRotation(rotate);
+
+    // [To Server] Send PacketPlayerMove
+    // Send Type
+    char type = PACKET_PLAYER_MOVE;
+    int retval = send(sock, &type, sizeof(char), 0);
+    if (retval == SOCKET_ERROR)
+        err_display("Send() - PACKET_PLAYER_MOVE.type");
+
+    // Send Packet
+    PacketPlayerMove ppm;
+    ppm.size = sizeof(PacketPlayerMove);
+    ppm.type = PACKET_PLAYER_MOVE;
+    ppm.pos.x = position.x;
+    ppm.pos.y = position.y;
+    ppm.pos.z = position.z;
+    ppm.state = state;
+
+    retval = send(sock, (char*)&ppm, sizeof(PacketPlayerMove), 0);
+    if (retval == SOCKET_ERROR)
+        err_display("send() - PACKET_PLAYER_MOVE");
 }
 
 void Player::Render(GLuint program)

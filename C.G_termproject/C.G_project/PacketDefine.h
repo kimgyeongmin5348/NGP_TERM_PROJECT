@@ -63,7 +63,7 @@ struct StateReady
 	//char id;  <<- 이거 중복 오류 뜬다... 수정 필요
 };
 
-struct AllReady
+struct PacketAllReady
 {
 	char size;
 	char type;

@@ -224,6 +224,9 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             if (retval == SOCKET_ERROR) break;
             // 플레이어 이동 처리
             Scene::GetInstance()->UpdatePlayerPosition(packet.id, packet.pos);
+
+            cout << "PACKET_PLAYER_MOVE 수신 : " << (int)packet.type << endl;
+
             break;
         }
         case PACKET_BULLET_MOVE: {
@@ -249,6 +252,11 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             // 플레이어-건물 충돌 처리
             ////Scene::GetInstance()->ProcessPlayerBuildingCollision(packet.player_id, packet.building_id);
             break;
+        }
+        case CLIENT_ALL_READY: {
+            PacketAllReady packet;
+            retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
+            if (retval == SOCKET_ERROR) break;
         }
         default:
             //cout << "알 수 없는 패킷 타입: " << (int)type << endl;
