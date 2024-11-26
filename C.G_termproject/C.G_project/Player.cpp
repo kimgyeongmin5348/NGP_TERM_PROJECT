@@ -119,22 +119,29 @@ void Player::Update(float deltaTime)
     SetPosition(pos);
     SetRotation(rotate);
 
+    // 타입 전송
+    char type = PACKET_PLAYER_MOVE;
+    int retval = send(sock, &type, sizeof(char), 0);
+    if (retval == SOCKET_ERROR) {
+        cout << "player move type 전송 실패" << endl;
+        return;
+    }
+
     // Player의 Update가 있을 때 마다 서버에게 위치, 상태 정보 전송
-    PacketPlayerMove ppm = {};
+    PacketPlayerMove ppm;
     ppm.size = sizeof(PacketPlayerMove);
     ppm.type = PACKET_PLAYER_MOVE;
-    //ppm.pos.x = position.x;
-    //ppm.pos.y = position.y;
-    //ppm.pos.z = position.z;
-    ppm.x = position.x;
-    ppm.y = position.y;
-    ppm.z = position.z;
+    ppm.pos.x = position.x;
+    ppm.pos.y = position.y;
+    ppm.pos.z = position.z;
+    //ppm.x = position.x;
+    //ppm.y = position.y;
+    //ppm.z = position.z;
 
     ppm.state = state;
     //cout << state << endl;
-    cout << (int)ppm.state << endl;
+    //cout << (int)ppm.state << endl;
 
-    int retval;
     retval = send(sock, (char*)&ppm, sizeof(PacketPlayerMove), 0);
     if (retval == SOCKET_ERROR) {
         err_display("send() - PacketPlayerMove");

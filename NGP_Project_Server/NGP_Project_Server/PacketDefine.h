@@ -85,9 +85,8 @@ struct PacketPlayerMove
 {
 	char size;
 	char type;
-	//glm::vec3 pos;
-	float x, y, z;
-	char state;
+	glm::vec3 pos;
+	int state;
 	//char playerid[MAX_ID_SIZE];
 	//char id;
 };

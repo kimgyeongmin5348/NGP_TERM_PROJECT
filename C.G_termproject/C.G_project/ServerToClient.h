@@ -22,7 +22,8 @@ extern int myID;  // Å¬¶óÀÌ¾ðÆ®ÀÇ ID
 
 //#define SERVERIP "192.168.45.121"  //  ÀÌ°Ç ³ëÆ®ºÏip ÁÖ¼Ò ->192.168.40.29 °æ¹Î
 //#define SERVERIP "172.30.1.72"  //  ¾Æ¿¬
-#define SERVERIP "192.168.219.102"  //  ¹Î»ó
+//#define SERVERIP "192.168.219.102"  //  ¹Î»ó
+#define SERVERIP "192.168.41.255"
 
 
 bool InitializeNetwork();

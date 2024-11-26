@@ -339,7 +339,7 @@ void GoToInGame()
 }
 
 
-// 메인 스레드
+// 클라이언트 스레드
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
     SOCKET client_sock = (SOCKET)arg;
@@ -501,8 +501,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 err_display("recv()");
                 break;
             }
-            //cout << "[" << ClientNum << "] " << movePacket.x << ", " << movePacket.y << ", " << movePacket.z << endl;
-            cout << "[" << ClientNum << "] " << (int)movePacket.state << endl;
+            cout << "[" << ClientNum << "] " << movePacket.pos.x << ", " << movePacket.pos.y << ", " << movePacket.pos.z <<"(" << (int)movePacket.state << ")" << endl;
             // 현재 플레이어의 위치 업데이트
             Player[ClientNum] = movePacket;
 
