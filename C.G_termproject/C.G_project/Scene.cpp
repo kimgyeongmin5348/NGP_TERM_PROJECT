@@ -187,12 +187,10 @@ void Scene::Resize(int w, int h)
 
 void Scene::UpdatePlayerPosition(int playerID, const glm::vec3& newPos) 
 {
-    if (playerID >= 0 && playerID < 2 && playerID != myID) {
-        if (otherPlayer == nullptr) {
-            otherPlayer = new Player();
-        }
-        otherPlayer->SetPosition(newPos);
+    if (otherPlayer == nullptr) {
+        otherPlayer = new Player(this);
     }
+    otherPlayer->SetPosition(newPos);
 }
 
 void Scene::UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& newPos) 
