@@ -147,7 +147,9 @@ void ProcessMove()
 {
     WaitForSingleObject(DataEvent, INFINITE);
 
-    // Update Building 
+    /*****************
+      Update Building 
+    ******************/
     PacketBuildingMove buildingPacket;
     ZeroMemory(&buildingPacket, sizeof(PacketBuildingMove));
     buildingPacket.size = sizeof(PacketBuildingMove);
@@ -171,15 +173,14 @@ void ProcessMove()
         }
     }
 
-    // Update Player - ProcessClient() 에서 전역변수 Player에 저장하는 것으로 대체
+    /**************
+      Update Player - ProcessClient() 에서 전역변수 Player에 저장하는 것으로 대체
+    ***************/
+ 
+    /***********************
+      Send PacketPlayerMove
+    ************************/
     int retval;
-
-    // Send PacketPlayerMove
-    PacketPlayerMove ppm;
-    ZeroMemory(&ppm, sizeof(PacketPlayerMove));
-    ppm.size = sizeof(PacketPlayerMove);
-    ppm.type = PACKET_PLAYER_MOVE;
-
     for (int i = 0; i < 2; i++) {
         if (clientSockets[i] != INVALID_SOCKET) {
             char type = PACKET_PLAYER_MOVE;
@@ -193,10 +194,8 @@ void ProcessMove()
                 cout << "플레이어 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
                 continue;
             }
-            cout << "ClientSocket [" << i << "] : " << Player[(i + 1) % 2].pos << endl;
         }
     }
-
 
     SetEvent(DataEvent);
 }
@@ -325,8 +324,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                         char type = CLIENT_ALL_READY;
                         send(clientSockets[i], &type, sizeof(char), 0);
                         send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
-
-                        cout << "ready packet 전송 성공 : Client " << i << endl;
                     }
                 }
                 gameStarted = true;
@@ -337,7 +334,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             cout << "=== 준비 패킷 처리 완료 ===" << endl;
             break;
         }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         case PACKET_PLAYER_MOVE: {
             PacketPlayerMove movePacket;
             retval = recvn(client_sock, (char*)&movePacket, sizeof(movePacket), 0);
@@ -351,7 +347,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
             break;
         }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
 
         if (ClientNum < 2) {
@@ -377,14 +372,12 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
     while (true) {
         WaitForSingleObject(UpdateEvent, INFINITE);
 
-        // 1. 건물 생성 - 3초마다 실행
-        //MakeBuildings();
-
-        //DWORD currentTime = GetTickCount();
-        //if (currentTime - lastBuildingTime >= 3000) {
-        //    MakeBuildings();
-        //    lastBuildingTime = currentTime;
-        //}
+        // 1. 건물 생성 - 3초마다 실행 (수정필요)
+        DWORD currentTime = GetTickCount();
+        if (currentTime - lastBuildingTime >= 3000) {
+            MakeBuildings();
+            lastBuildingTime = currentTime;
+        }
 
         // 2. 플레이어/총알/빌딩 이동 처리
         ProcessMove();

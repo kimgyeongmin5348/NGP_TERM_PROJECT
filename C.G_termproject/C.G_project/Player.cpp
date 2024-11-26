@@ -120,13 +120,11 @@ void Player::Update(float deltaTime)
     SetRotation(rotate);
 
     // [To Server] Send PacketPlayerMove
-    // Send Type
     char type = PACKET_PLAYER_MOVE;
     int retval = send(sock, &type, sizeof(char), 0);
     if (retval == SOCKET_ERROR)
         err_display("Send() - PACKET_PLAYER_MOVE.type");
 
-    // Send Packet
     PacketPlayerMove ppm;
     ppm.size = sizeof(PacketPlayerMove);
     ppm.type = PACKET_PLAYER_MOVE;

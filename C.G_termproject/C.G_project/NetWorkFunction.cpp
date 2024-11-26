@@ -227,9 +227,6 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             }
             // 플레이어 이동 처리
             Scene::GetInstance()->UpdatePlayerPosition(packet.id, packet.pos);
-
-            cout << "PACKET_PLAYER_MOVE 수신 : " << packet.pos << endl;
-
             break;
         }
         case PACKET_BULLET_MOVE: {
