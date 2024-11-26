@@ -210,7 +210,6 @@ DWORD WINAPI ProcessServer(LPVOID arg)
         // 전체 패킷을 한번에 받도록 수정
         char packet_buffer[256];  // 충분한 크기의 버퍼
         int retval = recv(sock, packet_buffer, sizeof(char), 0);
-
         if (retval == SOCKET_ERROR || retval == 0) {
             std::cout << "서버와의 연결이 끊어졌습니다." << std::endl;
             break;
@@ -254,9 +253,10 @@ DWORD WINAPI ProcessServer(LPVOID arg)
         case PACKET_PLAYER_MOVE: {  // 9
             PacketPlayerMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
+            cout << "상대 Player : " << packet.pos.x << " " << packet.pos.y << endl;
             if (retval == SOCKET_ERROR) break;
 
-            // 플레이어 이동 처리
+            // 상대 플레이어 이동 처리
             break;
         }
 

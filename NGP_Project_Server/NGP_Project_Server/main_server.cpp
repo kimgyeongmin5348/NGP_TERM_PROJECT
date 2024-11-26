@@ -505,14 +505,12 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             // 현재 플레이어의 위치 업데이트
             Player[ClientNum] = movePacket;
 
-            // 다른 클라이언트에게 위치 정보 전송
+            // 모든 클라이언트에게 위치 정보 전송
             for (int i = 0; i < 2; i++) {
                 if (i != ClientNum && clientSockets[i] != INVALID_SOCKET) {
                     // 패킷 타입 전송
-                    //char type = PACKET_PLAYER_MOVE;
-                    //retval = send(clientSockets[i], &type, sizeof(char), 0);
-
-                    retval = send(clientSockets[i], (char*)&movePacket, sizeof(movePacket), 0);
+                    char type = PACKET_PLAYER_MOVE;
+                    retval = send(clientSockets[i], &type, sizeof(char), 0);
                     if (retval == SOCKET_ERROR) {
                         cout << "플레이어 이동 타입 전송 실패: " << WSAGetLastError() << endl;
                         continue;
@@ -520,11 +518,11 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
                     // 위치 정보 패킷 전송
                     //movePacket.id = ClientNum;  // 어떤 플레이어가 이동했는지 표시
-                    //retval = send(clientSockets[i], (char*)&movePacket, sizeof(movePacket), 0);
-                    //if (retval == SOCKET_ERROR) {
-                    //    cout << "플레이어 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
-                    //   continue;
-                    //}
+                    retval = send(clientSockets[i], (char*)&movePacket, sizeof(movePacket), 0);
+                    if (retval == SOCKET_ERROR) {
+                        cout << "플레이어 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
+                       continue;
+                    }
 
                     //cout << "클라이언트 " << i << "에게 플레이어 " << ClientNum << "의 위치 전송 완료" << endl;
                 }
