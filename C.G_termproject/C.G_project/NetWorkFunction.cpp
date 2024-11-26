@@ -250,6 +250,11 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             ////Scene::GetInstance()->ProcessPlayerBuildingCollision(packet.player_id, packet.building_id);
             break;
         }
+        case CLIENT_ALL_READY: {
+            PacketAllReady packet;
+            retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
+            if (retval == SOCKET_ERROR) break;
+        }
         default:
             //cout << "알 수 없는 패킷 타입: " << (int)type << endl;
             break;

@@ -253,8 +253,8 @@ void GoToInGame()
                 char type = CLIENT_ALL_READY;
                 send(clientSockets[i], &type, sizeof(char), 0);
 
-                AllReady packet;
-                packet.size = sizeof(AllReady);
+                PacketAllReady packet;
+                packet.size = sizeof(PacketAllReady);
                 packet.type = CLIENT_ALL_READY;
                 send(clientSockets[i], (char*)&packet, sizeof(packet), 0);
             }
@@ -309,8 +309,8 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 cout << "\n모든 플레이어가 준비되었습니다!" << endl;
                 cout << "게임을 시작합니다..." << endl;
 
-                AllReady readyPacket;
-                readyPacket.size = sizeof(AllReady);
+                PacketAllReady readyPacket;
+                readyPacket.size = sizeof(PacketAllReady);
                 readyPacket.type = CLIENT_ALL_READY;
 
                 for (int i = 0; i < 2; i++) {
@@ -318,6 +318,8 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                         char type = CLIENT_ALL_READY;
                         send(clientSockets[i], &type, sizeof(char), 0);
                         send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
+
+                        cout << "ready packet 전송 성공 : Client " << i << endl;
                     }
                 }
                 gameStarted = true;
@@ -341,7 +343,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             Player[ClientNum] = movePacket;
             
             // 제대로 받았는지 확인
-            cout << "Player[0] - " << Player[0].pos << "("<< Player[0].state<<")" << endl;
+            cout << "Player[1] - " << Player[1].pos << "("<< (int)Player[1].state<<")" << endl;
 
             break;
         }
