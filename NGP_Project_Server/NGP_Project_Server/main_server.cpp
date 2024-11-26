@@ -105,30 +105,36 @@ void SendReadyCompleteServerToClient() {
 
 // InGame 관련 함수
 void MakeBuildings() {
+
+    WaitForSingleObject(DataEvent, INFINITE);
+
     PacketBuildingMove buildingPacket;
     buildingPacket.size = sizeof(PacketBuildingMove);
     buildingPacket.type = PACKET_BUILDING_MOVE;
 
-    WaitForSingleObject(DataEvent, INFINITE);
-    for (int k = 0; k < 2; ++k) {
-        vector<PacketBuildingMove> buildings;
-        for (int i = 0; i < 100; ++i) {
-            for (int j = 0; j < 10; ++j) {
-                random_device rd;
-                mt19937 gen(rd());
-                uniform_real_distribution<float> random_x(-20, 20);
-                uniform_real_distribution<float> random_height(1, 25);
+    vector<PacketBuildingMove> buildings;
 
-                buildingPacket.pos.x = random_x(gen);
-                buildingPacket.pos.y = 0;
-                buildingPacket.pos.z = 20.f * (j + 1);
-                buildingPacket.num = i;
-                buildingPacket.is_broken = false;
-                buildings.push_back(buildingPacket);
-            }
-        }
+    for (int i = 0; i < 100; ++i) {
+        random_device rd;
+        mt19937 gen(rd());
+        uniform_real_distribution<float> random_x(-20, 20);
+        uniform_real_distribution<float> random_height(1, 25);
 
+        buildingPacket.pos.x = random_x(gen);
+        buildingPacket.pos.y = 0;
+        buildingPacket.pos.z = 20.f;
+        buildingPacket.scale.x = 2.0f;
+        buildingPacket.scale.y = random_height(gen);
+        buildingPacket.scale.z = 4.0f;
+        buildingPacket.num = i;
+        buildingPacket.is_broken = false;
+        buildings.push_back(buildingPacket);
+    }
+
+    for (int k = 0; k < 2; ++k) {     
         for (const auto& building : buildings) {
+            char type = PACKET_BUILDING_MOVE;
+            send(clientSockets[k], &type, sizeof(char), 0);
             send(clientSockets[k], (char*)&building, sizeof(PacketBuildingMove), 0);
         }
     }
@@ -156,8 +162,8 @@ void ProcessMove() {
         for (int j = 0; j < 2; ++j) {
             if (clientSockets[j] != INVALID_SOCKET) {
                 char type = PACKET_BUILDING_MOVE;
-                send(clientSockets[j], &type, sizeof(char), 0);
-                send(clientSockets[j], (char*)&buildingPacket, sizeof(buildingPacket), 0);
+                //send(clientSockets[j], &type, sizeof(char), 0);
+                //send(clientSockets[j], (char*)&buildingPacket, sizeof(buildingPacket), 0);
             }
         }
     }

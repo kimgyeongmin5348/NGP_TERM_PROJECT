@@ -118,20 +118,30 @@ void err_display(int errcode) {
 }
 
 int recvn(SOCKET s, char* buf, int len, int flags) {
-    int received;
-    char* ptr = buf;
-    int left = len;
+    //int received;
+    //char* ptr = buf;
+    //int left = len;
 
-    while (left > 0) {
-        received = recv(s, ptr, left, flags);
-        if (received == SOCKET_ERROR)
-            return SOCKET_ERROR;
-        else if (received == 0)
-            break;
-        left -= received;
-        ptr += received;
+    //while (left > 0) {
+    //    received = recv(s, ptr, left, flags);
+    //    if (received == SOCKET_ERROR)
+    //        return SOCKET_ERROR;
+    //    else if (received == 0)
+    //        break;
+    //    left -= received;
+    //    ptr += received;
+    //}
+    //return (len - left);
+    int received = 0;
+    while (received < len) {
+        int retval = recv(s, buf + received, len - received, flags);
+        if (retval == SOCKET_ERROR || retval == 0) {
+            cerr << "recv error or connection closed" << endl;
+            return SOCKET_ERROR; // 에러 또는 연결 종료
+        }
+        received += retval;
     }
-    return (len - left);
+    return received;
 }
 
 void SendReadyClientToServer()
@@ -202,10 +212,10 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
         }    
         case PACKET_BUILDING_MOVE: {
             PacketBuildingMove packet;
-            retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
+            retval = recvn(sock, (char*)&packet, sizeof(PacketBuildingMove), 0);
             if (retval == SOCKET_ERROR) break;
             // 서버로부터 받은 건물 위치 정보로 씬 업데이트
-            Scene::GetInstance()->UpdateBuildingPosition(packet.num, packet.pos);
+            Scene::GetInstance()->UpdateBuilding(packet.num, packet.scale, packet.pos);
             break;
         }
         case PACKET_PLAYER_MOVE: {
@@ -241,7 +251,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             break;
         }
         default:
-            cout << "알 수 없는 패킷 타입: " << (int)type << endl;
+            //cout << "알 수 없는 패킷 타입: " << (int)type << endl;
             break;
         }
     }
