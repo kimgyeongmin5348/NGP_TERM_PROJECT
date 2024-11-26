@@ -372,7 +372,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
     while (true) {
         WaitForSingleObject(UpdateEvent, INFINITE);
 
-        // 1. 건물 생성 - 3초마다 실행 (수정필요)
+        // 1. 건물 생성 - 3초마다 실행
         DWORD currentTime = GetTickCount();
         if (currentTime - lastBuildingTime >= 3000) {
             MakeBuildings();

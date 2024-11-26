@@ -158,16 +158,11 @@ void Scene::Render()
     glUniform3f(lightColorLocation, 0.7f, 0.7f, 0.7f);
 
     mainPlayer->Render(s_program);
+    if (otherPlayer)
+        otherPlayer->Render(s_program);
 
     for (auto obj : gameObjects) {
         obj->Render(s_program, 0);
-    }
-
-    // 다른 플레이어들 렌더링
-    for (auto otherPlayer : otherPlayers) {
-        if (otherPlayer != nullptr) {
-            otherPlayer->Render(s_program);
-        }
     }
 
     glutSwapBuffers();
@@ -177,16 +172,11 @@ void Scene::Render()
 void Scene::Update(float deltaTime)
 {
     mainPlayer->Update(deltaTime);
+    if(otherPlayer)
+        otherPlayer->Update(deltaTime);
 
     for (auto obj : gameObjects) {
         obj->Update(deltaTime);
-    }
-
-    // 다른 플레이어들 업데이트
-    for (auto otherPlayer : otherPlayers) {
-        if (otherPlayer != nullptr) {
-            otherPlayer->Update(deltaTime);
-        }
     }
 }
 
@@ -198,10 +188,10 @@ void Scene::Resize(int w, int h)
 void Scene::UpdatePlayerPosition(int playerID, const glm::vec3& newPos) 
 {
     if (playerID >= 0 && playerID < 2 && playerID != myID) {
-        if (otherPlayers[playerID] == nullptr) {
-            otherPlayers[playerID] = new Player();
+        if (otherPlayer == nullptr) {
+            otherPlayer = new Player();
         }
-        otherPlayers[playerID]->SetPosition(newPos);
+        otherPlayer->SetPosition(newPos);
     }
 }
 
