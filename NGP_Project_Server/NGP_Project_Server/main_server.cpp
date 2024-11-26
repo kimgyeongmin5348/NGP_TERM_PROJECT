@@ -237,8 +237,6 @@ void GoToInGame()
             }
         }
 
-        // 초기 빌딩 생성
-        MakeBuildings();
 
         // 업데이트 스레드 시작
         SetEvent(UpdateEvent);
