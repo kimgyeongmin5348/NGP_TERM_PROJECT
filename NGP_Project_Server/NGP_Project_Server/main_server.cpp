@@ -123,6 +123,9 @@ void MakeBuildings() {
         buildingPacket.pos.x = random_x(gen);
         buildingPacket.pos.y = 0;
         buildingPacket.pos.z = 20.f;
+        buildingPacket.scale.x = 2.0f;
+        buildingPacket.scale.y = random_height(gen);
+        buildingPacket.scale.z = 4.0f;
         buildingPacket.num = i;
         buildingPacket.is_broken = false;
         buildings.push_back(buildingPacket);

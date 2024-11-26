@@ -98,7 +98,7 @@ void Bullet::Update(float deltaTime)
 Building::Building()
 {
     SetPosition(glm::vec3(position.x, 0.f, position.z));
-    SetScale(glm::vec3(2.0f, 12.5f, 4.0f));
+    SetScale(glm::vec3(2.0f, scale.y, 4.0f));
     SetColor(glm::vec3(1.0f, 0.0f, 0.5f));
 }
 

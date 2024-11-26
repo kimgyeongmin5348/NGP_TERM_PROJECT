@@ -31,11 +31,12 @@ public:
         }
     }
 
-    void UpdateBuildingPosition(int buildingNum, const glm::vec3& newPos) {
+    void UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& newPos) {
         if (buildingNum >= 0 && buildingNum < gameObjects.size()) {
             Building* building = dynamic_cast<Building*>(gameObjects[buildingNum]);
             if (building) {
                 building->SetPosition(newPos);
+                building->SetScale(scale);
             }
         }
     }

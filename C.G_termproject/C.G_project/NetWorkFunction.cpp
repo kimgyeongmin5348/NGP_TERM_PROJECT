@@ -250,10 +250,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             retval = recvn(sock, (char*)&packet, sizeof(PacketBuildingMove), 0);
             if (retval == SOCKET_ERROR) break;
             // 서버로부터 받은 건물 위치 정보로 씬 업데이트
-            cout << "Received Building Num: " << packet.num
-                << ", Position: " << packet.pos
-                << ", Broken: " << packet.is_broken << endl;            
-            Scene::GetInstance()->UpdateBuildingPosition(packet.num, packet.pos);
+            Scene::GetInstance()->UpdateBuilding(packet.num, packet.scale, packet.pos);
             break;
         }
         case PACKET_PLAYER_MOVE: {

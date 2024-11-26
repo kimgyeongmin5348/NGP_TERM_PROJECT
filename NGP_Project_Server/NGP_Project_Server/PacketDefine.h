@@ -99,16 +99,15 @@ struct PacketID
 
 };
 
-#pragma pack(push, 1) 
 struct PacketBuildingMove
 {
 	char size;
 	char type;
 	glm::vec3 pos;
+	glm::vec3 scale;
 	bool is_broken;
 	int num; // ºôµù ¹øÈ£
 };
-#pragma pack(pop)
 
 struct PacketBulletMove
 {
