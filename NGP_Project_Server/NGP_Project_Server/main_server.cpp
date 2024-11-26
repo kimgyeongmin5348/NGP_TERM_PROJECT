@@ -188,12 +188,12 @@ void ProcessMove()
                 cout << "플레이어 이동 타입 전송 실패: " << WSAGetLastError() << endl;
                 continue;
             }
-            retval = send(clientSockets[i], (char*)&Player[i], sizeof(PacketPlayerMove), 0);
+            retval = send(clientSockets[i], (char*)&Player[(i + 1) % 2], sizeof(PacketPlayerMove), 0);
             if (retval == SOCKET_ERROR) {
                 cout << "플레이어 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
                 continue;
             }
-            cout << "ClientSocket [" << i << "] : " << Player[i].pos << endl;
+            cout << "ClientSocket [" << i << "] : " << Player[(i + 1) % 2].pos << endl;
         }
     }
 
@@ -378,11 +378,13 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
         WaitForSingleObject(UpdateEvent, INFINITE);
 
         // 1. 건물 생성 - 3초마다 실행
-        DWORD currentTime = GetTickCount();
-        if (currentTime - lastBuildingTime >= 3000) {
-            MakeBuildings();
-            lastBuildingTime = currentTime;
-        }
+        //MakeBuildings();
+
+        //DWORD currentTime = GetTickCount();
+        //if (currentTime - lastBuildingTime >= 3000) {
+        //    MakeBuildings();
+        //    lastBuildingTime = currentTime;
+        //}
 
         // 2. 플레이어/총알/빌딩 이동 처리
         ProcessMove();
