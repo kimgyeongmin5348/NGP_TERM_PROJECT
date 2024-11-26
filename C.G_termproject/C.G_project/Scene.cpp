@@ -106,7 +106,7 @@ void Scene::Initialize()
 void Scene::BuildObject()
 {
     mainPlayer = new Player(this);
-    mainPlayer->state = 999;
+    mainPlayer->state = 0;
 
     Ground* ground = new Ground();
     gameObjects.push_back(ground);
@@ -249,7 +249,7 @@ void Scene::KeyDown(unsigned char key)
 void Scene::KeyUp(unsigned char key) 
 {
     keyStates[key] = false;
-    mainPlayer->state = 999;
+    mainPlayer->state = 0;
 }
 
 

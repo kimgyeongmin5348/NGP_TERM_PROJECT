@@ -172,23 +172,30 @@ void ProcessMove()
     }
 
     // Update Player - ProcessClient() 에서 전역변수 Player에 저장하는 것으로 대체
+    int retval;
 
     // Send PacketPlayerMove
-    //for (int i = 0; i < 2; i++) {
-    //    if (clientSockets[i] != INVALID_SOCKET) {
-    //        char type = PACKET_PLAYER_MOVE;
-    //        retval = send(clientSockets[i], &type, sizeof(char), 0);
-    //        if (retval == SOCKET_ERROR) {
-    //            cout << "플레이어 이동 타입 전송 실패: " << WSAGetLastError() << endl;
-    //            continue;
-    //        }
-    //        retval = send(clientSockets[i], (char*)&Player[ClientNum], sizeof(PacketPlayerMove), 0);
-    //        if (retval == SOCKET_ERROR) {
-    //            cout << "플레이어 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
-    //            continue;
-    //        }
-    //    }
-    //}
+    PacketPlayerMove ppm;
+    ZeroMemory(&ppm, sizeof(PacketPlayerMove));
+    ppm.size = sizeof(PacketPlayerMove);
+    ppm.type = PACKET_PLAYER_MOVE;
+
+    for (int i = 0; i < 2; i++) {
+        if (clientSockets[i] != INVALID_SOCKET) {
+            char type = PACKET_PLAYER_MOVE;
+            retval = send(clientSockets[i], &type, sizeof(char), 0);
+            if (retval == SOCKET_ERROR) {
+                cout << "플레이어 이동 타입 전송 실패: " << WSAGetLastError() << endl;
+                continue;
+            }
+            retval = send(clientSockets[i], (char*)&Player[i], sizeof(PacketPlayerMove), 0);
+            if (retval == SOCKET_ERROR) {
+                cout << "플레이어 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
+                continue;
+            }
+            cout << "ClientSocket [" << i << "] : " << Player[i].pos << endl;
+        }
+    }
 
 
     SetEvent(DataEvent);
@@ -341,9 +348,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
             // Update Player
             Player[ClientNum] = movePacket;
-            
-            // 제대로 받았는지 확인
-            cout << "Player[1] - " << Player[1].pos << "("<< (int)Player[1].state<<")" << endl;
 
             break;
         }
@@ -368,11 +372,13 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
 
 // 업데이트 스레드
-DWORD WINAPI ProcessUpdate(LPVOID arg) {
+DWORD WINAPI ProcessUpdate(LPVOID arg) 
+{
     while (true) {
+        cout << "ProcessUpdate" << endl;
         WaitForSingleObject(UpdateEvent, INFINITE);
 
-        // 1. 건물 생성 및 이동
+        // 1. 건물 생성
         MakeBuildings();
 
         // 2. 플레이어/총알/빌딩 이동 처리
@@ -383,6 +389,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg) {
         if (ColideBulletToObjects()) DeleteObjects();
 
         SetEvent(ClientEvent[0]);
+        SetEvent(UpdateEvent);
     }
     return 0;
 }
