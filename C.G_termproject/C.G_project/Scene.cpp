@@ -124,6 +124,9 @@ void Scene::BuildObject()
             gameObjects.push_back(building);
         }
     }*/
+    for (int i = 0; i < 1000; ++i) {
+
+    }
 }
 
 void Scene::Render()

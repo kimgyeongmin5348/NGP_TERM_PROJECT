@@ -99,6 +99,7 @@ struct PacketID
 
 };
 
+#pragma pack(push, 1) 
 struct PacketBuildingMove
 {
 	char size;
@@ -107,6 +108,7 @@ struct PacketBuildingMove
 	bool is_broken;
 	int num; // ºôµù ¹øÈ£
 };
+#pragma pack(pop)
 
 struct PacketBulletMove
 {
