@@ -370,16 +370,19 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     return 0;
 }
 
-
+static DWORD lastBuildingTime = GetTickCount();
 // 업데이트 스레드
 DWORD WINAPI ProcessUpdate(LPVOID arg) 
 {
     while (true) {
-        cout << "ProcessUpdate" << endl;
         WaitForSingleObject(UpdateEvent, INFINITE);
 
-        // 1. 건물 생성
-        MakeBuildings();
+        // 1. 건물 생성 - 3초마다 실행
+        DWORD currentTime = GetTickCount();
+        if (currentTime - lastBuildingTime >= 3000) {
+            MakeBuildings();
+            lastBuildingTime = currentTime;
+        }
 
         // 2. 플레이어/총알/빌딩 이동 처리
         ProcessMove();
