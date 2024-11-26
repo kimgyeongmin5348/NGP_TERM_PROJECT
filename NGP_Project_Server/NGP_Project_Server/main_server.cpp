@@ -218,30 +218,29 @@ void DeleteObjects()
 //}
 
 // 아직 정확하게 미완성 
-void GoToInGame()
-{
-    if (!gameStarted) {
-        cout << "게임 시작!" << endl;
-        gameStarted = true;
-
-        // 게임 시작 패킷 전송
-        for (int i = 0; i < 2; i++) {
-            if (clientSockets[i] != INVALID_SOCKET) {
-                char type = CLIENT_ALL_READY;
-                send(clientSockets[i], &type, sizeof(char), 0);
-
-                AllReady packet;
-                packet.size = sizeof(AllReady);
-                packet.type = CLIENT_ALL_READY;
-                send(clientSockets[i], (char*)&packet, sizeof(packet), 0);
-            }
-        }
-
-
-        // 업데이트 스레드 시작
-        SetEvent(UpdateEvent);
-    }
-}
+//void GoToInGame()
+//{
+//    if (!gameStarted) {
+//        cout << "게임 시작!" << endl;
+//        gameStarted = true;
+//
+//        // 게임 시작 패킷 전송
+//        for (int i = 0; i < 2; i++) {
+//            if (clientSockets[i] != INVALID_SOCKET) {
+//                char type = CLIENT_ALL_READY;
+//                send(clientSockets[i], &type, sizeof(char), 0);
+//
+//                AllReady packet;
+//                packet.size = sizeof(AllReady);
+//                packet.type = CLIENT_ALL_READY;
+//                send(clientSockets[i], (char*)&packet, sizeof(packet), 0);
+//            }
+//        }
+//
+//        // 업데이트 스레드 시작
+//        SetEvent(UpdateEvent);
+//    }
+//}
 
 
 // 메인 스레드
