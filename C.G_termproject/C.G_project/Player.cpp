@@ -12,14 +12,12 @@ Player::Player(Scene* scene)
 
     // 왼쪽 날개
     wingLeft = new RotatingObject();
-    Scene::GetInstance()->AddGameObject(wingLeft);
     wingLeft->SetPosition(glm::vec3(0.0f, 1.1f, 0.0f));
     wingLeft->SetScale(glm::vec3(4.5f, 0.2f, 0.2f));
     wingLeft->SetColor(glm::vec3(0.5f, 0.5f, 0.5f));
 
     // 오른쪽 날개
     wingRight = new RotatingObject();
-    Scene::GetInstance()->AddGameObject(wingRight);
     wingRight->SetPosition(glm::vec3(0.0f, 1.1f, 0.0f));
     wingRight->SetScale(glm::vec3(0.2f, 0.2f, 4.5f));
     wingRight->SetColor(glm::vec3(0.5f, 0.5f, 0.5f));
@@ -118,6 +116,28 @@ void Player::Update(float deltaTime)
     }
     SetPosition(pos);
     SetRotation(rotate);
+
+    // for 날개회전
+    wingLeft->Update(deltaTime);
+    wingRight->Update(deltaTime);
+
+    // [To Server] Send PacketPlayerMove
+    char type = PACKET_PLAYER_MOVE;
+    int retval = send(sock, &type, sizeof(char), 0);
+    if (retval == SOCKET_ERROR)
+        err_display("Send() - PACKET_PLAYER_MOVE.type");
+
+    PacketPlayerMove ppm;
+    ppm.size = sizeof(PacketPlayerMove);
+    ppm.type = PACKET_PLAYER_MOVE;
+    ppm.pos.x = position.x;
+    ppm.pos.y = position.y;
+    ppm.pos.z = position.z;
+    ppm.state = state;
+
+    retval = send(sock, (char*)&ppm, sizeof(PacketPlayerMove), 0);
+    if (retval == SOCKET_ERROR)
+        err_display("send() - PACKET_PLAYER_MOVE");
 }
 
 void Player::Render(GLuint program)
@@ -154,9 +174,31 @@ void Player::SetRotation(const glm::vec3& rot)
 {
     rotation = rot;
 
-    wingConnect->SetRotation(glm::vec3(rot.x, rot.y, rot.z));
-    wingLeft->SetRotation(glm::vec3(rot.x, wingLeft->GetRotation().y, rot.z));
-    wingRight->SetRotation(glm::vec3(rot.x, wingRight->GetRotation().y, rot.z));
+    // 플레이어의 중심점을 기준으로 회전 행렬 생성
+    glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    rotationMatrix = glm::rotate(rotationMatrix, glm::radians(rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    // 각 파츠의 상대 위치를 플레이어 중심점 기준으로 변환
+    glm::vec3 centerPos = position;  // 플레이어의 중심점
+
+    // 각 파츠에 대해 중심점 기준 회전 적용
+    wingConnect->SetPosition(centerPos + glm::vec3(rotationMatrix * glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)));
+    wingLeft->SetPosition(centerPos + glm::vec3(rotationMatrix * glm::vec4(0.0f, 1.1f, 0.0f, 1.0f)));
+    wingRight->SetPosition(centerPos + glm::vec3(rotationMatrix * glm::vec4(0.0f, 1.1f, 0.0f, 1.0f)));
+    body->SetPosition(centerPos + glm::vec3(rotationMatrix * glm::vec4(0.0f, 0.7f, -0.2f, 1.0f)));
+    bodyFront->SetPosition(centerPos + glm::vec3(rotationMatrix * glm::vec4(0.0f, 0.65f, 0.3f, 1.0f)));
+    bodyBack->SetPosition(centerPos + glm::vec3(rotationMatrix * glm::vec4(0.0f, 0.7f, -1.0f, 1.0f)));
+    tailFront->SetPosition(centerPos + glm::vec3(rotationMatrix * glm::vec4(0.0f, 0.7f, -1.7f, 1.0f)));
+    tailWing->SetPosition(centerPos + glm::vec3(rotationMatrix * glm::vec4(0.0f, 0.8f, -1.6f, 1.0f)));
+    bodyFloorLeft->SetPosition(centerPos + glm::vec3(rotationMatrix * glm::vec4(0.3f, 0.2f, -0.3f, 1.0f)));
+    bodyFloorRight->SetPosition(centerPos + glm::vec3(rotationMatrix * glm::vec4(-0.3f, 0.2f, -0.3f, 1.0f)));
+
+    // 회전 각도 설정
+    wingConnect->SetRotation(rot);
+    //wingLeft->SetRotation(glm::vec3(rot.x, wingLeft->GetRotation().y, rot.z));
+    //wingRight->SetRotation(glm::vec3(rot.x, wingRight->GetRotation().y, rot.z));
+    //wingLeft->SetRotation(glm::vec3(rot.x, rot.y, rot.z));
+    //wingRight->SetRotation(glm::vec3(rot.x, rot.y, rot.z));
     body->SetRotation(glm::vec3(rot.x, 0, rot.z));
     bodyFront->SetRotation(glm::vec3(rot.x, 0, rot.z));
     bodyBack->SetRotation(glm::vec3(rot.x, 0, rot.z));
@@ -164,5 +206,4 @@ void Player::SetRotation(const glm::vec3& rot)
     tailWing->SetRotation(glm::vec3(rot.x, 0, rot.z));
     bodyFloorLeft->SetRotation(glm::vec3(rot.x, 0, rot.z));
     bodyFloorRight->SetRotation(glm::vec3(rot.x, 0, rot.z));
-
 }

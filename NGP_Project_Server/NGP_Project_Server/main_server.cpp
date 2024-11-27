@@ -45,7 +45,8 @@ void DeleteObjects();
 //}
 
 // Lobby 관련 함수
-void SendReadyServerToClient() {
+void SendReadyServerToClient() 
+{
     ReadyClientToServer readyPacket;
     readyPacket.size = sizeof(ReadyClientToServer);
     readyPacket.type = CLIENT_READY;
@@ -70,42 +71,43 @@ void SendReadyServerToClient() {
     SetEvent(DataEvent);
 }
 
-void SendReadyCompleteServerToClient() {
-    WaitForSingleObject(DataEvent, INFINITE);
-
-    bool allReady = true;
-    for (int i = 0; i < 2; i++) {
-        if (!readyState[i] || clientSockets[i] == INVALID_SOCKET) {
-            allReady = false;
-            break;
-        }
-    }
-
-    if (allReady) {
-        cout << "\n모든 플레이어가 준비되었습니다!" << endl;
-        cout << "게임을 시작합니다..." << endl;
-
-        AllReady readyPacket;
-        readyPacket.size = sizeof(AllReady);
-        readyPacket.type = CLIENT_ALL_READY;
-
-        for (int i = 0; i < 2; i++) {
-            if (clientSockets[i] != INVALID_SOCKET) {
-                char type = CLIENT_ALL_READY;
-                send(clientSockets[i], &type, sizeof(char), 0);
-                send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
-            }
-        }
-        gameStarted = true;
-        SetEvent(UpdateEvent);
-    }
-    SetEvent(DataEvent);
-}
+//void SendReadyCompleteServerToClient() 
+//{
+//    WaitForSingleObject(DataEvent, INFINITE);
+//
+//    bool allReady = true;
+//    for (int i = 0; i < 2; i++) {
+//        if (!readyState[i] || clientSockets[i] == INVALID_SOCKET) {
+//            allReady = false;
+//            break;
+//        }
+//    }
+//
+//    if (allReady) {
+//        cout << "\n모든 플레이어가 준비되었습니다!" << endl;
+//        cout << "게임을 시작합니다..." << endl;
+//
+//        AllReady readyPacket;
+//        readyPacket.size = sizeof(AllReady);
+//        readyPacket.type = CLIENT_ALL_READY;
+//
+//        for (int i = 0; i < 2; i++) {
+//            if (clientSockets[i] != INVALID_SOCKET) {
+//                char type = CLIENT_ALL_READY;
+//                send(clientSockets[i], &type, sizeof(char), 0);
+//                send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
+//            }
+//        }
+//        gameStarted = true;
+//        SetEvent(UpdateEvent);
+//    }
+//    SetEvent(DataEvent);
+//}
 
 
 // InGame 관련 함수
-void MakeBuildings() {
-
+void MakeBuildings() 
+{
     WaitForSingleObject(DataEvent, INFINITE);
 
     PacketBuildingMove buildingPacket;
@@ -141,10 +143,13 @@ void MakeBuildings() {
     SetEvent(DataEvent);
 }
 
-void ProcessMove() {
+void ProcessMove() 
+{
     WaitForSingleObject(DataEvent, INFINITE);
 
-    // buildingPacket을 한 번만 선언
+    /*****************
+      Update Building 
+    ******************/
     PacketBuildingMove buildingPacket;
     ZeroMemory(&buildingPacket, sizeof(PacketBuildingMove));
     buildingPacket.size = sizeof(PacketBuildingMove);
@@ -164,6 +169,30 @@ void ProcessMove() {
                 char type = PACKET_BUILDING_MOVE;
                 //send(clientSockets[j], &type, sizeof(char), 0);
                 //send(clientSockets[j], (char*)&buildingPacket, sizeof(buildingPacket), 0);
+            }
+        }
+    }
+
+    /**************
+      Update Player - ProcessClient() 에서 전역변수 Player에 저장하는 것으로 대체
+    ***************/
+ 
+    /***********************
+      Send PacketPlayerMove
+    ************************/
+    int retval;
+    for (int i = 0; i < 2; i++) {
+        if (clientSockets[i] != INVALID_SOCKET) {
+            char type = PACKET_PLAYER_MOVE;
+            retval = send(clientSockets[i], &type, sizeof(char), 0);
+            if (retval == SOCKET_ERROR) {
+                cout << "플레이어 이동 타입 전송 실패: " << WSAGetLastError() << endl;
+                continue;
+            }
+            retval = send(clientSockets[i], (char*)&Player[(i + 1) % 2], sizeof(PacketPlayerMove), 0);
+            if (retval == SOCKET_ERROR) {
+                cout << "플레이어 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
+                continue;
             }
         }
     }
@@ -230,15 +259,12 @@ void GoToInGame()
                 char type = CLIENT_ALL_READY;
                 send(clientSockets[i], &type, sizeof(char), 0);
 
-                AllReady packet;
-                packet.size = sizeof(AllReady);
+                PacketAllReady packet;
+                packet.size = sizeof(PacketAllReady);
                 packet.type = CLIENT_ALL_READY;
                 send(clientSockets[i], (char*)&packet, sizeof(packet), 0);
             }
         }
-
-        // 초기 빌딩 생성
-        MakeBuildings();
 
         // 업데이트 스레드 시작
         SetEvent(UpdateEvent);
@@ -247,7 +273,8 @@ void GoToInGame()
 
 
 // 메인 스레드
-DWORD WINAPI ProcessClient(LPVOID arg) {
+DWORD WINAPI ProcessClient(LPVOID arg) 
+{
     SOCKET client_sock = (SOCKET)arg;
     int retval;
     char type;
@@ -288,8 +315,8 @@ DWORD WINAPI ProcessClient(LPVOID arg) {
                 cout << "\n모든 플레이어가 준비되었습니다!" << endl;
                 cout << "게임을 시작합니다..." << endl;
 
-                AllReady readyPacket;
-                readyPacket.size = sizeof(AllReady);
+                PacketAllReady readyPacket;
+                readyPacket.size = sizeof(PacketAllReady);
                 readyPacket.type = CLIENT_ALL_READY;
 
                 for (int i = 0; i < 2; i++) {
@@ -315,26 +342,9 @@ DWORD WINAPI ProcessClient(LPVOID arg) {
                 break;
             }
 
-            // 현재 플레이어의 위치 업데이트
+            // Update Player
             Player[ClientNum] = movePacket;
-            Player[ClientNum].id = ClientNum;
 
-            // 모든 클라이언트에게 위치 정보 전송
-            for (int i = 0; i < 2; i++) {
-                if (clientSockets[i] != INVALID_SOCKET) {
-                    char type = PACKET_PLAYER_MOVE;
-                    retval = send(clientSockets[i], &type, sizeof(char), 0);
-                    if (retval == SOCKET_ERROR) {
-                        cout << "플레이어 이동 타입 전송 실패: " << WSAGetLastError() << endl;
-                        continue;
-                    }
-                    retval = send(clientSockets[i], (char*)&Player[ClientNum], sizeof(PacketPlayerMove), 0);
-                    if (retval == SOCKET_ERROR) {
-                        cout << "플레이어 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
-                        continue;
-                    }
-                }
-            }
             break;
         }
         }
@@ -355,14 +365,19 @@ DWORD WINAPI ProcessClient(LPVOID arg) {
     return 0;
 }
 
-
+static DWORD lastBuildingTime = GetTickCount();
 // 업데이트 스레드
-DWORD WINAPI ProcessUpdate(LPVOID arg) {
+DWORD WINAPI ProcessUpdate(LPVOID arg) 
+{
     while (true) {
         WaitForSingleObject(UpdateEvent, INFINITE);
 
-        // 1. 건물 생성 및 이동
-        MakeBuildings();
+        // 1. 건물 생성 - 3초마다 실행
+        DWORD currentTime = GetTickCount();
+        if (currentTime - lastBuildingTime >= 3000) {
+            MakeBuildings();
+            lastBuildingTime = currentTime;
+        }
 
         // 2. 플레이어/총알/빌딩 이동 처리
         ProcessMove();
@@ -372,6 +387,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg) {
         if (ColideBulletToObjects()) DeleteObjects();
 
         SetEvent(ClientEvent[0]);
+        SetEvent(UpdateEvent);
     }
     return 0;
 }

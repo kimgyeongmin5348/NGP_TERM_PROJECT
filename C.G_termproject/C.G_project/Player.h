@@ -1,11 +1,11 @@
 #pragma once
 #include "Object.h"
 
-#define LEFT  0
-#define RIGHT 1
-#define UP    2
-#define DOWN  3
-#define ARE_YOU_READY 4
+#define LEFT  1
+#define RIGHT 2
+#define UP    3
+#define DOWN  4
+#define ARE_YOU_READY 5
 
 class Scene;
 
@@ -33,7 +33,7 @@ public:
     char playerid[32];              // 플레이어 ID (MAX_ID_SIZE = 32)
     int state;                      // 플레이어 상태 (기울기 등)
 
-
+        
 private:
 	Object* body;
 	Object* wingLeft;

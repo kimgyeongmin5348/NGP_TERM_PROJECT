@@ -22,61 +22,17 @@ public:
     void Update(float deltaTime);
     void Resize(int w, int h);
 
-    void UpdatePlayerPosition(int playerID, const glm::vec3& newPos) {
-        if (playerID >= 0 && playerID < 2 && playerID != myID) {
-            if (otherPlayers[playerID] == nullptr) {
-                otherPlayers[playerID] = new Player();
-            }
-            otherPlayers[playerID]->SetPosition(newPos);
-        }
-    }
+    void UpdatePlayerPosition(int playerID, const glm::vec3& newPos);
 
-    void UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& newPos) {
-        if (buildingNum >= 0 && buildingNum < gameObjects.size()) {
-            Building* building = dynamic_cast<Building*>(gameObjects[buildingNum]);
-            if (building) {
-                building->SetPosition(newPos);
-                building->SetScale(scale);
-            }
-        }
-    }
+    void UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& newPos);
 
     void AddGameObject(Object* obj) {
         gameObjects.push_back(obj);
     }
 
-    void KeyDown(unsigned char key) {
-        keyStates[key] = true;
+    void KeyDown(unsigned char key);
 
-        if (key == 'm') {
-            if (!isReady) {
-                cout << "준비 상태 전송 시도..." << '\n';
-                SendReadyClientToServer();
-            }           
-        }
-
-        if (keyStates['q']) exit(0);
-        if (keyStates['w']) { mainPlayer->state = UP; }
-        if (keyStates['a']) { mainPlayer->state = LEFT; }
-        if (keyStates['s']) { mainPlayer->state = DOWN; }
-        if (keyStates['d']) { mainPlayer->state = RIGHT; }
-
-        if (keyStates[' ']) {
-            for (auto obj : gameObjects) {
-                Bullet* bullet = dynamic_cast<Bullet*>(obj);
-                if (bullet && !bullet->active) {
-                    bullet->SetPosition(mainPlayer->GetPosition());
-                    bullet->active = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    void KeyUp(unsigned char key) {
-        keyStates[key] = false;
-        mainPlayer->state = 999;
-    }
+    void KeyUp(unsigned char key);
 
 public:
     GLuint VAO[3], VBO[6];
@@ -94,7 +50,7 @@ public:
 
 private:
     Player* mainPlayer{ nullptr };  // 현재 클라이언트의 플레이어
-    Player* otherPlayers[2]{ nullptr, nullptr };  // 다른 클라이언트들의 플레이어
+    Player* otherPlayer{ nullptr };  // 다른 클라이언트들의 플레이어
     std::vector<Object*> gameObjects;
     Camera* camera{ nullptr };
     bool isReady{ false };

@@ -106,7 +106,7 @@ void Scene::Initialize()
 void Scene::BuildObject()
 {
     mainPlayer = new Player(this);
-    mainPlayer->state = 999;
+    mainPlayer->state = 0;
 
     Ground* ground = new Ground();
     gameObjects.push_back(ground);
@@ -158,16 +158,11 @@ void Scene::Render()
     glUniform3f(lightColorLocation, 0.7f, 0.7f, 0.7f);
 
     mainPlayer->Render(s_program);
+    if (otherPlayer)
+        otherPlayer->Render(s_program);
 
     for (auto obj : gameObjects) {
         obj->Render(s_program, 0);
-    }
-
-    // 다른 플레이어들 렌더링
-    for (auto otherPlayer : otherPlayers) {
-        if (otherPlayer != nullptr) {
-            otherPlayer->Render(s_program);
-        }
     }
 
     glutSwapBuffers();
@@ -177,16 +172,11 @@ void Scene::Render()
 void Scene::Update(float deltaTime)
 {
     mainPlayer->Update(deltaTime);
+    if(otherPlayer)
+        otherPlayer->Update(deltaTime);
 
     for (auto obj : gameObjects) {
         obj->Update(deltaTime);
-    }
-
-    // 다른 플레이어들 업데이트
-    for (auto otherPlayer : otherPlayers) {
-        if (otherPlayer != nullptr) {
-            otherPlayer->Update(deltaTime);
-        }
     }
 }
 
@@ -194,6 +184,62 @@ void Scene::Resize(int w, int h)
 {
     glViewport(0, 0, w, h);
 }
+
+void Scene::UpdatePlayerPosition(int playerID, const glm::vec3& newPos) 
+{
+    if (otherPlayer == nullptr) {
+        otherPlayer = new Player(this);
+    }
+    otherPlayer->SetPosition(newPos);
+}
+
+void Scene::UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& newPos) 
+{
+    if (buildingNum >= 0 && buildingNum < gameObjects.size()) {
+        Building* building = dynamic_cast<Building*>(gameObjects[buildingNum]);
+        if (building) {
+            building->SetPosition(newPos);
+            building->SetScale(scale);
+        }
+    }
+}
+
+void Scene::KeyDown(unsigned char key) 
+{
+    keyStates[key] = true;
+
+    if (key == 'm') {
+        if (!isReady) {
+            cout << "준비 상태 전송 시도..." << '\n';
+            SendReadyClientToServer();
+        }
+    }
+
+    if (keyStates['q']) exit(0);
+    if (keyStates['w']) { mainPlayer->state = UP; }
+    if (keyStates['a']) { mainPlayer->state = LEFT; }
+    if (keyStates['s']) { mainPlayer->state = DOWN; }
+    if (keyStates['d']) { mainPlayer->state = RIGHT; }
+
+    if (keyStates[' ']) {
+        for (auto obj : gameObjects) {
+            Bullet* bullet = dynamic_cast<Bullet*>(obj);
+            if (bullet && !bullet->active) {
+                bullet->SetPosition(mainPlayer->GetPosition());
+                bullet->active = true;
+                break;
+            }
+        }
+    }
+}
+
+
+void Scene::KeyUp(unsigned char key) 
+{
+    keyStates[key] = false;
+    mainPlayer->state = 0;
+}
+
 
 //void Scene::HandleKeyboard(unsigned char key, bool isPressed)
 //{
