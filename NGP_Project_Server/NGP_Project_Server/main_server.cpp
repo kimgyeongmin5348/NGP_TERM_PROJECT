@@ -5,6 +5,7 @@ using namespace std;
 
 // 전역 변수 선언
 PacketPlayerMove Player[2];
+PacketBulletMove Bullet[60]; // 0 ~ 29 : Clinet1 30~59 : Client2
 int nowID = 0;
 HANDLE ClientEvent[2];
 HANDLE UpdateEvent;
@@ -174,9 +175,27 @@ void ProcessMove()
     }
 
     /**************
-      Update Player - ProcessClient() 에서 전역변수 Player에 저장하는 것으로 대체
+      Update Player
     ***************/
- 
+    //ProcessClient() 에서 전역변수 Player에 저장하는 것으로 대체
+
+
+    /**************
+      Update Bullet
+    ***************/
+    //ProcessClient() 에서 전역변수 Bullet에 저장하는 것으로 대체
+
+
+    /*****************
+      Collide Check BB
+    ******************/
+
+
+    /*****************
+      Collide Check PB
+    ******************/
+
+
     /***********************
       Send PacketPlayerMove
     ************************/
@@ -196,6 +215,11 @@ void ProcessMove()
             }
         }
     }
+
+    /**********************
+      Send PacketBulletMove
+    ***********************/
+
 
     SetEvent(DataEvent);
 }
@@ -359,6 +383,19 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
             // Update Player
             Player[ClientNum] = movePacket;
+
+            break;
+        }
+        case PACKET_BULLET_MOVE: {
+            PacketBulletMove movePacket;
+            retval = recvn(client_sock, (char*)&movePacket, sizeof(movePacket), 0);
+            if (retval == SOCKET_ERROR) {
+                err_display("recv()");
+                break;
+            }
+
+            // Update Bullet
+            Bullet[(ClientNum + 1) * movePacket.num] = movePacket;
 
             break;
         }
