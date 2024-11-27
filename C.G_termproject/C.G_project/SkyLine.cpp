@@ -308,7 +308,11 @@ GLvoid CollisionCheckPB(int i, int j)
 // 총알 - 건물 충돌 체크
 GLvoid CollisionCheckBB(int i, int j)
 {
-    if ((build[i][j].x_trans - 0.6f) < bullet.x_trans_aoc && bullet.x_trans_aoc < (build[i][j].x_trans + 0.6f) && bullet.y_trans_aoc < build[i][j].y_scale / 5 - 0.2f && bullet.z_trans_aoc < (build[i][j].z_trans + 1) && bullet.z_trans_aoc >(build[i][j].z_trans - 1)) {
+    if ((build[i][j].x_trans - 0.6f) < bullet.x_trans_aoc && 
+        bullet.x_trans_aoc < (build[i][j].x_trans + 0.6f) && 
+        bullet.y_trans_aoc < build[i][j].y_scale / 5 - 0.2f && 
+        bullet.z_trans_aoc < (build[i][j].z_trans + 1) && 
+        bullet.z_trans_aoc >(build[i][j].z_trans - 1)) {
         
         if(test)
             cout << "총알 충돌" << i << " : " << bullet.x_trans_aoc << ", " << bullet.y_trans_aoc << ", " << build[i][j].y_scale / 5 << "," << bullet.z_trans_aoc << ":::" << build[i][j].z_trans_aoc << '\n';

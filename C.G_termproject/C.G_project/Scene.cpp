@@ -115,13 +115,13 @@ void Scene::BuildObject()
 
     for (int i = 0; i < MAX_BULLETS; ++i) {
         Bullet* bullet = new Bullet();
+        bullet->num = i;
         gameObjects.push_back(bullet);
     }
 
-    // 빌딩 생성부분 -> 서버에서 하기 때문에 지워봄
     for (int i = 0; i < 100; ++i) {
-            Building* building = new Building();
-            gameObjects.push_back(building);
+        Building* building = new Building();
+        gameObjects.push_back(building);
     }
 }
 
@@ -181,6 +181,23 @@ void Scene::Update(float deltaTime)
 
     for (auto obj : gameObjects) {
         obj->Update(deltaTime);
+        Bullet* bullet = dynamic_cast<Bullet*>(obj);
+        if (bullet) {
+            // 총알 번호와 위치 값을 서버로 전송
+            PacketBulletMove packet;
+            packet.num = bullet->num;   // 총알 고유 번호
+            packet.pos = bullet->GetPosition();   // 총알 위치
+
+            // 서버로 패킷 전송
+            char type = PACKET_BULLET_MOVE;
+            int retval = send(sock, &type, sizeof(char), 0);
+            if (retval == SOCKET_ERROR)
+                err_display("Send() - PACKET_BULLET_MOVE.type");
+
+            retval = send(sock, (char*)&packet, sizeof(PacketBulletMove), 0);
+            if (retval == SOCKET_ERROR)
+                err_display("send() - PACKET_BULLET_MOVE");
+        }
     }
 }
 
@@ -208,12 +225,21 @@ void Scene::UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& n
     }
 }
 
+void Scene::ProcessBulletBuildingCollision(int BulletNum, int BuildingNum)
+{
+    for (auto obj : gameObjects) {
+        Building* building = dynamic_cast<Building*>(gameObjects[BuildingNum]);
+        Bullet* bullet = dynamic_cast<Bullet*>(gameObjects[BulletNum]);
+        if (bullet)bullet->active = false;
+    }
+}
+
 void Scene::KeyDown(unsigned char key) 
 {
     keyStates[key] = true;
 
     if (key == 'm') {
-        if (!isReady) {
+        if (!isReady) { 
             cout << "준비 상태 전송 시도..." << '\n';
             SendReadyClientToServer();
         }

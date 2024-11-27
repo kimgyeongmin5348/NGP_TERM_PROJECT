@@ -25,6 +25,7 @@ public:
     void UpdatePlayerPosition(int playerID, const glm::vec3& newPos);
 
     void UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& newPos);
+    void ProcessBulletBuildingCollision(int BulletNum, int BuildingNum);
 
     void AddGameObject(Object* obj) {
         gameObjects.push_back(obj);

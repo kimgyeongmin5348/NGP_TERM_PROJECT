@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Object.h"
+#include "PacketDefine.h"
 
 Object::Object()
 {
@@ -70,8 +71,8 @@ void RotatingObject::Update(float deltaTime)
 
 Bullet::Bullet()
 {
-    SetScale(glm::vec3(0.5f, 0.5f, 1.0f));
-    SetColor(glm::vec3(1.0f, 1.0f, 1.0f));
+    SetScale(glm::vec3(0.5f, 0.5f, 0.5f));
+    SetColor(glm::vec3(0.3f, 0.3f, 0.4f));
 }
 
 Bullet::~Bullet()
@@ -88,6 +89,21 @@ void Bullet::Update(float deltaTime)
     if (position.z > 50.0f) {
         active = false;
     }
+    // [To Server] Send PacketPlayerMove
+    //char type = PACKET_BULLET_MOVE;
+    //int retval = send(sock, &type, sizeof(char), 0);
+    //if (retval == SOCKET_ERROR)
+    //    err_display("Send() - PACKET_BULLET_MOVE.type");
+
+    //PacketBulletMove pbm;
+    //pbm.size = sizeof(PacketBulletMove);
+    //pbm.type = PACKET_BULLET_MOVE;
+    //pbm.pos = position;
+
+    //retval = send(sock, (char*)&pbm, sizeof(PacketBulletMove), 0);
+    //if (retval == SOCKET_ERROR)
+    //    err_display("send() - PACKET_BULLET_MOVE");
+
 }
 
 /////////////////////////////////////////////////////////////////////////

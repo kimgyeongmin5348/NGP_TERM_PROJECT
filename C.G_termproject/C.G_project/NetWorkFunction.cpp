@@ -242,7 +242,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
             // 총알-건물 충돌 처리
-            //Scene::GetInstance()->ProcessBulletBuildingCollision(packet.bullet_id, packet.building_id);
+            Scene::GetInstance()->ProcessBulletBuildingCollision(packet.bullet_num, packet.building_num);
             break;
         }
         case PACKET_COLLIDE_PLAYER_BUILDING: {
