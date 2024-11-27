@@ -12,6 +12,7 @@ HANDLE DataEvent;
 SOCKET clientSockets[2];
 bool readyState[2] = { false, false };
 bool gameStarted = false;
+vector<PacketBuildingMove> g_buildings(100);
 
 // 함수 선언
 //void SaveID();
@@ -87,8 +88,8 @@ void SendReadyServerToClient()
 //        cout << "\n모든 플레이어가 준비되었습니다!" << endl;
 //        cout << "게임을 시작합니다..." << endl;
 //
-//        AllReady readyPacket;
-//        readyPacket.size = sizeof(AllReady);
+//        PacketAllReady readyPacket;
+//        readyPacket.size = sizeof(PacketAllReady);
 //        readyPacket.type = CLIENT_ALL_READY;
 //
 //        for (int i = 0; i < 2; i++) {
@@ -102,6 +103,7 @@ void SendReadyServerToClient()
 //        SetEvent(UpdateEvent);
 //    }
 //    SetEvent(DataEvent);
+//    cout << "=== 준비 패킷 처리 완료 ===" << endl;
 //}
 
 
@@ -110,36 +112,33 @@ void MakeBuildings()
 {
     WaitForSingleObject(DataEvent, INFINITE);
 
-    PacketBuildingMove buildingPacket;
-    buildingPacket.size = sizeof(PacketBuildingMove);
-    buildingPacket.type = PACKET_BUILDING_MOVE;
-
-    vector<PacketBuildingMove> buildings;
-
     for (int i = 0; i < 100; ++i) {
         random_device rd;
         mt19937 gen(rd());
         uniform_real_distribution<float> random_x(-20, 20);
         uniform_real_distribution<float> random_height(1, 25);
 
-        buildingPacket.pos.x = random_x(gen);
-        buildingPacket.pos.y = 0;
-        buildingPacket.pos.z = 20.f;
-        buildingPacket.scale.x = 2.0f;
-        buildingPacket.scale.y = random_height(gen);
-        buildingPacket.scale.z = 4.0f;
-        buildingPacket.num = i;
-        buildingPacket.is_broken = false;
-        buildings.push_back(buildingPacket);
-    }
+        g_buildings[i].size = sizeof(PacketBuildingMove);
+        g_buildings[i].type = PACKET_BUILDING_MOVE;
+        g_buildings[i].pos.x = random_x(gen);
+        g_buildings[i].pos.y = 0;
+        g_buildings[i].pos.z = 20.f;
+        g_buildings[i].scale.x = 2.0f;
+        g_buildings[i].scale.y = random_height(gen);
+        g_buildings[i].scale.z = 4.0f;
+        g_buildings[i].num = i;
+        g_buildings[i].is_broken = false;
 
-    for (int k = 0; k < 2; ++k) {     
-        for (const auto& building : buildings) {
-            char type = PACKET_BUILDING_MOVE;
-            send(clientSockets[k], &type, sizeof(char), 0);
-            send(clientSockets[k], (char*)&building, sizeof(PacketBuildingMove), 0);
+        // 클라이언트에 전송
+        for (int k = 0; k < 2; ++k) {
+            if (clientSockets[k] != INVALID_SOCKET) {
+                char type = PACKET_BUILDING_MOVE;
+                send(clientSockets[k], &type, sizeof(char), 0);
+                send(clientSockets[k], (char*)&g_buildings[i], sizeof(PacketBuildingMove), 0);
+            }
         }
     }
+
     SetEvent(DataEvent);
 }
 
@@ -155,20 +154,21 @@ void ProcessMove()
     buildingPacket.size = sizeof(PacketBuildingMove);
     buildingPacket.type = PACKET_BUILDING_MOVE;
 
-    for (int i = 0; i < 10; ++i) {
+    // 이전 위치 정보를 유지하기 위한 static 변수 추가
+    static vector<glm::vec3> buildingPositions(100);  // 빌딩 위치 저장용
+
+    for (int i = 0; i < 100; ++i) {
         buildingPacket.num = i;
-        buildingPacket.pos.z -= 0.1f;
+        buildingPacket.pos = buildingPositions[i];  // 저장된 위치 사용
+        buildingPacket.pos.z -= 0.1f;  // z축 방향으로 이동
 
-        if (buildingPacket.pos.z < 0.0f) {
-            buildingPacket.pos.x = (float)(rand() % 41 - 20);
-            buildingPacket.pos.z = 200.0f;
-        }
 
+        // 클라이언트에 전송
         for (int j = 0; j < 2; ++j) {
             if (clientSockets[j] != INVALID_SOCKET) {
                 char type = PACKET_BUILDING_MOVE;
-                //send(clientSockets[j], &type, sizeof(char), 0);
-                //send(clientSockets[j], (char*)&buildingPacket, sizeof(buildingPacket), 0);
+               // send(clientSockets[j], &type, sizeof(char), 0);
+               // send(clientSockets[j], (char*)&buildingPacket, sizeof(buildingPacket), 0);
             }
         }
     }
@@ -235,16 +235,31 @@ void DeleteObjects()
 //
 //}
 
-//void SendPacketMoveBuildings()
-//{
-//    PacketBuildingMove building;
-//    building.size = sizeof(PacketBuildingMove);
-//    building.type = PACKET_BUILDING_MOVE;
-//
-//    for (int i = 0; i < 2; ++i) {
-//        send(clientSockets[i], (char*)&building.pos, sizeof(building.pos), 0);
-//    }
-//}
+void SendPacketMoveBuildings() {
+    WaitForSingleObject(DataEvent, INFINITE);
+
+    for (auto& building : g_buildings) {
+        // z축으로만 이동
+        building.pos.z -= 0.3f;   // 건물 이동속도 조절
+
+        // 위치 정보 출력 (디버깅용)
+        cout << "Building " << building.num << " Position: ("
+            << building.pos.x << ", "
+            << building.pos.y << ", "
+            << building.pos.z << ")" << endl;
+
+        // 클라이언트에 전송
+        for (int i = 0; i < 2; ++i) {
+            if (clientSockets[i] != INVALID_SOCKET) {
+                char type = PACKET_BUILDING_MOVE;
+                send(clientSockets[i], &type, sizeof(char), 0);
+                send(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
+            }
+        }
+    }
+
+    SetEvent(DataEvent);
+}
 
 // 아직 정확하게 미완성 
 void GoToInGame()
@@ -366,6 +381,8 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 }
 
 static DWORD lastBuildingTime = GetTickCount();
+
+
 // 업데이트 스레드
 DWORD WINAPI ProcessUpdate(LPVOID arg) 
 {
@@ -379,10 +396,13 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
             lastBuildingTime = currentTime;
         }
 
-        // 2. 플레이어/총알/빌딩 이동 처리
+        // 2. 빌딩 이동 처리
+        SendPacketMoveBuildings();
+
+        // 3. 플레이어/총알/빌딩 이동 처리
         ProcessMove();
 
-        // 3. 충돌 체크
+        // 4. 충돌 체크
         if (ColidePlayerToObjects()) DeleteObjects();
         if (ColideBulletToObjects()) DeleteObjects();
 
