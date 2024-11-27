@@ -62,13 +62,13 @@ void SendReadyServerToClient()
             char type = CLIENT_READY;
             int retval = send(clientSockets[i], &type, sizeof(char), 0);
             if (retval == SOCKET_ERROR) {
-                cout << "준비 상태 타입 전송 실패: " << WSAGetLastError() << endl;
+                std::cout << "준비 상태 타입 전송 실패: " << WSAGetLastError() << endl;
                 continue;
             }
             readyPacket.id = i;
             retval = send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
             if (retval == SOCKET_ERROR) {
-                cout << "준비 상태 패킷 전송 실패: " << WSAGetLastError() << endl;
+                std::cout << "준비 상태 패킷 전송 실패: " << WSAGetLastError() << endl;
                 continue;
             }
         }
@@ -112,7 +112,7 @@ void SendReadyServerToClient()
 
 
 // InGame 관련 함수
-void MakeBuildings() 
+void MakeBuildings()
 {
     WaitForSingleObject(DataEvent, INFINITE);
 
@@ -120,7 +120,7 @@ void MakeBuildings()
     //buildingPacket.size = sizeof(PacketBuildingMove);
     //buildingPacket.type = PACKET_BUILDING_MOVE;
 
-    vector<PacketBuildingMove> buildings;
+    //vector<PacketBuildingMove> buildings;
 
     for (int i = 0; i < 100; ++i) {
         random_device rd;
@@ -128,19 +128,18 @@ void MakeBuildings()
         uniform_real_distribution<float> random_x(-20, 20);
         uniform_real_distribution<float> random_height(1, 25);
 
-        Building[i].pos.x = random_x(gen);
-        Building[i].pos.y = 0;
-        Building[i].pos.z = 20.f;
-        Building[i].scale.x = 2.0f;
-        Building[i].scale.y = random_height(gen);
-        Building[i].scale.z = 4.0f;
-        Building[i].num = i;
-        Building[i].is_broken = false;
-        buildings.push_back(Building[i]);
-    }
+        g_buildings[i].pos.x = random_x(gen);
+        g_buildings[i].pos.y = 0;
+        g_buildings[i].pos.z = 20.f;
+        g_buildings[i].scale.x = 2.0f;
+        g_buildings[i].scale.y = random_height(gen);
+        g_buildings[i].scale.z = 4.0f;
+        g_buildings[i].num = i;
+        g_buildings[i].is_broken = false;
+        //buildings.push_back(Building[i]);
 
-        // 클라이언트에 전송
         for (int k = 0; k < 2; ++k) {
+            // 클라이언트에 전송
             if (clientSockets[k] != INVALID_SOCKET) {
                 char type = PACKET_BUILDING_MOVE;
                 send(clientSockets[k], &type, sizeof(char), 0);
@@ -307,10 +306,10 @@ void SendPacketMoveBuildings() {
         building.pos.z -= 0.3f;   // 건물 이동속도 조절
 
         // 위치 정보 출력 (디버깅용)
-        cout << "Building " << building.num << " Position: ("
-            << building.pos.x << ", "
-            << building.pos.y << ", "
-            << building.pos.z << ")" << endl;
+        //cout << "Building " << building.num << " Position: ("
+        //    << building.pos.x << ", "
+        //    << building.pos.y << ", "
+        //    << building.pos.z << ")" << endl;
 
         // 클라이언트에 전송
         for (int i = 0; i < 2; ++i) {
