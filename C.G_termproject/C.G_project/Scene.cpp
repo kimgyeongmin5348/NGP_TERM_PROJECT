@@ -108,6 +108,8 @@ void Scene::BuildObject()
     mainPlayer = new Player(this);
     mainPlayer->state = 0;
 
+    otherPlayer = new OtherPlayer(this);
+
     Ground* ground = new Ground();
     gameObjects.push_back(ground);
 
@@ -189,10 +191,10 @@ void Scene::Resize(int w, int h)
 
 void Scene::UpdatePlayerPosition(int playerID, const glm::vec3& newPos) 
 {
-    if (otherPlayer == nullptr) {
-        otherPlayer = new OtherPlayer(this);
+    if (otherPlayer) {
+        //otherPlayer = new OtherPlayer(this);
+        otherPlayer->SetPosition(newPos);
     }
-    otherPlayer->SetPosition(newPos);
 }
 
 void Scene::UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& newPos) 
