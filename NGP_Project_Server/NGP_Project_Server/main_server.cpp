@@ -5,7 +5,10 @@ using namespace std;
 
 // 전역 변수 선언
 PacketPlayerMove Player[2];
-PacketBulletMove Bullet[60]; // 0 ~ 29 : Clinet1 30~59 : Client2
+PacketBulletMove Bullet[2][30]; // 클라마다 30개
+PacketBuildingMove Building[100]; 
+PacketCollideBB  bb;
+
 int nowID = 0;
 HANDLE ClientEvent[2];
 HANDLE UpdateEvent;
@@ -20,7 +23,7 @@ void GoToInGame();
 void MakeBuildings();
 void ProcessMove();
 BOOL ColidePlayerToObjects();
-BOOL ColideBulletToObjects();
+void ColideBulletToObjects();
 void DeleteObjects();
 //void SendPacketMadebuildings();
 //void SendPacketMoveBuildings();
@@ -111,9 +114,9 @@ void MakeBuildings()
 {
     WaitForSingleObject(DataEvent, INFINITE);
 
-    PacketBuildingMove buildingPacket;
-    buildingPacket.size = sizeof(PacketBuildingMove);
-    buildingPacket.type = PACKET_BUILDING_MOVE;
+    //PacketBuildingMove buildingPacket;
+    //buildingPacket.size = sizeof(PacketBuildingMove);
+    //buildingPacket.type = PACKET_BUILDING_MOVE;
 
     vector<PacketBuildingMove> buildings;
 
@@ -123,15 +126,15 @@ void MakeBuildings()
         uniform_real_distribution<float> random_x(-20, 20);
         uniform_real_distribution<float> random_height(1, 25);
 
-        buildingPacket.pos.x = random_x(gen);
-        buildingPacket.pos.y = 0;
-        buildingPacket.pos.z = 20.f;
-        buildingPacket.scale.x = 2.0f;
-        buildingPacket.scale.y = random_height(gen);
-        buildingPacket.scale.z = 4.0f;
-        buildingPacket.num = i;
-        buildingPacket.is_broken = false;
-        buildings.push_back(buildingPacket);
+        Building[i].pos.x = random_x(gen);
+        Building[i].pos.y = 0;
+        Building[i].pos.z = 20.f;
+        Building[i].scale.x = 2.0f;
+        Building[i].scale.y = random_height(gen);
+        Building[i].scale.z = 4.0f;
+        Building[i].num = i;
+        Building[i].is_broken = false;
+        buildings.push_back(Building[i]);
     }
 
     for (int k = 0; k < 2; ++k) {     
@@ -230,15 +233,46 @@ BOOL ColidePlayerToObjects()
     return FALSE;
 }
 
-BOOL ColideBulletToObjects()
+void ColideBulletToObjects()
 {
+    bb.size = sizeof(PacketCollideBB);
+    bb.type = PACKET_COLLIDE_BULLET_BUILDING;
 
-    return FALSE;
+    bool collision = false;
+
+    for (int k = 0; k < 2; ++k) {
+        if (collision) break;
+        for (int i = 0; i < 30; ++i) {
+            if (collision) break;
+            for (int j = 0; j < 100; ++j) {
+                if (Building[i].pos.x - 0.6f < Bullet[k][j].pos.x &&
+                    Bullet[k][j].pos.x < Building[i].pos.x + 0.6f &&
+                    Bullet[k][j].pos.y < Building[i].scale.y / 5 - 0.2f &&
+                    Bullet[k][j].pos.z < Building[i].pos.z + 1 &&
+                    Bullet[k][j].pos.z > Building[i].pos.z - 1) {
+                    bb.building_num = i;
+                    bb.bullet_num = j;
+                    send(clientSockets[k], &bb.type, sizeof(char), 0);
+                    send(clientSockets[k], (char*)&bb, sizeof(PacketCollideBB), 0);
+                    cout << "충돌 패킷 전송" << endl;                 
+                    DeleteObjects();
+                    collision = true;
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void DeleteObjects()
 {
-
+    for (int k = 0; k < 2; ++k) {
+        Building[bb.building_num].scale.y = 0;    
+        char type = PACKET_BUILDING_MOVE;
+        send(clientSockets[k], &type, sizeof(char), 0);
+        send(clientSockets[k], (char*)&Building, sizeof(PacketBuildingMove), 0);
+        cout << "빌딩 패킷 전송" << endl;
+    }
 }
 
 //void SendPacketMadebuildings()
@@ -380,7 +414,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             }
 
             // Update Bullet
-            Bullet[(ClientNum + 1) * movePacket.num] = movePacket;
+            Bullet[ClientNum][movePacket.num] = movePacket;
 
             break;
         }
@@ -410,8 +444,8 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
         WaitForSingleObject(UpdateEvent, INFINITE);
 
         // 1. 건물 생성 - 3초마다 실행
-        DWORD currentTime = GetTickCount();
-        if (currentTime - lastBuildingTime >= 3000) {
+        DWORD currentTime = GetTickCount64();
+        if (currentTime - lastBuildingTime >= 10000) {
             MakeBuildings();
             lastBuildingTime = currentTime;
         }
@@ -420,8 +454,8 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
         ProcessMove();
 
         // 3. 충돌 체크
-        if (ColidePlayerToObjects()) DeleteObjects();
-        if (ColideBulletToObjects()) DeleteObjects();
+        //if (ColidePlayerToObjects()) DeleteObjects();
+        ColideBulletToObjects();
 
         SetEvent(ClientEvent[0]);
         SetEvent(UpdateEvent);

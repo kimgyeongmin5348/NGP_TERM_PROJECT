@@ -66,10 +66,10 @@ public:
     Bullet();
     ~Bullet();
 
-    void SetNum(int inputNum) {
+    /*void SetNum(int inputNum) {
         num = inputNum;
-    }
-
+    }*/
+    int GetNum() { return num; }
     virtual void Update(float deltaTime) override;
 
     bool active = false;
