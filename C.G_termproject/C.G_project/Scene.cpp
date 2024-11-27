@@ -100,15 +100,13 @@ void Scene::Initialize()
     BuildObject();
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
-}
 
+}
+    
 void Scene::BuildObject()
 {
     mainPlayer = new Player(this);
     mainPlayer->state = 0;
-
-    otherPlayer = new OtherPlayer(this);
-    otherPlayer->state = 0;
 
     Ground* ground = new Ground();
     gameObjects.push_back(ground);
@@ -118,9 +116,10 @@ void Scene::BuildObject()
         gameObjects.push_back(bullet);
     }
 
+    // 빌딩 생성부분 -> 서버에서 하기 때문에 지워봄
     for (int i = 0; i < 100; ++i) {
-        Building* building = new Building();
-        gameObjects.push_back(building);
+            Building* building = new Building();
+            gameObjects.push_back(building);
     }
 }
 
@@ -174,7 +173,6 @@ void Scene::Render()
 void Scene::Update(float deltaTime)
 {
     mainPlayer->Update(deltaTime);
-
     if (otherPlayer) {
         otherPlayer->Update(deltaTime);
     }
@@ -191,6 +189,9 @@ void Scene::Resize(int w, int h)
 
 void Scene::UpdatePlayerPosition(int playerID, const glm::vec3& newPos) 
 {
+    if (otherPlayer == nullptr) {
+        otherPlayer = new OtherPlayer(this);
+    }
     otherPlayer->SetPosition(newPos);
 }
 
@@ -233,6 +234,7 @@ void Scene::KeyDown(unsigned char key)
         }
     }
 }
+
 
 void Scene::KeyUp(unsigned char key) 
 {

@@ -28,8 +28,6 @@ public:
     virtual void Update(float deltaTime) override;
     virtual void Render(GLuint program);
 
-    Object* GetBody() { return body; }
-    
     // 네트워크 관련 멤버 변수
     bool isReady;                    // 로비에서의 준비 상태
     char playerid[32];              // 플레이어 ID (MAX_ID_SIZE = 32)

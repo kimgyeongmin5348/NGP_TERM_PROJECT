@@ -48,10 +48,7 @@ public:
     void make_fragmentShader();
     void InitShader();
 
-    bool start = false;
-
 private:
-    //std::vector<Player*> players;  // 플레이어들
     Player* mainPlayer{ nullptr };  // 현재 클라이언트의 플레이어
     OtherPlayer* otherPlayer{ nullptr };  // 다른 클라이언트들의 플레이어
     std::vector<Object*> gameObjects;
