@@ -20,7 +20,7 @@ public:
     }  // 기본 생성자 추가
 
     Player(Scene* scene);  // 기존 생성자
-    ~Player();
+    virtual ~Player();
 
     void SetPosition(const glm::vec3& pos) override;
     void SetRotation(const glm::vec3& rot) override;
@@ -34,7 +34,7 @@ public:
     int state;                      // 플레이어 상태 (기울기 등)
 
         
-private:
+protected:
 	Object* body;
 	Object* wingLeft;
 	Object* wingRight;
@@ -49,3 +49,18 @@ private:
 	Scene* scene;
 };
 
+class OtherPlayer : public Player
+{
+public:
+    OtherPlayer() {};
+    ~OtherPlayer() {};
+
+    OtherPlayer(Scene* scene) : Player(scene) {};
+
+    void Update(float deltaTime) override 
+    {
+        // for 날개회전
+        wingLeft->Update(deltaTime);
+        wingRight->Update(deltaTime);
+    };
+};

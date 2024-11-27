@@ -225,7 +225,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
                 err_display("recvn() - PACKET_PLAYER_MOVE");
                 break;
             }
-            // 플레이어 이동 처리
+            // 상대 플레이어 Update
             Scene::GetInstance()->UpdatePlayerPosition(packet.id, packet.pos);
             break;
         }

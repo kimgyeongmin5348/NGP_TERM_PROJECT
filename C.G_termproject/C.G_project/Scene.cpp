@@ -158,8 +158,9 @@ void Scene::Render()
     glUniform3f(lightColorLocation, 0.7f, 0.7f, 0.7f);
 
     mainPlayer->Render(s_program);
-    if (otherPlayer)
+    if (otherPlayer) {
         otherPlayer->Render(s_program);
+    }
 
     for (auto obj : gameObjects) {
         obj->Render(s_program, 0);
@@ -172,8 +173,9 @@ void Scene::Render()
 void Scene::Update(float deltaTime)
 {
     mainPlayer->Update(deltaTime);
-    if(otherPlayer)
+    if (otherPlayer) {
         otherPlayer->Update(deltaTime);
+    }
 
     for (auto obj : gameObjects) {
         obj->Update(deltaTime);
@@ -188,7 +190,7 @@ void Scene::Resize(int w, int h)
 void Scene::UpdatePlayerPosition(int playerID, const glm::vec3& newPos) 
 {
     if (otherPlayer == nullptr) {
-        otherPlayer = new Player(this);
+        otherPlayer = new OtherPlayer(this);
     }
     otherPlayer->SetPosition(newPos);
 }
@@ -239,30 +241,3 @@ void Scene::KeyUp(unsigned char key)
     keyStates[key] = false;
     mainPlayer->state = 0;
 }
-
-
-//void Scene::HandleKeyboard(unsigned char key, bool isPressed)
-//{
-//    if (key == 'q') exit(0);
-//    if (key == ' ') { // 스페이스바로 총알 발사
-//        for (auto obj : gameObjects) {
-//            Bullet* bullet = dynamic_cast<Bullet*>(obj);
-//            if (bullet && !bullet->active) {
-//                bullet->SetPosition(player->GetPosition()); // 발사 위치 설정
-//                bullet->active = true;
-//                break;
-//            }
-//        }
-//    }
-//
-//    // 플레이어의 상태 기반으로 수정 필요 (키 입력 시 부자연스러운 움직임)
-//    if (key == 'w' || key == 'a' || key == 's' || key == 'd') {
-//        glm::vec3 pos = player->GetPosition();
-//        if (key == 'w') pos.y += 0.05f;
-//        if (key == 'a') pos.x += 0.05f;
-//        if (key == 's') pos.y -= 0.05f;
-//        if (key == 'd') pos.x -= 0.05f;
-//        player->SetPosition(pos);
-//        std::cerr << player->GetPosition().x << ", " << player->GetPosition().y << ", " << player->GetPosition().z << std::endl;
-//    }
-//}

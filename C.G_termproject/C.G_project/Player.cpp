@@ -99,15 +99,6 @@ void Player::Update(float deltaTime)
         if (rotate.x > -15)
             rotate.x -= 1.0f;
         break;
-    /*case ARE_YOU_READY:
-        if (!isReady) {
-            cout << "ready" << '\n';
-            SendReadyClientToServer(); 
-        }
-        else {
-            cout << "not ready" << '\n';
-            SendNotReadyClientToServer();
-        }*/
     default:
         if (rotate.x < 0.f) rotate.x += 1.0f;
         if (rotate.x > 0.f) rotate.x -= 1.0f;
@@ -179,7 +170,7 @@ void Player::SetRotation(const glm::vec3& rot)
     rotationMatrix = glm::rotate(rotationMatrix, glm::radians(rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
 
     // 각 파츠의 상대 위치를 플레이어 중심점 기준으로 변환
-    glm::vec3 centerPos = position;  // 플레이어의 중심점
+    glm::vec3 centerPos = position;
 
     // 각 파츠에 대해 중심점 기준 회전 적용
     wingConnect->SetPosition(centerPos + glm::vec3(rotationMatrix * glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)));
@@ -195,10 +186,6 @@ void Player::SetRotation(const glm::vec3& rot)
 
     // 회전 각도 설정
     wingConnect->SetRotation(rot);
-    //wingLeft->SetRotation(glm::vec3(rot.x, wingLeft->GetRotation().y, rot.z));
-    //wingRight->SetRotation(glm::vec3(rot.x, wingRight->GetRotation().y, rot.z));
-    //wingLeft->SetRotation(glm::vec3(rot.x, rot.y, rot.z));
-    //wingRight->SetRotation(glm::vec3(rot.x, rot.y, rot.z));
     body->SetRotation(glm::vec3(rot.x, 0, rot.z));
     bodyFront->SetRotation(glm::vec3(rot.x, 0, rot.z));
     bodyBack->SetRotation(glm::vec3(rot.x, 0, rot.z));
