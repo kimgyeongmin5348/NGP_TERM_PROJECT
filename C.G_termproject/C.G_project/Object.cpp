@@ -14,7 +14,9 @@ Object::Object()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    qobj = gluNewQuadric();
+    gluQuadricDrawStyle(qobj, obj_type);
+
     glBindVertexArray(0);
 }
 
@@ -34,19 +36,18 @@ void Object::Render(GLuint program, int type)
     GLuint transformLoc = glGetUniformLocation(program, "transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle(qobj, obj_type);
-
     GLuint colorLoc = glGetUniformLocation(program, "objectColor");
     glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
-    // glBindVertexArray(0);
     glBindVertexArray(VAO);
     if (type == 1) gluSphere(qobj, 1.0, 20, 30);
     else if (type == 2) gluCylinder(qobj, 0.3f, 1.1f, 0.5, 100, 1);
     else if (type == 3) gluCylinder(qobj, 0.3f, 0.3f, 1.5, 100, 1);
     else glDrawArrays(GL_TRIANGLES, 0, 36);
-    
+    GLint currentVAO;
+    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
+    std::cout << "Current VAO: " << currentVAO << std::endl;
+
     glBindVertexArray(0);
 }
 

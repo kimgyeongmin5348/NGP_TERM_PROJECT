@@ -191,7 +191,6 @@ void Scene::UpdatePlayerPosition(int playerID, const glm::vec3& newPos)
 {
     if (otherPlayer == nullptr) {
         otherPlayer = new OtherPlayer(this);
-        
     }
     otherPlayer->SetPosition(newPos);
 }

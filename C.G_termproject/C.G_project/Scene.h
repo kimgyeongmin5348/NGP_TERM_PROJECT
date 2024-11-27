@@ -50,7 +50,7 @@ public:
 
 private:
     Player* mainPlayer{ nullptr };  // 현재 클라이언트의 플레이어
-    Player* otherPlayer{ nullptr };  // 다른 클라이언트들의 플레이어
+    OtherPlayer* otherPlayer{ nullptr };  // 다른 클라이언트들의 플레이어
     std::vector<Object*> gameObjects;
     Camera* camera{ nullptr };
     bool isReady{ false };
