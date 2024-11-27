@@ -5,9 +5,12 @@ Object::Object()
 {
     // VAO 생성 및 바인딩
     glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
     glGenBuffers(1, &VBO);
+
+    if (VAO == 0 || VBO == 0) {
+        std::cerr << "Failed to generate VAO or VBO! OpenGL program might not be active." << std::endl;
+    }
+    glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(hexa), hexa, GL_STATIC_DRAW);
 
@@ -44,9 +47,9 @@ void Object::Render(GLuint program, int type)
     else if (type == 2) gluCylinder(qobj, 0.3f, 1.1f, 0.5, 100, 1);
     else if (type == 3) gluCylinder(qobj, 0.3f, 0.3f, 1.5, 100, 1);
     else glDrawArrays(GL_TRIANGLES, 0, 36);
-    GLint currentVAO;
-    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
-    std::cout << "Current VAO: " << currentVAO << std::endl;
+    //GLint currentVAO;
+    //glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
+    //std::cout << "Current VAO: " << currentVAO << std::endl;
 
     glBindVertexArray(0);
 }
