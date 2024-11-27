@@ -44,10 +44,6 @@ void Object::Render(GLuint program, int type)
     else if (type == 2) gluCylinder(qobj, 0.3f, 1.1f, 0.5, 100, 1);
     else if (type == 3) gluCylinder(qobj, 0.3f, 0.3f, 1.5, 100, 1);
     else glDrawArrays(GL_TRIANGLES, 0, 36);
-    GLint currentVAO;
-    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
-    std::cout << "Current VAO: " << currentVAO << std::endl;
-
     glBindVertexArray(0);
 }
 
@@ -135,4 +131,8 @@ Ground::Ground()
 {
     SetScale(glm::vec3(1000.0f, 0.f, 1000.0f));
     SetColor(glm::vec3(0.1f, 0.1f, 0.1f));
+}
+
+Ground::~Ground()
+{
 }

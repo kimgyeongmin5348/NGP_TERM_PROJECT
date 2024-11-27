@@ -61,8 +61,14 @@ public:
 class Bullet : public Object
 {
 public:
+    int num;
+
     Bullet();
     ~Bullet();
+
+    void SetNum(int inputNum) {
+        num = inputNum;
+    }
 
     virtual void Update(float deltaTime) override;
 
