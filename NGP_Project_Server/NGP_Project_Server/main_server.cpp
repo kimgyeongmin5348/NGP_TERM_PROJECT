@@ -259,7 +259,7 @@ void ColideBulletToObjects()
                     bb.bullet_num = j;
                     send(clientSockets[k], &bb.type, sizeof(char), 0);
                     send(clientSockets[k], (char*)&bb, sizeof(PacketCollideBB), 0);
-                    cout << "충돌 패킷 전송" << endl;                 
+                    //cout << "충돌 패킷 전송" << endl;                 
                     DeleteObjects();
                     collision = true;
                     break;
@@ -276,7 +276,7 @@ void DeleteObjects()
         char type = PACKET_BUILDING_MOVE;
         send(clientSockets[k], &type, sizeof(char), 0);
         send(clientSockets[k], (char*)&Building, sizeof(PacketBuildingMove), 0);
-        cout << "빌딩 패킷 전송" << endl;
+        //cout << "빌딩 패킷 전송" << endl;
     }
 }
 
@@ -357,12 +357,16 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     int retval;
     char type;
 
+    // TCP_NODELAY 설정 추가
+    int flag = 1;
+    setsockopt(client_sock, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(int));
+
     WaitForSingleObject(DataEvent, INFINITE);
     int ClientNum = nowID++;
     SetEvent(DataEvent);
 
     while (true) {
-        WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
+        //WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
         retval = recv(client_sock, &type, sizeof(type), 0);
         if (retval <= 0) break;
 
@@ -440,9 +444,9 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         }
         }
 
-        if (ClientNum < 2) {
-            SetEvent(ClientEvent[(ClientNum + 1) % 2]);
-        }
+       //if (ClientNum < 2) {
+       //     SetEvent(ClientEvent[(ClientNum + 1) % 2]);
+       // }
     }
 
     // 연결 종료 처리
@@ -482,7 +486,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
         //if (ColidePlayerToObjects()) DeleteObjects();
         ColideBulletToObjects();
 
-        SetEvent(ClientEvent[0]);
+        //SetEvent(ClientEvent[0]);
         SetEvent(UpdateEvent);
     }
     return 0;
