@@ -191,12 +191,18 @@ void SendBulletMove(const glm::vec3& bulletPos, int bulletIndex) {
         return;
     }
 
+    // 총알 인덱스 범위 체크 추가
+    if (bulletIndex < 0 || bulletIndex >= 30) {
+        cout << "잘못된 총알 인덱스: " << bulletIndex << endl;
+        return;
+    }
+
     PacketBulletMove bulletPacket;
     bulletPacket.size = sizeof(PacketBulletMove);
     bulletPacket.type = PACKET_BULLET_MOVE;
     bulletPacket.pos = bulletPos;
     bulletPacket.num = bulletIndex;
-   
+
     char type = PACKET_BULLET_MOVE;
     int retval = send(sock, &type, sizeof(char), 0);
     if (retval == SOCKET_ERROR) {

@@ -6,7 +6,6 @@ using namespace std;
 // 전역 변수 선언
 PacketPlayerMove Player[2];
 PacketBulletMove Bullet[2][30]; // 클라마다 30개
-PacketBuildingMove Building[100]; 
 PacketCollideBB  bb;
 
 int nowID = 0;
@@ -158,29 +157,7 @@ void ProcessMove()
     /*****************
       Update Building 
     ******************/
-    PacketBuildingMove buildingPacket;
-    ZeroMemory(&buildingPacket, sizeof(PacketBuildingMove));
-    buildingPacket.size = sizeof(PacketBuildingMove);
-    buildingPacket.type = PACKET_BUILDING_MOVE;
-
-    // 이전 위치 정보를 유지하기 위한 static 변수 추가
-    static vector<glm::vec3> buildingPositions(100);  // 빌딩 위치 저장용
-
-    for (int i = 0; i < 100; ++i) {
-        buildingPacket.num = i;
-        buildingPacket.pos = buildingPositions[i];  // 저장된 위치 사용
-        buildingPacket.pos.z -= 0.1f;  // z축 방향으로 이동
-
-
-        // 클라이언트에 전송
-        for (int j = 0; j < 2; ++j) {
-            if (clientSockets[j] != INVALID_SOCKET) {
-                char type = PACKET_BUILDING_MOVE;
-               // send(clientSockets[j], &type, sizeof(char), 0);
-               // send(clientSockets[j], (char*)&buildingPacket, sizeof(buildingPacket), 0);
-            }
-        }
-    }
+   
 
     /**************
       Update Player
@@ -238,45 +215,59 @@ BOOL ColidePlayerToObjects()
     return FALSE;
 }
 
-void ColideBulletToObjects()
-{
+void ColideBulletToObjects() {
     bb.size = sizeof(PacketCollideBB);
     bb.type = PACKET_COLLIDE_BULLET_BUILDING;
-
     bool collision = false;
 
     for (int k = 0; k < 2; ++k) {
-        if (collision) break;
         for (int i = 0; i < 30; ++i) {
-            if (collision) break;
-            for (int j = 0; j < 100; ++j) {
-                if (Building[i].pos.x - 0.6f < Bullet[k][j].pos.x &&
-                    Bullet[k][j].pos.x < Building[i].pos.x + 0.6f &&
-                    Bullet[k][j].pos.y < Building[i].scale.y / 5 - 0.2f &&
-                    Bullet[k][j].pos.z < Building[i].pos.z + 1 &&
-                    Bullet[k][j].pos.z > Building[i].pos.z - 1) {
-                    bb.building_num = i;
-                    bb.bullet_num = j;
-                    send(clientSockets[k], &bb.type, sizeof(char), 0);
-                    send(clientSockets[k], (char*)&bb, sizeof(PacketCollideBB), 0);
-                    //cout << "충돌 패킷 전송" << endl;                 
-                    DeleteObjects();
+            for (int j = 0; j < g_buildings.size(); ++j) {
+                if (g_buildings[j].pos.x - 0.6f < Bullet[k][i].pos.x &&
+                    Bullet[k][i].pos.x < g_buildings[j].pos.x + 0.6f &&
+                    Bullet[k][i].pos.y < g_buildings[j].scale.y / 5 - 0.2f &&
+                    Bullet[k][i].pos.z < g_buildings[j].pos.z + 1 &&
+                    Bullet[k][i].pos.z > g_buildings[j].pos.z - 1) {
+
+                    cout << "충돌 발생!" << endl;
+                    cout << "건물 번호: " << j << ", 총알 번호: " << i << endl;
+                    cout << "충돌 위치: (" << Bullet[k][i].pos.x << ", "
+                        << Bullet[k][i].pos.y << ", "
+                        << Bullet[k][i].pos.z << ")" << endl;
+
+                    bb.building_num = j;
+                    bb.bullet_num = i;
+
+                    for (int c = 0; c < 2; ++c) {
+                        if (clientSockets[c] != INVALID_SOCKET) {
+                            send(clientSockets[c], &bb.type, sizeof(char), 0);
+                            send(clientSockets[c], (char*)&bb, sizeof(PacketCollideBB), 0);
+                        }
+                    }
+
+                    g_buildings[j].is_broken = true;
+                    g_buildings[j].scale.y = 0;
                     collision = true;
                     break;
                 }
             }
+            if (collision) break;
         }
+        if (collision) break;
     }
 }
 
 void DeleteObjects()
 {
     for (int k = 0; k < 2; ++k) {
-        Building[bb.building_num].scale.y = 0;    
+        // g_buildings vector 사용
+        g_buildings[bb.building_num].scale.y = 0;
+        g_buildings[bb.building_num].is_broken = true;
+
         char type = PACKET_BUILDING_MOVE;
         send(clientSockets[k], &type, sizeof(char), 0);
-        send(clientSockets[k], (char*)&Building, sizeof(PacketBuildingMove), 0);
-        //cout << "빌딩 패킷 전송" << endl;
+        // 해당 건물의 정보만 전송
+        send(clientSockets[k], (char*)&g_buildings[bb.building_num], sizeof(PacketBuildingMove), 0);
     }
 }
 
@@ -426,6 +417,12 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             cout << "총알 위치: (" << movePacket.pos.x << ", "
                 << movePacket.pos.y << ", "
                 << movePacket.pos.z << ")" << endl;
+
+            // 총알 인덱스 범위 체크 추가
+            if (movePacket.num < 0 || movePacket.num >= 30) {
+                cout << "잘못된 총알 인덱스 수신: " << movePacket.num << endl;
+                break;
+            }
 
             // Update Bullet
             Bullet[ClientNum][movePacket.num] = movePacket;
