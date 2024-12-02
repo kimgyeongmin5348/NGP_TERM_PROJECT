@@ -185,6 +185,32 @@ void SendPlayerMove(const glm::vec3& pos, int state) {
     send(sock, (char*)&movePacket, sizeof(movePacket), 0);
 }
 
+void SendBulletMove(const glm::vec3& bulletPos, int bulletIndex) {
+    if (sock == INVALID_SOCKET) {
+        cout << "서버에 연결되어 있지 않습니다." << endl;
+        return;
+    }
+
+    PacketBulletMove bulletPacket;
+    bulletPacket.size = sizeof(PacketBulletMove);
+    bulletPacket.type = PACKET_BULLET_MOVE;
+    bulletPacket.pos = bulletPos;
+    bulletPacket.num = bulletIndex;
+   
+    char type = PACKET_BULLET_MOVE;
+    int retval = send(sock, &type, sizeof(char), 0);
+    if (retval == SOCKET_ERROR) {
+        cout << "총알 이동 타입 전송 실패: " << WSAGetLastError() << endl;
+        return;
+    }
+
+    retval = send(sock, (char*)&bulletPacket, sizeof(bulletPacket), 0);
+    if (retval == SOCKET_ERROR) {
+        cout << "총알 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
+        return;
+    }
+}
+
 // 서버로부터 패킷을 받아 처리하는 스레드 함수
 DWORD WINAPI ProcessServer(LPVOID arg) {
     while (isConnected) {
@@ -234,7 +260,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
             // 총알 이동 처리
-            //Scene::GetInstance()->UpdateBulletPosition(packet.id, packet.pos);
+            Scene::GetInstance()->UpdateBulletPosition(packet.id, packet.pos);
             break;
         }
         case PACKET_COLLIDE_BULLET_BUILDING: {

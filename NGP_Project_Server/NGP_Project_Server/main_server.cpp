@@ -27,7 +27,7 @@ BOOL ColidePlayerToObjects();
 void ColideBulletToObjects();
 void DeleteObjects();
 //void SendPacketMadebuildings();
-//void SendPacketMoveBuildings();
+void SendPacketMoveBuildings();
 
 //void SaveID(const char* NewID) {
 //    strncpy(Player[nowID].playerid, NewID, MAX_ID_SIZE - 1);
@@ -280,24 +280,6 @@ void DeleteObjects()
     }
 }
 
-//void SendPacketMadebuildings()
-//{
-//    PacketBuildingMove building;
-//    building.size = sizeof(PacketBuildingMove);
-//    building.type = PACKET_BUILDING_MOVE;
-//
-//
-//    for (int i = 0; i < 2; ++i) {
-//        recv(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
-//        if (building.pos.z < 0.f) {
-//            MakeBuildings();
-//            send(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
-//        }
-//    }
-//
-//
-//}
-
 void SendPacketMoveBuildings() {
     WaitForSingleObject(DataEvent, INFINITE);
 
@@ -437,9 +419,40 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 break;
             }
 
+            // 서버가 수신한 총알 정보 출력
+            cout << "\n=== 서버 수신 총알 정보 ===" << endl;
+            cout << "발신 클라이언트 ID: " << ClientNum << endl;
+            cout << "총알 번호: " << movePacket.num << endl;
+            cout << "총알 위치: (" << movePacket.pos.x << ", "
+                << movePacket.pos.y << ", "
+                << movePacket.pos.z << ")" << endl;
+
             // Update Bullet
             Bullet[ClientNum][movePacket.num] = movePacket;
 
+            // 다른 클라이언트에게 전송
+            for (int i = 0; i < 2; i++) {
+                if (i != ClientNum && clientSockets[i] != INVALID_SOCKET) {
+                    // 전송 시도 로그
+                    cout << "\n=== 클라이언트 " << i << "에게 총알 정보 전송 시도 ===" << endl;
+
+                    char type = PACKET_BULLET_MOVE;
+                    retval = send(clientSockets[i], &type, sizeof(char), 0);
+                    if (retval == SOCKET_ERROR) {
+                        cout << "총알 이동 타입 전송 실패: " << WSAGetLastError() << endl;
+                        continue;
+                    }
+
+                    retval = send(clientSockets[i], (char*)&movePacket, sizeof(movePacket), 0);
+                    if (retval == SOCKET_ERROR) {
+                        cout << "총알 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
+                        continue;
+                    }
+
+                    // 전송 성공 로그
+                    cout << "총알 정보 전송 완료 -> 클라이언트 " << i << endl;
+                }
+            }
             break;
         }
         }

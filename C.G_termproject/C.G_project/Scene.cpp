@@ -182,21 +182,36 @@ void Scene::Update(float deltaTime)
     for (auto obj : gameObjects) {
         obj->Update(deltaTime);
         Bullet* bullet = dynamic_cast<Bullet*>(obj);
-        if (bullet) {
-            // 총알 번호와 위치 값을 서버로 전송
-            PacketBulletMove packet;
-            packet.num = bullet->num;   // 총알 고유 번호
-            packet.pos = bullet->GetPosition();   // 총알 위치
+        if (bullet && bullet->active) {  // active한 총알만 확인
+            cout << "\n=== 총알 위치 전송 정보 ===" << endl;
+            cout << "총알 번호: " << bullet->num << endl;
+            cout << "위치: (" << bullet->GetPosition().x << ", "
+                << bullet->GetPosition().y << ", "
+                << bullet->GetPosition().z << ")" << endl;
 
-            // 서버로 패킷 전송
+            // 총알 위치 정보를 서버로 전송
+            PacketBulletMove bulletPacket;
+            bulletPacket.size = sizeof(PacketBulletMove);
+            bulletPacket.type = PACKET_BULLET_MOVE;
+            bulletPacket.pos = bullet->GetPosition();
+            bulletPacket.num = bullet->num;
+
+            // 패킷 타입 전송
             char type = PACKET_BULLET_MOVE;
             int retval = send(sock, &type, sizeof(char), 0);
-            if (retval == SOCKET_ERROR)
-                err_display("Send() - PACKET_BULLET_MOVE.type");
+            if (retval == SOCKET_ERROR) {
+                cout << "총알 이동 타입 전송 실패: " << WSAGetLastError() << endl;
+                continue;
+            }
 
-            retval = send(sock, (char*)&packet, sizeof(PacketBulletMove), 0);
-            if (retval == SOCKET_ERROR)
-                err_display("send() - PACKET_BULLET_MOVE");
+            // 총알 이동 패킷 전송
+            retval = send(sock, (char*)&bulletPacket, sizeof(bulletPacket), 0);
+            if (retval == SOCKET_ERROR) {
+                cout << "총알 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
+                continue;
+            }
+
+            cout << "총알 위치 정보 전송 완료" << endl;
         }
     }
 }
@@ -221,6 +236,20 @@ void Scene::UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& n
         if (building) {
             building->SetPosition(newPos);
             building->SetScale(scale);
+        }
+    }
+}
+
+void Scene::UpdateBulletPosition(int bulletNum, const glm::vec3& newPos)
+{
+    if (bulletNum >= 0 && bulletNum < MAX_BULLETS) {
+        for (auto obj : gameObjects) {
+            Bullet* bullet = dynamic_cast<Bullet*>(obj);
+            if (bullet && bullet->num == bulletNum) {
+                bullet->SetPosition(newPos);
+                bullet->active = true;
+                break;
+            }
         }
     }
 }
