@@ -22,7 +22,7 @@ BOOL ColidePlayerToObjects();
 BOOL ColideBulletToObjects();
 void DeleteObjects();
 //void SendPacketMadebuildings();
-//void SendPacketMoveBuildings();
+void SendPacketMoveBuildings();
 
 //void SaveID(const char* NewID) {
 //    strncpy(Player[nowID].playerid, NewID, MAX_ID_SIZE - 1);
@@ -206,6 +206,7 @@ void DeleteObjects()
 //
 //}
 
+<<<<<<< Updated upstream
 //void SendPacketMoveBuildings()
 //{
 //    PacketBuildingMove building;
@@ -216,6 +217,33 @@ void DeleteObjects()
 //        send(clientSockets[i], (char*)&building.pos, sizeof(building.pos), 0);
 //    }
 //}
+=======
+void SendPacketMoveBuildings() {
+    WaitForSingleObject(DataEvent, INFINITE);
+
+    for (auto& building : g_buildings) {
+        // z축으로만 이동
+        building.pos.z -= 0.1f;   // 건물 이동속도 조절
+
+        // 위치 정보 출력 (디버깅용)
+        //cout << "Building " << building.num << " Position: ("
+        //    << building.pos.x << ", "
+        //    << building.pos.y << ", "
+        //    << building.pos.z << ")" << endl;
+
+        // 클라이언트에 전송
+        for (int i = 0; i < 2; ++i) {
+            if (clientSockets[i] != INVALID_SOCKET) {
+                char type = PACKET_BUILDING_MOVE;
+                send(clientSockets[i], &type, sizeof(char), 0);
+                send(clientSockets[i], (char*)&building, sizeof(PacketBuildingMove), 0);
+            }
+        }
+    }
+
+    SetEvent(DataEvent);
+}
+>>>>>>> Stashed changes
 
 // 아직 정확하게 미완성 
 //void GoToInGame()
