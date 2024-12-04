@@ -37,9 +37,8 @@ public:
     void KeyDown(unsigned char key);
     void KeyUp(unsigned char key);
 
-    void StartScoreCount() {
-        startTime = currentTime;
-    }
+    void StartScoreCount() { startTime = currentTime; }
+    void ProcessGameOver(float otherScore);
 
 public:
     GLuint VAO[3], VBO[6];
@@ -66,4 +65,5 @@ private:
     float currentTime;
     float startTime;
     float score;
+    bool alive = true;
 };

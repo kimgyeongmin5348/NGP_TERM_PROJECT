@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #define _CRT_SECURE_NO_WARNINGS // ���� C �Լ� ��� �� ��� ����
 #define _WINSOCK_DEPRECATED_NO_WARNINGS // ���� ���� API ��� �� ��� ��
 #include "stdafx.h"

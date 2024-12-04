@@ -1,4 +1,4 @@
-#include "framework.h"
+﻿#include "framework.h"
 #include "PacketDefine.h"
 
 using namespace std;
@@ -8,6 +8,11 @@ PacketPlayerMove Player[2];
 PacketBulletMove Bullet[2][3]; // 클라마다 3개
 PacketCollideBB  bb;
 PacketCollidePB  pb;
+
+PacketGameOver Score[2];
+bool Alive[2] = { true, true };
+bool RUN = true;
+PacketLoginRequest userName[2];
 
 int nowID = 0;
 HANDLE ClientEvent[2];
@@ -87,7 +92,6 @@ void MakeBuildings()
         g_buildings[i].is_broken = false;
 
         for (int k = 0; k < 2; ++k) {
-            // 클라이언트에 전송
             if (clientSockets[k] != INVALID_SOCKET) {
                 char type = PACKET_BUILDING_MOVE;
                 send(clientSockets[k], &type, sizeof(char), 0);
@@ -106,7 +110,7 @@ void ProcessMove()
     /*****************
       Update Building
     ******************/
-    // SendPacketMoveBuilding() 에서 처리   
+    // SendPacketMoveBuildings() 에서 처리   
 
     /**************
       Update Player
@@ -143,7 +147,6 @@ void ProcessMove()
     /**********************
       Send PacketBulletMove
     ***********************/
-    // 다른 클라이언트에게 전송
     for (int i = 0; i < 2; i++) {
         for (int bulletIndex = 0; bulletIndex < 3; bulletIndex++) {
             if (clientSockets[i] != INVALID_SOCKET) {
@@ -168,6 +171,7 @@ void ProcessMove()
     }
 
 
+
     SetEvent(DataEvent);
 }
 
@@ -179,25 +183,25 @@ void ColidePlayerToObjects()
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < g_buildings.size(); ++j) {
             if (g_buildings[j].pos.z < 0.4f && g_buildings[j].pos.z > -0.1f) {
-                if ((g_buildings[j].pos.x - 0.6f) < Player[i].pos.x &&
-                    Player[i].pos.x < (g_buildings[j].pos.x + 0.6f) &&
-                    Player[i].pos.y < g_buildings[j].scale.y / 5 - 0.2f) {
+                if ((g_buildings[j].pos.x - 0.3f) < Player[i].pos.x &&
+                    Player[i].pos.x < (g_buildings[j].pos.x + 0.3f) &&
+                    Player[i].pos.y < g_buildings[j].scale.y / 6 - 0.2f) {
 
                     pb.num = i;
 
-                    for (int c = 0; c < 2; ++c) {
-                        if (clientSockets[c] != INVALID_SOCKET) {
-                            send(clientSockets[c], &pb.type, sizeof(char), 0);
-                            send(clientSockets[c], (char*)&pb, sizeof(PacketCollidePB), 0);
-                        }
+                    if (clientSockets[i] != INVALID_SOCKET) {
+                        send(clientSockets[i], &pb.type, sizeof(char), 0);
+                        send(clientSockets[i], (char*)&pb, sizeof(PacketCollidePB), 0);
                     }
+                    
                 }
             }
         }
     }
 }
 
-void ColideBulletToObjects() {
+void ColideBulletToObjects() 
+{
     bb.size = sizeof(PacketCollideBB);
     bb.type = PACKET_COLLIDE_BULLET_BUILDING;
     bool collision = false;
@@ -240,12 +244,13 @@ void ColideBulletToObjects() {
 }
 
 
-void SendPacketMoveBuildings() {
+void SendPacketMoveBuildings() 
+{
     WaitForSingleObject(DataEvent, INFINITE);
 
     for (auto& building : g_buildings) {
         // z축으로만 이동
-        building.pos.z -= 0.05f;   // 건물 이동속도 조절
+        building.pos.z -= 0.03f;   // 건물 이동속도 조절
 
         // 위치 정보 출력 (디버깅용)
         //cout << "Building " << building.num << " Position: ("
@@ -266,7 +271,6 @@ void SendPacketMoveBuildings() {
     SetEvent(DataEvent);
 }
 
-// 메인 스레드
 DWORD WINAPI ProcessClient(LPVOID arg)
 {
     SOCKET client_sock = (SOCKET)arg;
@@ -301,6 +305,9 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
             send(client_sock, (char*)&response, sizeof(response), 0);
             cout << "클라이언트 " << ClientNum << " 로그인 성공" << endl;
+
+            // Update Username
+            userName[ClientNum] = loginPacket;
             break;
         }
         case CLIENT_READY: {
@@ -370,7 +377,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             }
 
             // 총알 인덱스 범위 체크 추가
-            if (movebulletPacket.num < 0 || movebulletPacket.num >= 30) {
+            if (movebulletPacket.num < 0 || movebulletPacket.num >= 3) {
                 cout << "잘못된 총알 인덱스 수신: " << movebulletPacket.num << endl;
                 break;
             }
@@ -379,6 +386,12 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             Bullet[ClientNum][movebulletPacket.num] = movebulletPacket;
 
             break;
+        }
+        case PACKET_GAME_OVER: {
+            PacketGameOver pgo;
+            retval = recvn(client_sock, (char*)&pgo, sizeof(pgo), 0);
+            Score[ClientNum] = pgo;
+            Alive[ClientNum] = false;
         }
         }
     }
@@ -395,17 +408,15 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 }
 
 static DWORD lastBuildingTime = GetTickCount();
-
-
 // 업데이트 스레드
 DWORD WINAPI ProcessUpdate(LPVOID arg)
 {
-    while (true) {
+    while (RUN) {
         WaitForSingleObject(UpdateEvent, INFINITE);
 
-        // 1. 건물 생성 - 3초마다 실행
+        // 1. 건물 생성 - 5초마다 실행
         DWORD currentTime = GetTickCount64();
-        if (currentTime - lastBuildingTime >= 10000) {
+        if (currentTime - lastBuildingTime >= 5000) {
             MakeBuildings();
             lastBuildingTime = currentTime;
         }
@@ -417,8 +428,28 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
         ProcessMove();
 
         // 3. 충돌 체크
-        ColidePlayerToObjects();
         ColideBulletToObjects();
+        ColidePlayerToObjects();
+
+        // 4. 게임 오버 처리
+        int retval;
+        if (Alive[0] == false && Alive[1] == false) {
+            for (int i = 0; i < 2; ++i) {
+                if (clientSockets[i] != INVALID_SOCKET) {
+                    char type = PACKET_GAME_OVER;
+                    retval = send(clientSockets[i], &type, sizeof(char), 0);
+                    retval = send(clientSockets[i], (char*)&Score[(i + 1) % 2], sizeof(PacketGameOver), 0);
+                }
+            }
+            cout << "========= 게임 종료 =========" << endl;
+            if (abs(Score[0].score - Score[1].score) < 0.5) {
+                cout << "무승부!" << endl;
+            }
+            else {
+                cout << (Score[0].score > Score[1].score ? userName[0].username : userName[1].username) << " 승리!" << endl;
+            }
+            RUN = false;
+        }
 
         //SetEvent(ClientEvent[0]);
         SetEvent(UpdateEvent);
@@ -427,7 +458,8 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
 }
 
 
-int main() {
+int main() 
+{
     // 윈속 초기화
     WSADATA wsa;
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) return 1;
@@ -442,7 +474,6 @@ int main() {
         WSACleanup();
         return 1;
     }
-
 
     // 서버 소켓 생성 및 설정
     SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);

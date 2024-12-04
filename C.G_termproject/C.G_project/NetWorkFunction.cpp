@@ -1,4 +1,4 @@
-#include "PacketDefine.h"
+﻿#include "PacketDefine.h"
 #include "ServerToClient.h"
 #include "Scene.h"
 
@@ -63,25 +63,37 @@ void CleanupNetwork() {
 }
 
 // 로그인 요청 함수
-//bool SendLoginRequest(const char* playerid) {
-//    if (sock == INVALID_SOCKET) {
-//        cout << "서버에 연결되어 있지 않습니다." << endl;
-//        return false;
-//    }
-//
-//    PacketID loginPacket;
-//    loginPacket.size = sizeof(PacketID);
-//    loginPacket.type = PACKET_ID;
-//    strncpy_s(loginPacket.id, playerid, MAX_ID_SIZE - 1);
-//    loginPacket.id[MAX_ID_SIZE - 1] = '\0';
-//
-//    int retval = send(sock, (char*)&loginPacket, sizeof(loginPacket), 0);
-//    if (retval == SOCKET_ERROR) {
-//        cout << "로그인 패킷 전송 실패: " << WSAGetLastError() << endl;
-//        return false;
-//    }
-//    return true;
-//}
+bool SendLoginRequest(const char* username, const char* password) {
+    if (!isConnected) {
+        cout << "서버에 연결되어 있지 않습니다." << endl;
+        return false;
+    }
+
+    PacketLoginRequest loginPacket;
+    loginPacket.size = sizeof(PacketLoginRequest);
+    loginPacket.type = PACKET_LOGIN_REQUEST;
+    strncpy(loginPacket.username, username, MAX_ID_SIZE - 1);
+    strncpy(loginPacket.password, password, MAX_ID_SIZE - 1);
+    loginPacket.username[MAX_ID_SIZE - 1] = '\0';
+    loginPacket.password[MAX_ID_SIZE - 1] = '\0';
+
+    // 패킷 타입 전송
+    char type = PACKET_LOGIN_REQUEST;
+    int retval = send(sock, &type, sizeof(char), 0);
+    if (retval == SOCKET_ERROR) {
+        cout << "로그인 요청 타입 전송 실패" << endl;
+        return false;
+    }
+
+    // 패킷 데이터 전송
+    retval = send(sock, (char*)&loginPacket, sizeof(loginPacket), 0);
+    if (retval == SOCKET_ERROR) {
+        cout << "로그인 패킷 전송 실패" << endl;
+        return false;
+    }
+
+    return true;
+}
 
 void err_quit(const char* msg) {
     LPVOID lpMsgBuf;
@@ -117,8 +129,7 @@ void err_display(int errcode) {
     LocalFree(lpMsgBuf);
 }
 
-int recvn(SOCKET s, char* buf, int len, int flags) 
-{
+int recvn(SOCKET s, char* buf, int len, int flags) {
     int received = 0;
     while (received < len) {
         int retval = recv(s, buf + received, len - received, flags);
@@ -157,8 +168,7 @@ void SendReadyClientToServer()
     isReady = true;
 }
 
-void SendPlayerMove(const glm::vec3& pos, int state) 
-{
+void SendPlayerMove(const glm::vec3& pos, int state) {
     if (!isConnected) return;
 
     PacketPlayerMove movePacket;
@@ -173,10 +183,15 @@ void SendPlayerMove(const glm::vec3& pos, int state)
     send(sock, (char*)&movePacket, sizeof(movePacket), 0);
 }
 
-void SendBulletMove(const glm::vec3& bulletPos, int bulletIndex) 
-{
+void SendBulletMove(const glm::vec3& bulletPos, int bulletIndex) {
     if (sock == INVALID_SOCKET) {
         cout << "서버에 연결되어 있지 않습니다." << endl;
+        return;
+    }
+
+    // 총알 인덱스 범위 체크 추가
+    if (bulletIndex < 0 || bulletIndex >= 30) {
+        cout << "잘못된 총알 인덱스: " << bulletIndex << endl;
         return;
     }
 
@@ -201,15 +216,14 @@ void SendBulletMove(const glm::vec3& bulletPos, int bulletIndex)
 }
 
 // 서버로부터 패킷을 받아 처리하는 스레드 함수
-DWORD WINAPI ProcessServer(LPVOID arg) 
-{
+DWORD WINAPI ProcessServer(LPVOID arg) {
     while (isConnected) {
-       /* if (sock == INVALID_SOCKET) {
-            std::cout << "소켓이 유효하지 않습니다." << std::endl;
-            break;
-        }*/
+        /* if (sock == INVALID_SOCKET) {
+             std::cout << "소켓이 유효하지 않습니다." << std::endl;
+             break;
+         }*/
 
-        // 1. 먼저 패킷 타입만 수신
+         // 1. 먼저 패킷 타입만 수신
         unsigned char type;
         int retval = recv(sock, (char*)&type, sizeof(type), 0);
         if (retval <= 0) {
@@ -219,13 +233,19 @@ DWORD WINAPI ProcessServer(LPVOID arg)
 
         // 2. 패킷 타입에 따른 처리
         switch (type) {
+        case PACKET_LOGIN_RESPONSE: {
+            PacketLoginResponse loginResponse;
+            retval = recvn(sock, (char*)&loginResponse, sizeof(loginResponse), 0);
+            if (retval == SOCKET_ERROR) break;
+            break;
+        }
         case CLIENT_READY: {
             ReadyClientToServer packet;
             retval = recvn(sock, (char*)&packet, sizeof(ReadyClientToServer), 0);
             if (retval == SOCKET_ERROR) break;
             cout << "플레이어 " << (int)packet.id << " 준비완료" << endl;
             break;
-        }    
+        }
         case PACKET_BUILDING_MOVE: {
             PacketBuildingMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(PacketBuildingMove), 0);
@@ -249,6 +269,7 @@ DWORD WINAPI ProcessServer(LPVOID arg)
             PacketBulletMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
+            //cout << "수신" << packet.num << " " << packet.pos << endl;
 
             // 총알 이동 처리
             Scene::GetInstance()->UpdateOtherBulletPosition(packet.num, packet.pos);
@@ -258,7 +279,6 @@ DWORD WINAPI ProcessServer(LPVOID arg)
             PacketCollideBB packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
-
             // 총알-건물 충돌 처리
             Scene::GetInstance()->ProcessBulletBuildingCollision(packet.bullet_num, packet.building_num);
             break;
@@ -276,6 +296,12 @@ DWORD WINAPI ProcessServer(LPVOID arg)
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
             Scene::GetInstance()->StartScoreCount();
+        }
+        case PACKET_GAME_OVER: {
+            PacketGameOver packet;
+            retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
+            if (retval == SOCKET_ERROR) break;
+            Scene::GetInstance()->ProcessGameOver(packet.score);
         }
         default:
             //cout << "알 수 없는 패킷 타입: " << (int)type << endl;

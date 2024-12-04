@@ -223,8 +223,8 @@ void Scene::Update(float deltaTime)
     }
 
     // 점수 Update
-    score = deltaTime - startTime;
-    cout << score << endl;
+    if(alive)
+        score = deltaTime - startTime;
 }
 
 void Scene::Resize(int w, int h)
@@ -276,7 +276,18 @@ void Scene::ProcessBulletBuildingCollision(int BulletNum, int BuildingNum)
 
 void Scene::ProcessPlayerBuildingCollision(int num)
 {
-    cout << num << " - 플레이어와 빌딩 충둘" << endl;
+    cout << " ****** 충돌! 점수 계산 중지 ****** " << endl;
+    if (alive) {
+        PacketGameOver pgo;
+        pgo.size = sizeof(PacketGameOver);
+        pgo.type = PACKET_GAME_OVER;
+        pgo.score = score;
+
+        char type = PACKET_GAME_OVER;
+        int retval = send(sock, &type, sizeof(char), 0);
+        retval = send(sock, (char*)&pgo, sizeof(PacketGameOver), 0);
+    }
+    alive = false;
 }
 
 void Scene::KeyDown(unsigned char key) 
@@ -308,9 +319,23 @@ void Scene::KeyDown(unsigned char key)
     }
 }
 
-
 void Scene::KeyUp(unsigned char key) 
 {
     keyStates[key] = false;
     mainPlayer->state = 0;
+}
+
+void Scene::ProcessGameOver(float otherScore)
+{
+    if(!alive) {
+        cout << " ========== 게임 종료 ========== " << endl;
+        cout << "내 점수 : " << score << endl;
+        cout << "상대 점수 : " << otherScore << endl;
+        if (score > otherScore + 0.5)
+            cout << " =========== 승 리 =========== " << endl;
+        else if (score + 0.5 < otherScore)
+            cout << " =========== 패 배 =========== " << endl;
+        else
+            cout << "=========== 무승부 ===========" << endl;
+    }
 }
