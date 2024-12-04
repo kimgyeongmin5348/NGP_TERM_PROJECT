@@ -35,7 +35,29 @@ void ProcessMove();
 void ColidePlayerToObjects();
 void ColideBulletToObjects();
 void DeleteObjects();
+//void SendPacketMadebuildings();
 void SendPacketMoveBuildings();
+
+//void SaveID(const char* NewID) {
+//    strncpy(Player[nowID].playerid, NewID, MAX_ID_SIZE - 1);
+//    Player[nowID].playerid[MAX_ID_SIZE - 1] = '\0';
+//    nowID++;
+//    SetEvent(DataEvent);
+//    cout << "ID ���� �Ϸ�: " << NewID << endl;
+//}
+//
+//bool CheckID(const char* playerid) {
+//    // DataEvent ���� ���� (���ʿ��� ����ȭ ����)
+//    for (int i = 0; i < nowID; ++i) {
+//        if (strcmp(Player[i].playerid, playerid) == 0) {
+//            cout << "�ߺ��� ID: " << playerid << endl;
+//            return false;
+//        }
+//    }
+//    cout << "��� ������ ID: " << playerid << endl;
+//    return true;
+//}
+
 
 // Lobby ���� �Լ�
 void SendReadyServerToClient() 
