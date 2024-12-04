@@ -276,8 +276,9 @@ void Scene::ProcessBulletBuildingCollision(int BulletNum, int BuildingNum)
 
 void Scene::ProcessPlayerBuildingCollision(int num)
 {
-    cout << " ****** 충돌! 점수 계산 중지 ****** " << endl;
     if (alive) {
+        cout << " ****** 충돌! 점수 계산 중지 ****** " << endl;
+
         PacketGameOver pgo;
         pgo.size = sizeof(PacketGameOver);
         pgo.type = PACKET_GAME_OVER;
