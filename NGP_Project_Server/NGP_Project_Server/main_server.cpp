@@ -170,7 +170,7 @@ void ProcessMove()
                         continue;
                     }
 
-                    cout << i << "에게 송신 " << Bullet[(i + 1) % 2][bulletIndex].num << "-" << Bullet[(i + 1) % 2][bulletIndex].pos << endl;
+                    //cout << i << "에게 송신 " << Bullet[(i + 1) % 2][bulletIndex].num << "-" << Bullet[(i + 1) % 2][bulletIndex].pos << endl;
                 }
             }
         }
@@ -356,14 +356,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             }
 
             // 서버가 수신한 총알 정보 출력
-            cout << "수신" << ClientNum << " - " << movebulletPacket.num << " - " << movebulletPacket.pos << endl;
-
-            //cout << "\n=== 서버 수신 총알 정보 ===" << endl;
-            //cout << "발신 클라이언트 ID: " << ClientNum << endl;
-            //cout << "총알 번호: " << movebulletPacket.num << endl;
-            //cout << "총알 위치: (" << movebulletPacket.pos.x << ", "
-            //    << movebulletPacket.pos.y << ", "
-            //    << movebulletPacket.pos.z << ")" << endl;
+            //cout << "수신" << ClientNum << " - " << movebulletPacket.num << " - " << movebulletPacket.pos << endl;
 
             // 총알 인덱스 범위 체크 추가
             if (movebulletPacket.num < 0 || movebulletPacket.num >= 30) {
