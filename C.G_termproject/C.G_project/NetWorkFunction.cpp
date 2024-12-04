@@ -284,7 +284,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
             // 플레이어-건물 충돌 처리
-            ////Scene::GetInstance()->ProcessPlayerBuildingCollision(packet.player_id, packet.building_id);
+            Scene::GetInstance()->ProcessPlayerBuildingCollision(packet.num);
             break;
         }
         case CLIENT_ALL_READY: {
