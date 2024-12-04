@@ -64,7 +64,7 @@ public:
     int num;
 
     Bullet();
-    ~Bullet();
+    virtual ~Bullet();
 
     /*void SetNum(int inputNum) {
         num = inputNum;
@@ -73,6 +73,13 @@ public:
     virtual void Update(float deltaTime) override;
 
     bool active = false;
+};
+
+class OtherBullet : public Bullet
+{
+public:
+    OtherBullet() {};
+    ~OtherBullet() {};
 };
 
 class Building : public Object

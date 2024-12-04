@@ -265,8 +265,10 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             PacketBulletMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
+            //cout << "수신" << packet.num << " " << packet.pos << endl;
+
             // 총알 이동 처리
-            Scene::GetInstance()->UpdateBulletPosition(packet.id, packet.pos);
+            Scene::GetInstance()->UpdateOtherBulletPosition(packet.num, packet.pos);
             break;
         }
         case PACKET_COLLIDE_BULLET_BUILDING: {

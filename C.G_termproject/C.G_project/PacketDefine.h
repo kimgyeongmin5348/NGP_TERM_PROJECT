@@ -104,7 +104,7 @@ struct PacketBulletMove
 	char type;
 	glm::vec3 pos;
 	int num; // ÃÑ¾Ë ¹øÈ£
-	char id;
+	bool active;
 };
 
 struct PacketCollideBB

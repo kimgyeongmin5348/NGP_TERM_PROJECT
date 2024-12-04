@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "ServerToClient.h"
 
-#define MAX_BULLETS 30
+#define MAX_BULLETS 3
 
 class Scene
 {
@@ -25,7 +25,7 @@ public:
     void UpdatePlayerPosition(int playerID, const glm::vec3& newPos);
 
     void UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& newPos);
-    void UpdateBulletPosition(int bulletNum, const glm::vec3& newPos);
+    void UpdateOtherBulletPosition(int bulletNum, const glm::vec3& newPos);
     void ProcessBulletBuildingCollision(int BulletNum, int BuildingNum);
 
     void AddGameObject(Object* obj) {

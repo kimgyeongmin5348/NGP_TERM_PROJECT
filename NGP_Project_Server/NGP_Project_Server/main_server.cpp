@@ -5,7 +5,7 @@ using namespace std;
 
 // 전역 변수 선언
 PacketPlayerMove Player[2];
-PacketBulletMove Bullet[2][30]; // 클라마다 30개
+PacketBulletMove Bullet[2][3]; // 클라마다 3개
 PacketCollideBB  bb;
 
 int nowID = 0;
@@ -19,7 +19,6 @@ vector<PacketBuildingMove> g_buildings(100);
 
 // 함수 선언
 //void SaveID();
-void GoToInGame();
 void MakeBuildings();
 void ProcessMove();
 BOOL ColidePlayerToObjects();
@@ -75,51 +74,11 @@ void SendReadyServerToClient()
     SetEvent(DataEvent);
 }
 
-//void SendReadyCompleteServerToClient() 
-//{
-//    WaitForSingleObject(DataEvent, INFINITE);
-//
-//    bool allReady = true;
-//    for (int i = 0; i < 2; i++) {
-//        if (!readyState[i] || clientSockets[i] == INVALID_SOCKET) {
-//            allReady = false;
-//            break;
-//        }
-//    }
-//
-//    if (allReady) {
-//        cout << "\n모든 플레이어가 준비되었습니다!" << endl;
-//        cout << "게임을 시작합니다..." << endl;
-//
-//        PacketAllReady readyPacket;
-//        readyPacket.size = sizeof(PacketAllReady);
-//        readyPacket.type = CLIENT_ALL_READY;
-//
-//        for (int i = 0; i < 2; i++) {
-//            if (clientSockets[i] != INVALID_SOCKET) {
-//                char type = CLIENT_ALL_READY;
-//                send(clientSockets[i], &type, sizeof(char), 0);
-//                send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
-//            }
-//        }
-//        gameStarted = true;
-//        SetEvent(UpdateEvent);
-//    }
-//    SetEvent(DataEvent);
-//    cout << "=== 준비 패킷 처리 완료 ===" << endl;
-//}
-
 
 // InGame 관련 함수
 void MakeBuildings()
 {
     WaitForSingleObject(DataEvent, INFINITE);
-
-    //PacketBuildingMove buildingPacket;
-    //buildingPacket.size = sizeof(PacketBuildingMove);
-    //buildingPacket.type = PACKET_BUILDING_MOVE;
-
-    //vector<PacketBuildingMove> buildings;
 
     for (int i = 0; i < 100; ++i) {
         random_device rd;
@@ -135,7 +94,6 @@ void MakeBuildings()
         g_buildings[i].scale.z = 4.0f;
         g_buildings[i].num = i;
         g_buildings[i].is_broken = false;
-        //buildings.push_back(Building[i]);
 
         for (int k = 0; k < 2; ++k) {
             // 클라이언트에 전송
@@ -157,7 +115,7 @@ void ProcessMove()
     /*****************
       Update Building 
     ******************/
-   
+    // SendPacketMoveBuilding() 에서 처리   
 
     /**************
       Update Player
@@ -169,16 +127,6 @@ void ProcessMove()
       Update Bullet
     ***************/
     //ProcessClient() 에서 전역변수 Bullet에 저장하는 것으로 대체
-
-
-    /*****************
-      Collide Check BB
-    ******************/
-
-
-    /*****************
-      Collide Check PB
-    ******************/
 
 
     /***********************
@@ -204,6 +152,29 @@ void ProcessMove()
     /**********************
       Send PacketBulletMove
     ***********************/
+    // 다른 클라이언트에게 전송
+    for (int i = 0; i < 2; i++) {
+        for (int bulletIndex = 0; bulletIndex < 3; bulletIndex++) {
+            if (clientSockets[i] != INVALID_SOCKET) {
+                if (Bullet[(i + 1) % 2][bulletIndex].active){
+                    char type = PACKET_BULLET_MOVE;
+                    retval = send(clientSockets[i], &type, sizeof(char), 0);
+                    if (retval == SOCKET_ERROR) {
+                        cout << "총알 이동 타입 전송 실패: " << WSAGetLastError() << endl;
+                        continue;
+                    }
+
+                    retval = send(clientSockets[i], (char*)&Bullet[(i + 1) % 2][bulletIndex], sizeof(PacketBulletMove), 0);
+                    if (retval == SOCKET_ERROR) {
+                        cout << "총알 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
+                        continue;
+                    }
+
+                    //cout << i << "에게 송신 " << Bullet[(i + 1) % 2][bulletIndex].num << "-" << Bullet[(i + 1) % 2][bulletIndex].pos << endl;
+                }
+            }
+        }
+    }
 
 
     SetEvent(DataEvent);
@@ -221,7 +192,7 @@ void ColideBulletToObjects() {
     bool collision = false;
 
     for (int k = 0; k < 2; ++k) {
-        for (int i = 0; i < 30; ++i) {
+        for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < g_buildings.size(); ++j) {
                 if (g_buildings[j].pos.x - 0.6f < Bullet[k][i].pos.x &&
                     Bullet[k][i].pos.x < g_buildings[j].pos.x + 0.6f &&
@@ -229,11 +200,11 @@ void ColideBulletToObjects() {
                     Bullet[k][i].pos.z < g_buildings[j].pos.z + 1 &&
                     Bullet[k][i].pos.z > g_buildings[j].pos.z - 1) {
 
-                    cout << "충돌 발생!" << endl;
-                    cout << "건물 번호: " << j << ", 총알 번호: " << i << endl;
-                    cout << "충돌 위치: (" << Bullet[k][i].pos.x << ", "
-                        << Bullet[k][i].pos.y << ", "
-                        << Bullet[k][i].pos.z << ")" << endl;
+                    //cout << "충돌 발생!" << endl;
+                    //cout << "건물 번호: " << j << ", 총알 번호: " << i << endl;
+                    //cout << "충돌 위치: (" << Bullet[k][i].pos.x << ", "
+                    //    << Bullet[k][i].pos.y << ", "
+                    //    << Bullet[k][i].pos.z << ")" << endl;
 
                     bb.building_num = j;
                     bb.bullet_num = i;
@@ -276,7 +247,7 @@ void SendPacketMoveBuildings() {
 
     for (auto& building : g_buildings) {
         // z축으로만 이동
-        building.pos.z -= 0.3f;   // 건물 이동속도 조절
+        building.pos.z -= 0.05f;   // 건물 이동속도 조절
 
         // 위치 정보 출력 (디버깅용)
         //cout << "Building " << building.num << " Position: ("
@@ -296,32 +267,6 @@ void SendPacketMoveBuildings() {
 
     SetEvent(DataEvent);
 }
-
-// 아직 정확하게 미완성 
-void GoToInGame()
-{
-    if (!gameStarted) {
-        cout << "게임 시작!" << endl;
-        gameStarted = true;
-
-        // 게임 시작 패킷 전송
-        for (int i = 0; i < 2; i++) {
-            if (clientSockets[i] != INVALID_SOCKET) {
-                char type = CLIENT_ALL_READY;
-                send(clientSockets[i], &type, sizeof(char), 0);
-
-                PacketAllReady packet;
-                packet.size = sizeof(PacketAllReady);
-                packet.type = CLIENT_ALL_READY;
-                send(clientSockets[i], (char*)&packet, sizeof(packet), 0);
-            }
-        }
-
-        // 업데이트 스레드 시작
-        SetEvent(UpdateEvent);
-    }
-}
-
 
 // 메인 스레드
 DWORD WINAPI ProcessClient(LPVOID arg) 
@@ -403,53 +348,25 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             break;
         }
         case PACKET_BULLET_MOVE: {
-            PacketBulletMove movePacket;
-            retval = recvn(client_sock, (char*)&movePacket, sizeof(movePacket), 0);
+            PacketBulletMove movebulletPacket;
+            retval = recvn(client_sock, (char*)&movebulletPacket, sizeof(movebulletPacket), 0);
             if (retval == SOCKET_ERROR) {
                 err_display("recv()");
                 break;
             }
 
             // 서버가 수신한 총알 정보 출력
-            cout << "\n=== 서버 수신 총알 정보 ===" << endl;
-            cout << "발신 클라이언트 ID: " << ClientNum << endl;
-            cout << "총알 번호: " << movePacket.num << endl;
-            cout << "총알 위치: (" << movePacket.pos.x << ", "
-                << movePacket.pos.y << ", "
-                << movePacket.pos.z << ")" << endl;
+            //cout << "수신" << ClientNum << " - " << movebulletPacket.num << " - " << movebulletPacket.pos << endl;
 
             // 총알 인덱스 범위 체크 추가
-            if (movePacket.num < 0 || movePacket.num >= 30) {
-                cout << "잘못된 총알 인덱스 수신: " << movePacket.num << endl;
+            if (movebulletPacket.num < 0 || movebulletPacket.num >= 30) {
+                cout << "잘못된 총알 인덱스 수신: " << movebulletPacket.num << endl;
                 break;
             }
 
             // Update Bullet
-            Bullet[ClientNum][movePacket.num] = movePacket;
+            Bullet[ClientNum][movebulletPacket.num] = movebulletPacket;
 
-            // 다른 클라이언트에게 전송
-            for (int i = 0; i < 2; i++) {
-                if (i != ClientNum && clientSockets[i] != INVALID_SOCKET) {
-                    // 전송 시도 로그
-                    cout << "\n=== 클라이언트 " << i << "에게 총알 정보 전송 시도 ===" << endl;
-
-                    char type = PACKET_BULLET_MOVE;
-                    retval = send(clientSockets[i], &type, sizeof(char), 0);
-                    if (retval == SOCKET_ERROR) {
-                        cout << "총알 이동 타입 전송 실패: " << WSAGetLastError() << endl;
-                        continue;
-                    }
-
-                    retval = send(clientSockets[i], (char*)&movePacket, sizeof(movePacket), 0);
-                    if (retval == SOCKET_ERROR) {
-                        cout << "총알 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
-                        continue;
-                    }
-
-                    // 전송 성공 로그
-                    cout << "총알 정보 전송 완료 -> 클라이언트 " << i << endl;
-                }
-            }
             break;
         }
         }
