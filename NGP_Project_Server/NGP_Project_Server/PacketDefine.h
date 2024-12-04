@@ -28,9 +28,8 @@ using namespace std;
 
 #define MAX_ID_SIZE 32
 
-
-#define ID_USE 3
-#define ID_NOT_USE 4
+#define PACKET_LOGIN_REQUEST 3
+#define PACKET_LOGIN_RESPONSE 4
 #define CLIENT_READY 5
 #define CLIENT_NOTREADY 6
 #define CLIENT_STATE_READY 7
@@ -46,11 +45,20 @@ using namespace std;
 #define TCPPORT			4000
 
 
-struct ClientLoginUsePacket
-{
+// 로그인 요청 패킷 구조체 추가
+struct PacketLoginRequest {
 	char size;
 	char type;
-	char playerid[MAX_ID_SIZE];
+	char username[MAX_ID_SIZE];
+	char password[MAX_ID_SIZE];
+};
+
+// 로그인 응답 패킷 구조체 추가 
+struct PacketLoginResponse {
+	char size;
+	char type;
+	bool success;
+	int userID;
 };
 
 struct ReadyClientToServer

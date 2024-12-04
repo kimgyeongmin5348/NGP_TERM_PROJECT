@@ -17,7 +17,16 @@ SOCKET clientSockets[2];
 bool readyState[2] = { false, false };
 bool gameStarted = false;
 vector<PacketBuildingMove> g_buildings(100);
+
 auto start_time = chrono::high_resolution_clock::now();
+
+struct UserInfo {
+    string username;
+    string password;
+    bool isLoggedIn;
+};
+
+vector<UserInfo> userDatabase;
 
 // �Լ� ����
 //void SaveID();
@@ -48,6 +57,7 @@ void SendPacketMoveBuildings();
 //    cout << "��� ������ ID: " << playerid << endl;
 //    return true;
 //}
+
 
 // Lobby ���� �Լ�
 void SendReadyServerToClient() 
@@ -251,20 +261,6 @@ void ColideBulletToObjects()
     }
 }
 
-void DeleteObjects()
-{
-    for (int k = 0; k < 2; ++k) {
-        // g_buildings vector ���
-        g_buildings[bb.building_num].scale.y = 0;
-        g_buildings[bb.building_num].is_broken = true;
-
-        char type = PACKET_BUILDING_MOVE;
-        send(clientSockets[k], &type, sizeof(char), 0);
-        // �ش� �ǹ��� ������ ����
-        send(clientSockets[k], (char*)&g_buildings[bb.building_num], sizeof(PacketBuildingMove), 0);
-    }
-}
-
 void SendPacketMoveBuildings() 
 {
     WaitForSingleObject(DataEvent, INFINITE);
@@ -312,6 +308,22 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         if (retval <= 0) break;
 
         switch (type) {
+        case PACKET_LOGIN_REQUEST: {
+            PacketLoginRequest loginPacket;
+            retval = recvn(client_sock, (char*)&loginPacket, sizeof(PacketLoginRequest), 0);
+            cout << "�α������� ����" << '\n';
+            if (retval == SOCKET_ERROR) break;
+
+            PacketLoginResponse response;
+            response.size = sizeof(PacketLoginResponse);
+            response.type = PACKET_LOGIN_RESPONSE;
+            response.success = true;  // �ӽ÷� ��� �α��� ���
+            response.userID = ClientNum;
+
+            send(client_sock, (char*)&response, sizeof(response), 0);
+            cout << "Ŭ���̾�Ʈ " << ClientNum << " �α��� ����" << endl;
+            break;
+        }
         case CLIENT_READY: {
             ReadyClientToServer readyPacket;
             retval = recv(client_sock, (char*)&readyPacket, sizeof(ReadyClientToServer), 0);
@@ -377,7 +389,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 err_display("recv()");
                 break;
             }
-            //cout << "����" << ClientNum << " - " << movebulletPacket.num << " - " << movebulletPacket.pos << endl;
 
             // Update Bullet
             Bullet[ClientNum][movebulletPacket.num] = movebulletPacket;

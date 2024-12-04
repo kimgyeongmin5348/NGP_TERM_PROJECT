@@ -1,11 +1,11 @@
 #pragma once
-#define _CRT_SECURE_NO_WARNINGS // ±¸Çü C ÇÔ¼ö »ç¿ë ½Ã °æ°í ²ô±â
-#define _WINSOCK_DEPRECATED_NO_WARNINGS // ±¸Çü ¼ÒÄÏ API »ç¿ë ½Ã °æ°í ²ô
+#define _CRT_SECURE_NO_WARNINGS // ï¿½ï¿½ï¿½ï¿½ C ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+#define _WINSOCK_DEPRECATED_NO_WARNINGS // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ API ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½
 #include "stdafx.h"
 #include "Scene.h"
 
-#include <winsock2.h> // À©¼Ó2 ¸ÞÀÎ Çì´õ
-#include <ws2tcpip.h> // À©¼Ó2 È®Àå Çì´õ
+#include <winsock2.h> // ï¿½ï¿½ï¿½ï¿½2 ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+#include <ws2tcpip.h> // ï¿½ï¿½ï¿½ï¿½2 È®ï¿½ï¿½ ï¿½ï¿½ï¿½
 
 #include <tchar.h> // _T(), ...
 #include <stdio.h> // printf(), ...
@@ -16,8 +16,8 @@ using namespace std;
 
 #define MAX_ID_SIZE 32
 
-#define ID_USE 3
-#define ID_NOT_USE 4
+#define PACKET_LOGIN_REQUEST 3  
+#define PACKET_LOGIN_RESPONSE 4
 #define CLIENT_READY 5
 #define CLIENT_NOTREADY 6
 #define CLIENT_STATE_READY 7
@@ -33,12 +33,20 @@ using namespace std;
 #define TCPPORT			4000
 
 
-struct ClientLoginUsePacket
-{
+// ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½Ã» ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½Ã¼ ï¿½ß°ï¿½
+struct PacketLoginRequest {
 	char size;
 	char type;
-	char playerid[MAX_ID_SIZE];
-	char id;
+	char username[MAX_ID_SIZE];
+	char password[MAX_ID_SIZE];
+};
+
+// ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½Ã¼
+struct PacketLoginResponse {
+	char size;
+	char type;
+	bool success;
+	int userID;
 };
 
 struct ReadyClientToServer
@@ -60,7 +68,7 @@ struct StateReady
 	char size;
 	char type;
 	char id;
-	//char id;  <<- ÀÌ°Å Áßº¹ ¿À·ù ¶á´Ù... ¼öÁ¤ ÇÊ¿ä
+	//char id;  <<- ï¿½Ì°ï¿½ ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½... ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½
 };
 
 struct PacketAllReady
@@ -95,7 +103,7 @@ struct PacketBuildingMove
 	glm::vec3 pos;
 	glm::vec3 scale;
 	bool is_broken;
-	int num; // ºôµù ¹øÈ£
+	int num; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È£
 };
 
 struct PacketBulletMove
@@ -103,7 +111,7 @@ struct PacketBulletMove
 	char size;
 	char type;
 	glm::vec3 pos;
-	int num; // ÃÑ¾Ë ¹øÈ£
+	int num; // ï¿½Ñ¾ï¿½ ï¿½ï¿½È£
 	bool active;
 };
 
@@ -130,11 +138,11 @@ struct PacketGameOver
 	float score;
 };
 
-// ¼ÒÄÏ ÇÔ¼ö ¿À·ù Ãâ·Â ÈÄ Á¾·á
+// ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 void err_quit(const char* msg);
-// ¼ÒÄÏ ÇÔ¼ö ¿À·ù Ãâ·Â
+// ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 void err_display(const char* msg);
-// ¼ÒÄÏ ÇÔ¼ö ¿À·ù Ãâ·Â
+// ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 void err_display(int errcode);
 
 int recvn(SOCKET s, char* buf, int len, int flags);
