@@ -268,10 +268,15 @@ void Scene::UpdateOtherBulletPosition(int bulletNum, const glm::vec3& newPos)
 void Scene::ProcessBulletBuildingCollision(int BulletNum, int BuildingNum)
 {
     for (auto obj : gameObjects) {
-        Building* building = dynamic_cast<Building*>(gameObjects[BuildingNum]);
+        //Building* building = dynamic_cast<Building*>(gameObjects[BuildingNum]);
         Bullet* bullet = dynamic_cast<Bullet*>(gameObjects[BulletNum]);
         if (bullet)bullet->active = false;
     }
+}
+
+void Scene::ProcessPlayerBuildingCollision(int num)
+{
+    cout << num << " - 플레이어와 빌딩 충둘" << endl;
 }
 
 void Scene::KeyDown(unsigned char key) 

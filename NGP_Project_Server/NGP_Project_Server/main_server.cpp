@@ -3,10 +3,11 @@
 
 using namespace std;
 
-// Àü¿ª º¯¼ö ¼±¾ð
+// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 PacketPlayerMove Player[2];
-PacketBulletMove Bullet[2][3]; // Å¬¶ó¸¶´Ù 3°³
+PacketBulletMove Bullet[2][3]; // Å¬ï¿½ó¸¶´ï¿½ 3ï¿½ï¿½
 PacketCollideBB  bb;
+PacketCollidePB  pb;
 
 int nowID = 0;
 HANDLE ClientEvent[2];
@@ -16,12 +17,13 @@ SOCKET clientSockets[2];
 bool readyState[2] = { false, false };
 bool gameStarted = false;
 vector<PacketBuildingMove> g_buildings(100);
+auto start_time = chrono::high_resolution_clock::now();
 
-// ÇÔ¼ö ¼±¾ð
+// ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½
 //void SaveID();
 void MakeBuildings();
 void ProcessMove();
-BOOL ColidePlayerToObjects();
+void ColidePlayerToObjects();
 void ColideBulletToObjects();
 void DeleteObjects();
 //void SendPacketMadebuildings();
@@ -32,22 +34,22 @@ void SendPacketMoveBuildings();
 //    Player[nowID].playerid[MAX_ID_SIZE - 1] = '\0';
 //    nowID++;
 //    SetEvent(DataEvent);
-//    cout << "ID ÀúÀå ¿Ï·á: " << NewID << endl;
+//    cout << "ID ï¿½ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½: " << NewID << endl;
 //}
 //
 //bool CheckID(const char* playerid) {
-//    // DataEvent ´ë±â´Â Á¦°Å (ºÒÇÊ¿äÇÑ µ¿±âÈ­ Á¦°Å)
+//    // DataEvent ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½È­ ï¿½ï¿½ï¿½ï¿½)
 //    for (int i = 0; i < nowID; ++i) {
 //        if (strcmp(Player[i].playerid, playerid) == 0) {
-//            cout << "Áßº¹µÈ ID: " << playerid << endl;
+//            cout << "ï¿½ßºï¿½ï¿½ï¿½ ID: " << playerid << endl;
 //            return false;
 //        }
 //    }
-//    cout << "»ç¿ë °¡´ÉÇÑ ID: " << playerid << endl;
+//    cout << "ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ID: " << playerid << endl;
 //    return true;
 //}
 
-// Lobby °ü·Ã ÇÔ¼ö
+// Lobby ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 void SendReadyServerToClient() 
 {
     ReadyClientToServer readyPacket;
@@ -60,13 +62,13 @@ void SendReadyServerToClient()
             char type = CLIENT_READY;
             int retval = send(clientSockets[i], &type, sizeof(char), 0);
             if (retval == SOCKET_ERROR) {
-                std::cout << "ÁØºñ »óÅÂ Å¸ÀÔ Àü¼Û ½ÇÆÐ: " << WSAGetLastError() << endl;
+                std::cout << "ï¿½Øºï¿½ ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: " << WSAGetLastError() << endl;
                 continue;
             }
             readyPacket.id = i;
             retval = send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
             if (retval == SOCKET_ERROR) {
-                std::cout << "ÁØºñ »óÅÂ ÆÐÅ¶ Àü¼Û ½ÇÆÐ: " << WSAGetLastError() << endl;
+                std::cout << "ï¿½Øºï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: " << WSAGetLastError() << endl;
                 continue;
             }
         }
@@ -75,7 +77,7 @@ void SendReadyServerToClient()
 }
 
 
-// InGame °ü·Ã ÇÔ¼ö
+// InGame ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 void MakeBuildings()
 {
     WaitForSingleObject(DataEvent, INFINITE);
@@ -96,7 +98,7 @@ void MakeBuildings()
         g_buildings[i].is_broken = false;
 
         for (int k = 0; k < 2; ++k) {
-            // Å¬¶óÀÌ¾ðÆ®¿¡ Àü¼Û
+            // Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             if (clientSockets[k] != INVALID_SOCKET) {
                 char type = PACKET_BUILDING_MOVE;
                 send(clientSockets[k], &type, sizeof(char), 0);
@@ -115,18 +117,18 @@ void ProcessMove()
     /*****************
       Update Building 
     ******************/
-    // SendPacketMoveBuilding() ¿¡¼­ Ã³¸®   
+    // SendPacketMoveBuilding() ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½   
 
     /**************
       Update Player
     ***************/
-    //ProcessClient() ¿¡¼­ Àü¿ªº¯¼ö Player¿¡ ÀúÀåÇÏ´Â °ÍÀ¸·Î ´ëÃ¼
+    //ProcessClient() ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Playerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼
 
 
     /**************
       Update Bullet
     ***************/
-    //ProcessClient() ¿¡¼­ Àü¿ªº¯¼ö Bullet¿¡ ÀúÀåÇÏ´Â °ÍÀ¸·Î ´ëÃ¼
+    //ProcessClient() ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Bulletï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼
 
 
     /***********************
@@ -138,12 +140,12 @@ void ProcessMove()
             char type = PACKET_PLAYER_MOVE;
             retval = send(clientSockets[i], &type, sizeof(char), 0);
             if (retval == SOCKET_ERROR) {
-                cout << "ÇÃ·¹ÀÌ¾î ÀÌµ¿ Å¸ÀÔ Àü¼Û ½ÇÆÐ: " << WSAGetLastError() << endl;
+                cout << "ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ìµï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: " << WSAGetLastError() << endl;
                 continue;
             }
             retval = send(clientSockets[i], (char*)&Player[(i + 1) % 2], sizeof(PacketPlayerMove), 0);
             if (retval == SOCKET_ERROR) {
-                cout << "ÇÃ·¹ÀÌ¾î ÀÌµ¿ ÆÐÅ¶ Àü¼Û ½ÇÆÐ: " << WSAGetLastError() << endl;
+                cout << "ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: " << WSAGetLastError() << endl;
                 continue;
             }
         }
@@ -159,16 +161,16 @@ void ProcessMove()
                     char type = PACKET_BULLET_MOVE;
                     retval = send(clientSockets[i], &type, sizeof(char), 0);
                     if (retval == SOCKET_ERROR) {
-                        cout << "ÃÑ¾Ë ÀÌµ¿ Å¸ÀÔ Àü¼Û ½ÇÆÐ: " << WSAGetLastError() << endl;
+                        cout << "ï¿½Ñ¾ï¿½ ï¿½Ìµï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: " << WSAGetLastError() << endl;
                         continue;
                     }
 
                     retval = send(clientSockets[i], (char*)&Bullet[(i + 1) % 2][bulletIndex], sizeof(PacketBulletMove), 0);
                     if (retval == SOCKET_ERROR) {
-                        cout << "ÃÑ¾Ë ÀÌµ¿ ÆÐÅ¶ Àü¼Û ½ÇÆÐ: " << WSAGetLastError() << endl;
+                        cout << "ï¿½Ñ¾ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: " << WSAGetLastError() << endl;
                         continue;
                     }
-                    //cout << i << "¿¡°Ô ¼Û½Å " << Bullet[(i + 1) % 2][bulletIndex].num << "-" << Bullet[(i + 1) % 2][bulletIndex].pos << endl;
+                    //cout << i << "ï¿½ï¿½ï¿½ï¿½ ï¿½Û½ï¿½ " << Bullet[(i + 1) % 2][bulletIndex].num << "-" << Bullet[(i + 1) % 2][bulletIndex].pos << endl;
                 }
             }
         }
@@ -178,10 +180,30 @@ void ProcessMove()
     SetEvent(DataEvent);
 }
 
-BOOL ColidePlayerToObjects()
+void ColidePlayerToObjects()
 {
+    pb.size = sizeof(PacketCollidePB);
+    pb.type = PACKET_COLLIDE_PLAYER_BUILDING;
 
-    return FALSE;
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < g_buildings.size(); ++j) {
+            if (g_buildings[j].pos.z < 0.4f && g_buildings[j].pos.z > -0.1f){
+                if ((g_buildings[j].pos.x - 0.6f) < Player[i].pos.x &&
+                    Player[i].pos.x < (g_buildings[j].pos.x + 0.6f) &&
+                    Player[i].pos.y < g_buildings[j].scale.y / 5 - 0.2f) {
+
+                    pb.num = i;
+                        
+                    for (int c = 0; c < 2; ++c) {
+                        if (clientSockets[c] != INVALID_SOCKET) {
+                            send(clientSockets[c], &pb.type, sizeof(char), 0);
+                            send(clientSockets[c], (char*)&pb, sizeof(PacketCollidePB), 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void ColideBulletToObjects() 
@@ -199,9 +221,9 @@ void ColideBulletToObjects()
                     Bullet[k][i].pos.z < g_buildings[j].pos.z + 1 &&
                     Bullet[k][i].pos.z > g_buildings[j].pos.z - 1) {
 
-                    //cout << "Ãæµ¹ ¹ß»ý!" << endl;
-                    //cout << "°Ç¹° ¹øÈ£: " << j << ", ÃÑ¾Ë ¹øÈ£: " << i << endl;
-                    //cout << "Ãæµ¹ À§Ä¡: (" << Bullet[k][i].pos.x << ", "
+                    //cout << "ï¿½æµ¹ ï¿½ß»ï¿½!" << endl;
+                    //cout << "ï¿½Ç¹ï¿½ ï¿½ï¿½È£: " << j << ", ï¿½Ñ¾ï¿½ ï¿½ï¿½È£: " << i << endl;
+                    //cout << "ï¿½æµ¹ ï¿½ï¿½Ä¡: (" << Bullet[k][i].pos.x << ", "
                     //    << Bullet[k][i].pos.y << ", "
                     //    << Bullet[k][i].pos.z << ")" << endl;
 
@@ -232,13 +254,13 @@ void ColideBulletToObjects()
 void DeleteObjects()
 {
     for (int k = 0; k < 2; ++k) {
-        // g_buildings vector »ç¿ë
+        // g_buildings vector ï¿½ï¿½ï¿½
         g_buildings[bb.building_num].scale.y = 0;
         g_buildings[bb.building_num].is_broken = true;
 
         char type = PACKET_BUILDING_MOVE;
         send(clientSockets[k], &type, sizeof(char), 0);
-        // ÇØ´ç °Ç¹°ÀÇ Á¤º¸¸¸ Àü¼Û
+        // ï¿½Ø´ï¿½ ï¿½Ç¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         send(clientSockets[k], (char*)&g_buildings[bb.building_num], sizeof(PacketBuildingMove), 0);
     }
 }
@@ -248,16 +270,16 @@ void SendPacketMoveBuildings()
     WaitForSingleObject(DataEvent, INFINITE);
 
     for (auto& building : g_buildings) {
-        // zÃàÀ¸·Î¸¸ ÀÌµ¿
-        building.pos.z -= 0.05f;   // °Ç¹° ÀÌµ¿¼Óµµ Á¶Àý
+        // zï¿½ï¿½ï¿½ï¿½ï¿½Î¸ï¿½ ï¿½Ìµï¿½
+        building.pos.z -= 0.05f;   // ï¿½Ç¹ï¿½ ï¿½Ìµï¿½ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½
 
-        // À§Ä¡ Á¤º¸ Ãâ·Â (µð¹ö±ë¿ë)
+        // ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
         //cout << "Building " << building.num << " Position: ("
         //    << building.pos.x << ", "
         //    << building.pos.y << ", "
         //    << building.pos.z << ")" << endl;
 
-        // Å¬¶óÀÌ¾ðÆ®¿¡ Àü¼Û
+        // Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         for (int i = 0; i < 2; ++i) {
             if (clientSockets[i] != INVALID_SOCKET) {
                 char type = PACKET_BUILDING_MOVE;
@@ -277,7 +299,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     int retval;
     char type;
 
-    // TCP_NODELAY ¼³Á¤ Ãß°¡
+    // TCP_NODELAY ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
     int flag = 1;
     setsockopt(client_sock, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(int));
 
@@ -294,15 +316,15 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             ReadyClientToServer readyPacket;
             retval = recv(client_sock, (char*)&readyPacket, sizeof(ReadyClientToServer), 0);
             if (retval == SOCKET_ERROR) {
-                cout << "ÁØºñ ÆÐÅ¶ ¼ö½Å ½ÇÆÐ: " << WSAGetLastError() << endl;
+                cout << "ï¿½Øºï¿½ ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: " << WSAGetLastError() << endl;
                 break;
             }
 
             WaitForSingleObject(DataEvent, INFINITE);
             readyState[ClientNum] = true;
-            cout << "ÇÃ·¹ÀÌ¾î " << ClientNum + 1 << " : ÁØºñ¿Ï·á" << endl;
+            cout << "ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ " << ClientNum + 1 << " : ï¿½Øºï¿½Ï·ï¿½" << endl;
 
-            // ¸ðµç Å¬¶óÀÌ¾ðÆ®°¡ ÁØºñµÇ¾ú´ÂÁö È®ÀÎ
+            // ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½Øºï¿½Ç¾ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
             bool allReady = true;
             for (int i = 0; i < 2; i++) {
                 if (!readyState[i] || clientSockets[i] == INVALID_SOCKET) {
@@ -311,11 +333,10 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 }
             }
 
-            // ¸ðµç Å¬¶óÀÌ¾ðÆ®°¡ ÁØºñµÇ¾ú´Ù¸é °ÔÀÓ ½ÃÀÛ
+            // ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½Øºï¿½Ç¾ï¿½ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             if (allReady) {
-                cout << "\n¸ðµç ÇÃ·¹ÀÌ¾î°¡ ÁØºñµÇ¾ú½À´Ï´Ù!" << endl;
-                cout << "°ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù..." << endl;
-
+                cout << "\nï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½Øºï¿½Ç¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½!" << endl;
+                cout << "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½..." << endl;
                 PacketAllReady readyPacket;
                 readyPacket.size = sizeof(PacketAllReady);
                 readyPacket.type = CLIENT_ALL_READY;
@@ -327,12 +348,13 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                         send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
                     }
                 }
+                start_time = chrono::high_resolution_clock::now();
                 gameStarted = true;
                 SetEvent(UpdateEvent);
             }
 
             SetEvent(DataEvent);
-            cout << "=== ÁØºñ ÆÐÅ¶ Ã³¸® ¿Ï·á ===" << endl;
+            cout << "=== ï¿½Øºï¿½ ï¿½ï¿½Å¶ Ã³ï¿½ï¿½ ï¿½Ï·ï¿½ ===" << endl;
             break;
         }
         case PACKET_PLAYER_MOVE: {
@@ -355,7 +377,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 err_display("recv()");
                 break;
             }
-            //cout << "¼ö½Å" << ClientNum << " - " << movebulletPacket.num << " - " << movebulletPacket.pos << endl;
+            //cout << "ï¿½ï¿½ï¿½ï¿½" << ClientNum << " - " << movebulletPacket.num << " - " << movebulletPacket.pos << endl;
 
             // Update Bullet
             Bullet[ClientNum][movebulletPacket.num] = movebulletPacket;
@@ -365,7 +387,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         }
     }
 
-    // ¿¬°á Á¾·á Ã³¸®
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     WaitForSingleObject(DataEvent, INFINITE);
     readyState[ClientNum] = false;
     closesocket(client_sock);
@@ -378,26 +400,26 @@ DWORD WINAPI ProcessClient(LPVOID arg)
 
 
 static DWORD lastBuildingTime = GetTickCount();
-// ¾÷µ¥ÀÌÆ® ½º·¹µå
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 DWORD WINAPI ProcessUpdate(LPVOID arg) 
 {
     while (true) {
         WaitForSingleObject(UpdateEvent, INFINITE);
 
-        // 1. °Ç¹° »ý¼º - 5ÃÊ¸¶´Ù ½ÇÇà
+        // 1. ï¿½Ç¹ï¿½ ï¿½ï¿½ï¿½ï¿½ - 5ï¿½Ê¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         DWORD currentTime = GetTickCount64();
         if (currentTime - lastBuildingTime >= 5000) {
             MakeBuildings();
             lastBuildingTime = currentTime;
         }
 
-        // 2. ºôµù ÀÌµ¿ Ã³¸®
+        // 2. ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ Ã³ï¿½ï¿½
         SendPacketMoveBuildings();
 
-        // 3. ÇÃ·¹ÀÌ¾î/ÃÑ¾Ë/ºôµù ÀÌµ¿ Ã³¸®
+        // 3. ï¿½Ã·ï¿½ï¿½Ì¾ï¿½/ï¿½Ñ¾ï¿½/ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ Ã³ï¿½ï¿½
         ProcessMove();
 
-        // 3. Ãæµ¹ Ã¼Å©
+        // 3. ï¿½æµ¹ Ã¼Å©
         ColideBulletToObjects();
 
         SetEvent(UpdateEvent);
@@ -407,17 +429,17 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
 
 
 int main() {
-    // À©¼Ó ÃÊ±âÈ­
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
     WSADATA wsa;
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) return 1;
 
-    // ÀÌº¥Æ® »ý¼º ¹× È®ÀÎ
+    // ï¿½Ìºï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ È®ï¿½ï¿½
     ClientEvent[0] = CreateEvent(NULL, FALSE, TRUE, NULL);
     ClientEvent[1] = CreateEvent(NULL, FALSE, FALSE, NULL);
     UpdateEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
     DataEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
 
-    // ÃÑ¾Ë ÃÊ±â À§Ä¡ ÃÊ±âÈ­
+    // ï¿½Ñ¾ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½Ä¡ ï¿½Ê±ï¿½È­
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 3; j++) {
             Bullet[i][j].pos = glm::vec3(1000.0f, 1000.0f, 1000.0f);
@@ -429,14 +451,14 @@ int main() {
         return 1;
     }
 
-    // ¼­¹ö ¼ÒÄÏ »ý¼º ¹× ¼³Á¤
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (listen_sock == INVALID_SOCKET) {
         WSACleanup();
         return 1;
     }
 
-    // ¼­¹ö ÁÖ¼Ò ¼³Á¤
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¼ï¿½ ï¿½ï¿½ï¿½ï¿½
     SOCKADDR_IN serveraddr;
     ZeroMemory(&serveraddr, sizeof(serveraddr));
     serveraddr.sin_family = AF_INET;
@@ -446,10 +468,10 @@ int main() {
     bind(listen_sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
     listen(listen_sock, SOMAXCONN);
 
-    // ¾÷µ¥ÀÌÆ® ½º·¹µå »ý¼º
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     CreateThread(NULL, 0, ProcessUpdate, NULL, 0, NULL);
 
-    // Å¬¶óÀÌ¾ðÆ® Á¢¼Ó Ã³¸®
+    // Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     while (true) {
         SOCKADDR_IN clientaddr;
         int addrlen = sizeof(clientaddr);
@@ -470,7 +492,7 @@ int main() {
         CreateThread(NULL, 0, ProcessClient, (LPVOID)client_sock, 0, NULL);
     }
 
-    // Á¤¸®
+    // ï¿½ï¿½ï¿½ï¿½
     closesocket(listen_sock);
     WSACleanup();
 

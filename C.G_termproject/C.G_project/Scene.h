@@ -28,6 +28,7 @@ public:
     void UpdateOtherBulletPosition(int bulletNum, const glm::vec3& newPos);
 
     void ProcessBulletBuildingCollision(int BulletNum, int BuildingNum);
+    void ProcessPlayerBuildingCollision(int num);
 
     void AddGameObject(Object* obj) {
         gameObjects.push_back(obj);

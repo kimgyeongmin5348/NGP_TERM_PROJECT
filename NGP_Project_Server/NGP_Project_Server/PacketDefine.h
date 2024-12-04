@@ -131,7 +131,7 @@ struct PacketCollidePB
 {
 	char size;
 	char type;
-	int building_num;
+	int num;	// 플레이어 번호
 	char id[MAX_ID_SIZE];
 };
 

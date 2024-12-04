@@ -119,7 +119,7 @@ struct PacketCollidePB
 {
 	char size;
 	char type;
-	int building_num;
+	int num;
 	char id[MAX_ID_SIZE];
 };
 
