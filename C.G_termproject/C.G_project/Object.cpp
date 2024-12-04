@@ -90,21 +90,6 @@ void Bullet::Update(float deltaTime)
         active = false;
         this->SetPosition(glm::vec3(1000, 1000, 1000));
     }
-    // [To Server] Send PacketPlayerMove
-    //char type = PACKET_BULLET_MOVE;
-    //int retval = send(sock, &type, sizeof(char), 0);
-    //if (retval == SOCKET_ERROR)
-    //    err_display("Send() - PACKET_BULLET_MOVE.type");
-
-    //PacketBulletMove pbm;
-    //pbm.size = sizeof(PacketBulletMove);
-    //pbm.type = PACKET_BULLET_MOVE;
-    //pbm.pos = position;
-
-    //retval = send(sock, (char*)&pbm, sizeof(PacketBulletMove), 0);
-    //if (retval == SOCKET_ERROR)
-    //    err_display("send() - PACKET_BULLET_MOVE");
-
 }
 
 /////////////////////////////////////////////////////////////////////////

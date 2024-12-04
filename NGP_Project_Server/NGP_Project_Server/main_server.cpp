@@ -152,7 +152,6 @@ void ProcessMove()
     /**********************
       Send PacketBulletMove
     ***********************/
-    // 다른 클라이언트에게 전송
     for (int i = 0; i < 2; i++) {
         for (int bulletIndex = 0; bulletIndex < 3; bulletIndex++) {
             if (clientSockets[i] != INVALID_SOCKET) {
@@ -169,7 +168,6 @@ void ProcessMove()
                         cout << "총알 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
                         continue;
                     }
-
                     //cout << i << "에게 송신 " << Bullet[(i + 1) % 2][bulletIndex].num << "-" << Bullet[(i + 1) % 2][bulletIndex].pos << endl;
                 }
             }
@@ -186,7 +184,8 @@ BOOL ColidePlayerToObjects()
     return FALSE;
 }
 
-void ColideBulletToObjects() {
+void ColideBulletToObjects() 
+{
     bb.size = sizeof(PacketCollideBB);
     bb.type = PACKET_COLLIDE_BULLET_BUILDING;
     bool collision = false;
@@ -205,6 +204,8 @@ void ColideBulletToObjects() {
                     //cout << "충돌 위치: (" << Bullet[k][i].pos.x << ", "
                     //    << Bullet[k][i].pos.y << ", "
                     //    << Bullet[k][i].pos.z << ")" << endl;
+
+                    cout << j  << " - " << k << "(" << i << ")" << Bullet[k][i].pos << endl;
 
                     bb.building_num = j;
                     bb.bullet_num = i;
@@ -242,7 +243,8 @@ void DeleteObjects()
     }
 }
 
-void SendPacketMoveBuildings() {
+void SendPacketMoveBuildings() 
+{
     WaitForSingleObject(DataEvent, INFINITE);
 
     for (auto& building : g_buildings) {
@@ -268,7 +270,7 @@ void SendPacketMoveBuildings() {
     SetEvent(DataEvent);
 }
 
-// 메인 스레드
+
 DWORD WINAPI ProcessClient(LPVOID arg) 
 {
     SOCKET client_sock = (SOCKET)arg;
@@ -284,7 +286,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     SetEvent(DataEvent);
 
     while (true) {
-        //WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
         retval = recv(client_sock, &type, sizeof(type), 0);
         if (retval <= 0) break;
 
@@ -354,15 +355,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 err_display("recv()");
                 break;
             }
-
-            // 서버가 수신한 총알 정보 출력
             //cout << "수신" << ClientNum << " - " << movebulletPacket.num << " - " << movebulletPacket.pos << endl;
-
-            // 총알 인덱스 범위 체크 추가
-            if (movebulletPacket.num < 0 || movebulletPacket.num >= 30) {
-                cout << "잘못된 총알 인덱스 수신: " << movebulletPacket.num << endl;
-                break;
-            }
 
             // Update Bullet
             Bullet[ClientNum][movebulletPacket.num] = movebulletPacket;
@@ -370,10 +363,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             break;
         }
         }
-
-       //if (ClientNum < 2) {
-       //     SetEvent(ClientEvent[(ClientNum + 1) % 2]);
-       // }
     }
 
     // 연결 종료 처리
@@ -387,18 +376,17 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     return 0;
 }
 
+
 static DWORD lastBuildingTime = GetTickCount();
-
-
 // 업데이트 스레드
 DWORD WINAPI ProcessUpdate(LPVOID arg) 
 {
     while (true) {
         WaitForSingleObject(UpdateEvent, INFINITE);
 
-        // 1. 건물 생성 - 3초마다 실행
+        // 1. 건물 생성 - 5초마다 실행
         DWORD currentTime = GetTickCount64();
-        if (currentTime - lastBuildingTime >= 10000) {
+        if (currentTime - lastBuildingTime >= 5000) {
             MakeBuildings();
             lastBuildingTime = currentTime;
         }
@@ -410,10 +398,8 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
         ProcessMove();
 
         // 3. 충돌 체크
-        //if (ColidePlayerToObjects()) DeleteObjects();
         ColideBulletToObjects();
 
-        //SetEvent(ClientEvent[0]);
         SetEvent(UpdateEvent);
     }
     return 0;
@@ -431,11 +417,17 @@ int main() {
     UpdateEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
     DataEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
 
+    // 총알 초기 위치 초기화
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 3; j++) {
+            Bullet[i][j].pos = glm::vec3(1000.0f, 1000.0f, 1000.0f);
+        }
+    }
+
     if (!ClientEvent[0] || !ClientEvent[1] || !UpdateEvent || !DataEvent) {
         WSACleanup();
         return 1;
     }
-
 
     // 서버 소켓 생성 및 설정
     SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);

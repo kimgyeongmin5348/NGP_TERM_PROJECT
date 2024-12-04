@@ -102,6 +102,11 @@ void Scene::Initialize()
     glFrontFace(GL_CW);
 
 }
+
+void Scene::UpdateCurrentTime(float deltaTime)
+{
+    currentTime = deltaTime;
+}
     
 void Scene::BuildObject()
 {
@@ -191,11 +196,6 @@ void Scene::Update(float deltaTime)
         obj->Update(deltaTime);
         Bullet* bullet = dynamic_cast<Bullet*>(obj);
         if (bullet && bullet->active && typeid(*bullet) == typeid(Bullet)) {  // 내 총알중에서 active한 총알만 확인
-            //cout << "\n=== 총알 위치 전송 정보 ===" << endl;
-            //cout << "총알 번호: " << bullet->num << endl;
-            //cout << "위치: (" << bullet->GetPosition().x << ", "
-            //    << bullet->GetPosition().y << ", "
-            //    << bullet->GetPosition().z << ")" << endl;
 
             // 총알 위치 정보를 서버로 전송
             PacketBulletMove bulletPacket;
@@ -219,10 +219,12 @@ void Scene::Update(float deltaTime)
                 cout << "총알 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
                 continue;
             }
-
-            //cout << "총알 위치 정보 전송 완료" << endl;
         }
     }
+
+    // 점수 Update
+    score = deltaTime - startTime;
+    cout << score << endl;
 }
 
 void Scene::Resize(int w, int h)

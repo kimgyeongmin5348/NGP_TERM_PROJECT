@@ -7,9 +7,6 @@
 #include "PacketDefine.h"
 
 
-
-// Player* player[2] = { nullptr, nullptr };  // 동적 할당으로 변경
-
 extern WSADATA wsa;
 extern SOCKET sock;
 extern SOCKADDR_IN serveraddr;

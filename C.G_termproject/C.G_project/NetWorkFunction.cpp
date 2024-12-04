@@ -117,21 +117,8 @@ void err_display(int errcode) {
     LocalFree(lpMsgBuf);
 }
 
-int recvn(SOCKET s, char* buf, int len, int flags) {
-    //int received;
-    //char* ptr = buf;
-    //int left = len;
-
-    //while (left > 0) {
-    //    received = recv(s, ptr, left, flags);
-    //    if (received == SOCKET_ERROR)
-    //        return SOCKET_ERROR;
-    //    else if (received == 0)
-    //        break;
-    //    left -= received;
-    //    ptr += received;
-    //}
-    //return (len - left);
+int recvn(SOCKET s, char* buf, int len, int flags) 
+{
     int received = 0;
     while (received < len) {
         int retval = recv(s, buf + received, len - received, flags);
@@ -170,7 +157,8 @@ void SendReadyClientToServer()
     isReady = true;
 }
 
-void SendPlayerMove(const glm::vec3& pos, int state) {
+void SendPlayerMove(const glm::vec3& pos, int state) 
+{
     if (!isConnected) return;
 
     PacketPlayerMove movePacket;
@@ -185,15 +173,10 @@ void SendPlayerMove(const glm::vec3& pos, int state) {
     send(sock, (char*)&movePacket, sizeof(movePacket), 0);
 }
 
-void SendBulletMove(const glm::vec3& bulletPos, int bulletIndex) {
+void SendBulletMove(const glm::vec3& bulletPos, int bulletIndex) 
+{
     if (sock == INVALID_SOCKET) {
         cout << "서버에 연결되어 있지 않습니다." << endl;
-        return;
-    }
-
-    // 총알 인덱스 범위 체크 추가
-    if (bulletIndex < 0 || bulletIndex >= 30) {
-        cout << "잘못된 총알 인덱스: " << bulletIndex << endl;
         return;
     }
 
@@ -218,7 +201,8 @@ void SendBulletMove(const glm::vec3& bulletPos, int bulletIndex) {
 }
 
 // 서버로부터 패킷을 받아 처리하는 스레드 함수
-DWORD WINAPI ProcessServer(LPVOID arg) {
+DWORD WINAPI ProcessServer(LPVOID arg) 
+{
     while (isConnected) {
        /* if (sock == INVALID_SOCKET) {
             std::cout << "소켓이 유효하지 않습니다." << std::endl;
@@ -265,7 +249,6 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             PacketBulletMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
-            //cout << "수신" << packet.num << " " << packet.pos << endl;
 
             // 총알 이동 처리
             Scene::GetInstance()->UpdateOtherBulletPosition(packet.num, packet.pos);
@@ -275,6 +258,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             PacketCollideBB packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
+
             // 총알-건물 충돌 처리
             Scene::GetInstance()->ProcessBulletBuildingCollision(packet.bullet_num, packet.building_num);
             break;
@@ -291,6 +275,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             PacketAllReady packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
+            Scene::GetInstance()->StartScoreCount();
         }
         default:
             //cout << "알 수 없는 패킷 타입: " << (int)type << endl;
