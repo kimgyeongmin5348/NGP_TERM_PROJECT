@@ -31,13 +31,10 @@ using namespace std;
 #define PACKET_LOGIN_REQUEST 3
 #define PACKET_LOGIN_RESPONSE 4
 #define CLIENT_READY 5
-#define CLIENT_NOTREADY 6
-#define CLIENT_STATE_READY 7
 #define CLIENT_ALL_READY 8
 #define PACKET_PLAYER_MOVE 9
 #define PACKET_BUILDING_MOVE 10
 #define PACKET_BULLET_MOVE 11
-#define PACKET_ID 12
 #define PACKET_COLLIDE_BULLET_BUILDING 14
 #define PACKET_COLLIDE_PLAYER_BUILDING 15
 #define PACKET_GAME_OVER 16
@@ -68,21 +65,6 @@ struct ReadyClientToServer
 	char id;
 };
 
-struct NotReadyClientToServer
-{
-	char size;
-	char type;
-	char id;
-};
-
-struct StateReady
-{
-	char size;
-	char type;
-	char id;
-	//char id;  <<- 이거 중복 오류 뜬다... 수정 필요
-};
-
 struct PacketAllReady
 {
 	char size;
@@ -98,14 +80,6 @@ struct PacketPlayerMove
 	char state;
 	char playerid[MAX_ID_SIZE];
 	char id;
-};
-
-struct PacketID
-{
-	char size;
-	char type;
-	char id[MAX_ID_SIZE];
-
 };
 
 struct PacketBuildingMove
