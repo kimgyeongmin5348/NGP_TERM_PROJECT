@@ -120,6 +120,13 @@ void Scene::BuildObject()
         gameObjects.push_back(bullet);
     }
 
+    for (int i = 0; i < MAX_BULLETS; ++i) {
+        OtherBullet* otherBullet = new OtherBullet();
+        otherBullet->num = i;
+        otherBullet->SetPosition(glm::vec3(1000, 1000, 1000));
+        gameObjects.push_back(otherBullet);
+    }
+
     for (int i = 0; i < 100; ++i) {
         Building* building = new Building();
         gameObjects.push_back(building);
@@ -183,7 +190,7 @@ void Scene::Update(float deltaTime)
     for (auto obj : gameObjects) {
         obj->Update(deltaTime);
         Bullet* bullet = dynamic_cast<Bullet*>(obj);
-        if (bullet && bullet->active) {  // active한 총알만 확인
+        if (bullet && bullet->active && typeid(*bullet) == typeid(Bullet)) {  // 내 총알중에서 active한 총알만 확인
             //cout << "\n=== 총알 위치 전송 정보 ===" << endl;
             //cout << "총알 번호: " << bullet->num << endl;
             //cout << "위치: (" << bullet->GetPosition().x << ", "
@@ -242,12 +249,12 @@ void Scene::UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& n
     }
 }
 
-void Scene::UpdateBulletPosition(int bulletNum, const glm::vec3& newPos)
+void Scene::UpdateOtherBulletPosition(int bulletNum, const glm::vec3& newPos)
 {
     if (bulletNum >= 0 && bulletNum < MAX_BULLETS) {
         for (auto obj : gameObjects) {
-            Bullet* bullet = dynamic_cast<Bullet*>(obj);
-            if (bullet && bullet->num == bulletNum) {
+            OtherBullet* bullet = dynamic_cast<OtherBullet*>(obj);
+            if (bullet && bullet->num == bulletNum && typeid(*bullet) == typeid(OtherBullet)) {
                 bullet->SetPosition(newPos);
                 bullet->active = true;
                 break;
@@ -285,7 +292,7 @@ void Scene::KeyDown(unsigned char key)
     if (keyStates[' ']) {
         for (auto obj : gameObjects) {
             Bullet* bullet = dynamic_cast<Bullet*>(obj);
-            if (bullet && !bullet->active) {
+            if (bullet && !bullet->active && typeid(*bullet) == typeid(Bullet)) {
                 bullet->SetPosition(mainPlayer->GetPosition());
                 bullet->active = true;
                 break;
