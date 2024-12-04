@@ -285,7 +285,7 @@ GLvoid InitBuffer()
 //        return 1;
 //    return 0;
 //}
-
+    
 // 플레이어 - 건물 충돌 체크
 GLvoid CollisionCheckPB(int i, int j)
 {

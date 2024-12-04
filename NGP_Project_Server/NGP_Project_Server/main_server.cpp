@@ -7,6 +7,7 @@ using namespace std;
 PacketPlayerMove Player[2];
 PacketBulletMove Bullet[2][3]; // 클라마다 3개
 PacketCollideBB  bb;
+PacketCollidePB  pb;
 
 int nowID = 0;
 HANDLE ClientEvent[2];
@@ -16,12 +17,13 @@ SOCKET clientSockets[2];
 bool readyState[2] = { false, false };
 bool gameStarted = false;
 vector<PacketBuildingMove> g_buildings(100);
+auto start_time = chrono::high_resolution_clock::now();
 
 // 함수 선언
 //void SaveID();
 void MakeBuildings();
 void ProcessMove();
-BOOL ColidePlayerToObjects();
+void ColidePlayerToObjects();
 void ColideBulletToObjects();
 void DeleteObjects();
 //void SendPacketMadebuildings();
@@ -180,10 +182,30 @@ void ProcessMove()
     SetEvent(DataEvent);
 }
 
-BOOL ColidePlayerToObjects()
+void ColidePlayerToObjects()
 {
+    pb.size = sizeof(PacketCollidePB);
+    pb.type = PACKET_COLLIDE_PLAYER_BUILDING;
 
-    return FALSE;
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < g_buildings.size(); ++j) {
+            if (g_buildings[j].pos.z < 0.4f && g_buildings[j].pos.z > -0.1f){
+                if ((g_buildings[j].pos.x - 0.6f) < Player[i].pos.x &&
+                    Player[i].pos.x < (g_buildings[j].pos.x + 0.6f) &&
+                    Player[i].pos.y < g_buildings[j].scale.y / 5 - 0.2f) {
+
+                    pb.num = i;
+                        
+                    for (int c = 0; c < 2; ++c) {
+                        if (clientSockets[c] != INVALID_SOCKET) {
+                            send(clientSockets[c], &pb.type, sizeof(char), 0);
+                            send(clientSockets[c], (char*)&pb, sizeof(PacketCollidePB), 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void ColideBulletToObjects() {
@@ -314,7 +336,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             if (allReady) {
                 cout << "\n모든 플레이어가 준비되었습니다!" << endl;
                 cout << "게임을 시작합니다..." << endl;
-
                 PacketAllReady readyPacket;
                 readyPacket.size = sizeof(PacketAllReady);
                 readyPacket.type = CLIENT_ALL_READY;
@@ -326,6 +347,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                         send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
                     }
                 }
+                start_time = chrono::high_resolution_clock::now();
                 gameStarted = true;
                 SetEvent(UpdateEvent);
             }
@@ -410,7 +432,7 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
         ProcessMove();
 
         // 3. 충돌 체크
-        //if (ColidePlayerToObjects()) DeleteObjects();
+        ColidePlayerToObjects();
         ColideBulletToObjects();
 
         //SetEvent(ClientEvent[0]);
