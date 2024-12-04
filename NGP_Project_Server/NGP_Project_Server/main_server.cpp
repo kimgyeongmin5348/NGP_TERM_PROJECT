@@ -17,7 +17,16 @@ SOCKET clientSockets[2];
 bool readyState[2] = { false, false };
 bool gameStarted = false;
 vector<PacketBuildingMove> g_buildings(100);
+
 auto start_time = chrono::high_resolution_clock::now();
+
+struct UserInfo {
+    string username;
+    string password;
+    bool isLoggedIn;
+};
+
+vector<UserInfo> userDatabase;
 
 // 함수 선언
 //void SaveID();
@@ -48,6 +57,7 @@ void SendPacketMoveBuildings();
 //    cout << "사용 가능한 ID: " << playerid << endl;
 //    return true;
 //}
+
 
 // Lobby 관련 함수
 void SendReadyServerToClient() 
@@ -250,19 +260,6 @@ void ColideBulletToObjects() {
     }
 }
 
-void DeleteObjects()
-{
-    for (int k = 0; k < 2; ++k) {
-        // g_buildings vector 사용
-        g_buildings[bb.building_num].scale.y = 0;
-        g_buildings[bb.building_num].is_broken = true;
-
-        char type = PACKET_BUILDING_MOVE;
-        send(clientSockets[k], &type, sizeof(char), 0);
-        // 해당 건물의 정보만 전송
-        send(clientSockets[k], (char*)&g_buildings[bb.building_num], sizeof(PacketBuildingMove), 0);
-    }
-}
 
 void SendPacketMoveBuildings() {
     WaitForSingleObject(DataEvent, INFINITE);
@@ -311,6 +308,22 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         if (retval <= 0) break;
 
         switch (type) {
+        case PACKET_LOGIN_REQUEST: {
+            PacketLoginRequest loginPacket;
+            retval = recvn(client_sock, (char*)&loginPacket, sizeof(PacketLoginRequest), 0);
+            cout << "로그인정보 받음" << '\n';
+            if (retval == SOCKET_ERROR) break;
+
+            PacketLoginResponse response;
+            response.size = sizeof(PacketLoginResponse);
+            response.type = PACKET_LOGIN_RESPONSE;
+            response.success = true;  // 임시로 모든 로그인 허용
+            response.userID = ClientNum;
+
+            send(client_sock, (char*)&response, sizeof(response), 0);
+            cout << "클라이언트 " << ClientNum << " 로그인 성공" << endl;
+            break;
+        }
         case CLIENT_READY: {
             ReadyClientToServer readyPacket;
             retval = recv(client_sock, (char*)&readyPacket, sizeof(ReadyClientToServer), 0);
@@ -377,9 +390,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 break;
             }
 
-            // 서버가 수신한 총알 정보 출력
-            //cout << "수신" << ClientNum << " - " << movebulletPacket.num << " - " << movebulletPacket.pos << endl;
-
             // 총알 인덱스 범위 체크 추가
             if (movebulletPacket.num < 0 || movebulletPacket.num >= 30) {
                 cout << "잘못된 총알 인덱스 수신: " << movebulletPacket.num << endl;
@@ -392,10 +402,6 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             break;
         }
         }
-
-       //if (ClientNum < 2) {
-       //     SetEvent(ClientEvent[(ClientNum + 1) % 2]);
-       // }
     }
 
     // 연결 종료 처리

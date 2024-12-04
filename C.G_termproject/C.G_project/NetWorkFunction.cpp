@@ -63,25 +63,37 @@ void CleanupNetwork() {
 }
 
 // 로그인 요청 함수
-//bool SendLoginRequest(const char* playerid) {
-//    if (sock == INVALID_SOCKET) {
-//        cout << "서버에 연결되어 있지 않습니다." << endl;
-//        return false;
-//    }
-//
-//    PacketID loginPacket;
-//    loginPacket.size = sizeof(PacketID);
-//    loginPacket.type = PACKET_ID;
-//    strncpy_s(loginPacket.id, playerid, MAX_ID_SIZE - 1);
-//    loginPacket.id[MAX_ID_SIZE - 1] = '\0';
-//
-//    int retval = send(sock, (char*)&loginPacket, sizeof(loginPacket), 0);
-//    if (retval == SOCKET_ERROR) {
-//        cout << "로그인 패킷 전송 실패: " << WSAGetLastError() << endl;
-//        return false;
-//    }
-//    return true;
-//}
+bool SendLoginRequest(const char* username, const char* password) {
+    if (!isConnected) {
+        cout << "서버에 연결되어 있지 않습니다." << endl;
+        return false;
+    }
+
+    PacketLoginRequest loginPacket;
+    loginPacket.size = sizeof(PacketLoginRequest);
+    loginPacket.type = PACKET_LOGIN_REQUEST;
+    strncpy(loginPacket.username, username, MAX_ID_SIZE - 1);
+    strncpy(loginPacket.password, password, MAX_ID_SIZE - 1);
+    loginPacket.username[MAX_ID_SIZE - 1] = '\0';
+    loginPacket.password[MAX_ID_SIZE - 1] = '\0';
+
+    // 패킷 타입 전송
+    char type = PACKET_LOGIN_REQUEST;
+    int retval = send(sock, &type, sizeof(char), 0);
+    if (retval == SOCKET_ERROR) {
+        cout << "로그인 요청 타입 전송 실패" << endl;
+        return false;
+    }
+
+    // 패킷 데이터 전송
+    retval = send(sock, (char*)&loginPacket, sizeof(loginPacket), 0);
+    if (retval == SOCKET_ERROR) {
+        cout << "로그인 패킷 전송 실패" << endl;
+        return false;
+    }
+
+    return true;
+}
 
 void err_quit(const char* msg) {
     LPVOID lpMsgBuf;
@@ -118,20 +130,6 @@ void err_display(int errcode) {
 }
 
 int recvn(SOCKET s, char* buf, int len, int flags) {
-    //int received;
-    //char* ptr = buf;
-    //int left = len;
-
-    //while (left > 0) {
-    //    received = recv(s, ptr, left, flags);
-    //    if (received == SOCKET_ERROR)
-    //        return SOCKET_ERROR;
-    //    else if (received == 0)
-    //        break;
-    //    left -= received;
-    //    ptr += received;
-    //}
-    //return (len - left);
     int received = 0;
     while (received < len) {
         int retval = recv(s, buf + received, len - received, flags);
@@ -235,6 +233,12 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
 
         // 2. 패킷 타입에 따른 처리
         switch (type) {
+        case PACKET_LOGIN_RESPONSE: {
+            PacketLoginResponse loginResponse;
+            retval = recvn(sock, (char*)&loginResponse, sizeof(loginResponse), 0);
+            if (retval == SOCKET_ERROR) break;
+            break;
+        }
         case CLIENT_READY: {
             ReadyClientToServer packet;
             retval = recvn(sock, (char*)&packet, sizeof(ReadyClientToServer), 0);
