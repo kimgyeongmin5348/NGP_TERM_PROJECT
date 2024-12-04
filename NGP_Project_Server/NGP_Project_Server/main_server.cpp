@@ -3,9 +3,9 @@
 
 using namespace std;
 
-// ���� ���� ����
+// 전역 변수 선언
 PacketPlayerMove Player[2];
-PacketBulletMove Bullet[2][3]; // Ŭ�󸶴� 3��
+PacketBulletMove Bullet[2][3]; // 클라마다 3개
 PacketCollideBB  bb;
 PacketCollidePB  pb;
 
@@ -28,7 +28,7 @@ struct UserInfo {
 
 vector<UserInfo> userDatabase;
 
-// �Լ� ����
+// 함수 선언
 //void SaveID();
 void MakeBuildings();
 void ProcessMove();
@@ -37,8 +37,9 @@ void ColideBulletToObjects();
 void DeleteObjects();
 void SendPacketMoveBuildings();
 
-// Lobby ���� �Լ�
-void SendReadyServerToClient() 
+
+// Lobby 관련 함수
+void SendReadyServerToClient()
 {
     ReadyClientToServer readyPacket;
     readyPacket.size = sizeof(ReadyClientToServer);
@@ -50,13 +51,13 @@ void SendReadyServerToClient()
             char type = CLIENT_READY;
             int retval = send(clientSockets[i], &type, sizeof(char), 0);
             if (retval == SOCKET_ERROR) {
-                std::cout << "�غ� ���� Ÿ�� ���� ����: " << WSAGetLastError() << endl;
+                std::cout << "준비 상태 타입 전송 실패: " << WSAGetLastError() << endl;
                 continue;
             }
             readyPacket.id = i;
             retval = send(clientSockets[i], (char*)&readyPacket, sizeof(readyPacket), 0);
             if (retval == SOCKET_ERROR) {
-                std::cout << "�غ� ���� ��Ŷ ���� ����: " << WSAGetLastError() << endl;
+                std::cout << "준비 상태 패킷 전송 실패: " << WSAGetLastError() << endl;
                 continue;
             }
         }
@@ -65,7 +66,7 @@ void SendReadyServerToClient()
 }
 
 
-// InGame ���� �Լ�
+// InGame 관련 함수
 void MakeBuildings()
 {
     WaitForSingleObject(DataEvent, INFINITE);
@@ -86,7 +87,7 @@ void MakeBuildings()
         g_buildings[i].is_broken = false;
 
         for (int k = 0; k < 2; ++k) {
-            // Ŭ���̾�Ʈ�� ����
+            // 클라이언트에 전송
             if (clientSockets[k] != INVALID_SOCKET) {
                 char type = PACKET_BUILDING_MOVE;
                 send(clientSockets[k], &type, sizeof(char), 0);
@@ -98,25 +99,25 @@ void MakeBuildings()
     SetEvent(DataEvent);
 }
 
-void ProcessMove() 
+void ProcessMove()
 {
     WaitForSingleObject(DataEvent, INFINITE);
 
     /*****************
-      Update Building 
+      Update Building
     ******************/
-    // SendPacketMoveBuilding() ���� ó��   
+    // SendPacketMoveBuilding() 에서 처리   
 
     /**************
       Update Player
     ***************/
-    //ProcessClient() ���� �������� Player�� �����ϴ� ������ ��ü
+    //ProcessClient() 에서 전역변수 Player에 저장하는 것으로 대체
 
 
     /**************
       Update Bullet
     ***************/
-    //ProcessClient() ���� �������� Bullet�� �����ϴ� ������ ��ü
+    //ProcessClient() 에서 전역변수 Bullet에 저장하는 것으로 대체
 
 
     /***********************
@@ -128,12 +129,12 @@ void ProcessMove()
             char type = PACKET_PLAYER_MOVE;
             retval = send(clientSockets[i], &type, sizeof(char), 0);
             if (retval == SOCKET_ERROR) {
-                cout << "�÷��̾� �̵� Ÿ�� ���� ����: " << WSAGetLastError() << endl;
+                cout << "플레이어 이동 타입 전송 실패: " << WSAGetLastError() << endl;
                 continue;
             }
             retval = send(clientSockets[i], (char*)&Player[(i + 1) % 2], sizeof(PacketPlayerMove), 0);
             if (retval == SOCKET_ERROR) {
-                cout << "�÷��̾� �̵� ��Ŷ ���� ����: " << WSAGetLastError() << endl;
+                cout << "플레이어 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
                 continue;
             }
         }
@@ -142,23 +143,25 @@ void ProcessMove()
     /**********************
       Send PacketBulletMove
     ***********************/
+    // 다른 클라이언트에게 전송
     for (int i = 0; i < 2; i++) {
         for (int bulletIndex = 0; bulletIndex < 3; bulletIndex++) {
             if (clientSockets[i] != INVALID_SOCKET) {
-                if (Bullet[(i + 1) % 2][bulletIndex].active){
+                if (Bullet[(i + 1) % 2][bulletIndex].active) {
                     char type = PACKET_BULLET_MOVE;
                     retval = send(clientSockets[i], &type, sizeof(char), 0);
                     if (retval == SOCKET_ERROR) {
-                        cout << "�Ѿ� �̵� Ÿ�� ���� ����: " << WSAGetLastError() << endl;
+                        cout << "총알 이동 타입 전송 실패: " << WSAGetLastError() << endl;
                         continue;
                     }
 
                     retval = send(clientSockets[i], (char*)&Bullet[(i + 1) % 2][bulletIndex], sizeof(PacketBulletMove), 0);
                     if (retval == SOCKET_ERROR) {
-                        cout << "�Ѿ� �̵� ��Ŷ ���� ����: " << WSAGetLastError() << endl;
+                        cout << "총알 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
                         continue;
                     }
-                    //cout << i << "���� �۽� " << Bullet[(i + 1) % 2][bulletIndex].num << "-" << Bullet[(i + 1) % 2][bulletIndex].pos << endl;
+
+                    //cout << i << "에게 송신 " << Bullet[(i + 1) % 2][bulletIndex].num << "-" << Bullet[(i + 1) % 2][bulletIndex].pos << endl;
                 }
             }
         }
@@ -175,13 +178,13 @@ void ColidePlayerToObjects()
 
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < g_buildings.size(); ++j) {
-            if (g_buildings[j].pos.z < 0.4f && g_buildings[j].pos.z > -0.1f){
+            if (g_buildings[j].pos.z < 0.4f && g_buildings[j].pos.z > -0.1f) {
                 if ((g_buildings[j].pos.x - 0.6f) < Player[i].pos.x &&
                     Player[i].pos.x < (g_buildings[j].pos.x + 0.6f) &&
                     Player[i].pos.y < g_buildings[j].scale.y / 5 - 0.2f) {
 
                     pb.num = i;
-                        
+
                     for (int c = 0; c < 2; ++c) {
                         if (clientSockets[c] != INVALID_SOCKET) {
                             send(clientSockets[c], &pb.type, sizeof(char), 0);
@@ -194,8 +197,7 @@ void ColidePlayerToObjects()
     }
 }
 
-void ColideBulletToObjects() 
-{
+void ColideBulletToObjects() {
     bb.size = sizeof(PacketCollideBB);
     bb.type = PACKET_COLLIDE_BULLET_BUILDING;
     bool collision = false;
@@ -209,13 +211,11 @@ void ColideBulletToObjects()
                     Bullet[k][i].pos.z < g_buildings[j].pos.z + 1 &&
                     Bullet[k][i].pos.z > g_buildings[j].pos.z - 1) {
 
-                    //cout << "�浹 �߻�!" << endl;
-                    //cout << "�ǹ� ��ȣ: " << j << ", �Ѿ� ��ȣ: " << i << endl;
-                    //cout << "�浹 ��ġ: (" << Bullet[k][i].pos.x << ", "
+                    //cout << "충돌 발생!" << endl;
+                    //cout << "건물 번호: " << j << ", 총알 번호: " << i << endl;
+                    //cout << "충돌 위치: (" << Bullet[k][i].pos.x << ", "
                     //    << Bullet[k][i].pos.y << ", "
                     //    << Bullet[k][i].pos.z << ")" << endl;
-
-                    cout << j  << " - " << k << "(" << i << ")" << Bullet[k][i].pos << endl;
 
                     bb.building_num = j;
                     bb.bullet_num = i;
@@ -239,21 +239,21 @@ void ColideBulletToObjects()
     }
 }
 
-void SendPacketMoveBuildings() 
-{
+
+void SendPacketMoveBuildings() {
     WaitForSingleObject(DataEvent, INFINITE);
 
     for (auto& building : g_buildings) {
-        // z�����θ� �̵�
-        building.pos.z -= 0.05f;   // �ǹ� �̵��ӵ� ����
+        // z축으로만 이동
+        building.pos.z -= 0.05f;   // 건물 이동속도 조절
 
-        // ��ġ ���� ��� (������)
+        // 위치 정보 출력 (디버깅용)
         //cout << "Building " << building.num << " Position: ("
         //    << building.pos.x << ", "
         //    << building.pos.y << ", "
         //    << building.pos.z << ")" << endl;
 
-        // Ŭ���̾�Ʈ�� ����
+        // 클라이언트에 전송
         for (int i = 0; i < 2; ++i) {
             if (clientSockets[i] != INVALID_SOCKET) {
                 char type = PACKET_BUILDING_MOVE;
@@ -266,14 +266,14 @@ void SendPacketMoveBuildings()
     SetEvent(DataEvent);
 }
 
-
-DWORD WINAPI ProcessClient(LPVOID arg) 
+// 메인 스레드
+DWORD WINAPI ProcessClient(LPVOID arg)
 {
     SOCKET client_sock = (SOCKET)arg;
     int retval;
     char type;
 
-    // TCP_NODELAY ���� �߰�
+    // TCP_NODELAY 설정 추가
     int flag = 1;
     setsockopt(client_sock, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(int));
 
@@ -282,6 +282,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     SetEvent(DataEvent);
 
     while (true) {
+        //WaitForSingleObject(ClientEvent[ClientNum], INFINITE);
         retval = recv(client_sock, &type, sizeof(type), 0);
         if (retval <= 0) break;
 
@@ -289,32 +290,32 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         case PACKET_LOGIN_REQUEST: {
             PacketLoginRequest loginPacket;
             retval = recvn(client_sock, (char*)&loginPacket, sizeof(PacketLoginRequest), 0);
-            cout << "�α������� ����" << '\n';
+            cout << "로그인정보 받음" << '\n';
             if (retval == SOCKET_ERROR) break;
 
             PacketLoginResponse response;
             response.size = sizeof(PacketLoginResponse);
             response.type = PACKET_LOGIN_RESPONSE;
-            response.success = true;  // �ӽ÷� ��� �α��� ���
+            response.success = true;  // 임시로 모든 로그인 허용
             response.userID = ClientNum;
 
             send(client_sock, (char*)&response, sizeof(response), 0);
-            cout << "Ŭ���̾�Ʈ " << ClientNum << " �α��� ����" << endl;
+            cout << "클라이언트 " << ClientNum << " 로그인 성공" << endl;
             break;
         }
         case CLIENT_READY: {
             ReadyClientToServer readyPacket;
             retval = recv(client_sock, (char*)&readyPacket, sizeof(ReadyClientToServer), 0);
             if (retval == SOCKET_ERROR) {
-                cout << "�غ� ��Ŷ ���� ����: " << WSAGetLastError() << endl;
+                cout << "준비 패킷 수신 실패: " << WSAGetLastError() << endl;
                 break;
             }
 
             WaitForSingleObject(DataEvent, INFINITE);
             readyState[ClientNum] = true;
-            cout << "�÷��̾� " << ClientNum + 1 << " : �غ�Ϸ�" << endl;
+            cout << "플레이어 " << ClientNum + 1 << " : 준비완료" << endl;
 
-            // ��� Ŭ���̾�Ʈ�� �غ�Ǿ����� Ȯ��
+            // 모든 클라이언트가 준비되었는지 확인
             bool allReady = true;
             for (int i = 0; i < 2; i++) {
                 if (!readyState[i] || clientSockets[i] == INVALID_SOCKET) {
@@ -323,10 +324,10 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 }
             }
 
-            // ��� Ŭ���̾�Ʈ�� �غ�Ǿ��ٸ� ���� ����
+            // 모든 클라이언트가 준비되었다면 게임 시작
             if (allReady) {
-                cout << "\n��� �÷��̾ �غ�Ǿ����ϴ�!" << endl;
-                cout << "������ �����մϴ�..." << endl;
+                cout << "\n모든 플레이어가 준비되었습니다!" << endl;
+                cout << "게임을 시작합니다..." << endl;
                 PacketAllReady readyPacket;
                 readyPacket.size = sizeof(PacketAllReady);
                 readyPacket.type = CLIENT_ALL_READY;
@@ -344,7 +345,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             }
 
             SetEvent(DataEvent);
-            cout << "=== �غ� ��Ŷ ó�� �Ϸ� ===" << endl;
+            cout << "=== 준비 패킷 처리 완료 ===" << endl;
             break;
         }
         case PACKET_PLAYER_MOVE: {
@@ -368,6 +369,12 @@ DWORD WINAPI ProcessClient(LPVOID arg)
                 break;
             }
 
+            // 총알 인덱스 범위 체크 추가
+            if (movebulletPacket.num < 0 || movebulletPacket.num >= 30) {
+                cout << "잘못된 총알 인덱스 수신: " << movebulletPacket.num << endl;
+                break;
+            }
+
             // Update Bullet
             Bullet[ClientNum][movebulletPacket.num] = movebulletPacket;
 
@@ -376,7 +383,7 @@ DWORD WINAPI ProcessClient(LPVOID arg)
         }
     }
 
-    // ���� ���� ó��
+    // 연결 종료 처리
     WaitForSingleObject(DataEvent, INFINITE);
     readyState[ClientNum] = false;
     closesocket(client_sock);
@@ -387,30 +394,33 @@ DWORD WINAPI ProcessClient(LPVOID arg)
     return 0;
 }
 
-
 static DWORD lastBuildingTime = GetTickCount();
-// ������Ʈ ������
-DWORD WINAPI ProcessUpdate(LPVOID arg) 
+
+
+// 업데이트 스레드
+DWORD WINAPI ProcessUpdate(LPVOID arg)
 {
     while (true) {
         WaitForSingleObject(UpdateEvent, INFINITE);
 
-        // 1. �ǹ� ���� - 5�ʸ��� ����
+        // 1. 건물 생성 - 3초마다 실행
         DWORD currentTime = GetTickCount64();
-        if (currentTime - lastBuildingTime >= 5000) {
+        if (currentTime - lastBuildingTime >= 10000) {
             MakeBuildings();
             lastBuildingTime = currentTime;
         }
 
-        // 2. ���� �̵� ó��
+        // 2. 빌딩 이동 처리
         SendPacketMoveBuildings();
 
-        // 3. �÷��̾�/�Ѿ�/���� �̵� ó��
+        // 3. 플레이어/총알/빌딩 이동 처리
         ProcessMove();
 
-        // 3. �浹 üũ
+        // 3. 충돌 체크
+        ColidePlayerToObjects();
         ColideBulletToObjects();
 
+        //SetEvent(ClientEvent[0]);
         SetEvent(UpdateEvent);
     }
     return 0;
@@ -418,36 +428,30 @@ DWORD WINAPI ProcessUpdate(LPVOID arg)
 
 
 int main() {
-    // ���� �ʱ�ȭ
+    // 윈속 초기화
     WSADATA wsa;
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) return 1;
 
-    // �̺�Ʈ ���� �� Ȯ��
+    // 이벤트 생성 및 확인
     ClientEvent[0] = CreateEvent(NULL, FALSE, TRUE, NULL);
     ClientEvent[1] = CreateEvent(NULL, FALSE, FALSE, NULL);
     UpdateEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
     DataEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
-
-    // �Ѿ� �ʱ� ��ġ �ʱ�ȭ
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 3; j++) {
-            Bullet[i][j].pos = glm::vec3(1000.0f, 1000.0f, 1000.0f);
-        }
-    }
 
     if (!ClientEvent[0] || !ClientEvent[1] || !UpdateEvent || !DataEvent) {
         WSACleanup();
         return 1;
     }
 
-    // ���� ���� ���� �� ����
+
+    // 서버 소켓 생성 및 설정
     SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (listen_sock == INVALID_SOCKET) {
         WSACleanup();
         return 1;
     }
 
-    // ���� �ּ� ����
+    // 서버 주소 설정
     SOCKADDR_IN serveraddr;
     ZeroMemory(&serveraddr, sizeof(serveraddr));
     serveraddr.sin_family = AF_INET;
@@ -457,10 +461,10 @@ int main() {
     bind(listen_sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr));
     listen(listen_sock, SOMAXCONN);
 
-    // ������Ʈ ������ ����
+    // 업데이트 스레드 생성
     CreateThread(NULL, 0, ProcessUpdate, NULL, 0, NULL);
 
-    // Ŭ���̾�Ʈ ���� ó��
+    // 클라이언트 접속 처리
     while (true) {
         SOCKADDR_IN clientaddr;
         int addrlen = sizeof(clientaddr);
@@ -481,7 +485,7 @@ int main() {
         CreateThread(NULL, 0, ProcessClient, (LPVOID)client_sock, 0, NULL);
     }
 
-    // ����
+    // 정리
     closesocket(listen_sock);
     WSACleanup();
 
