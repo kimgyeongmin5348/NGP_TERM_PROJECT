@@ -88,6 +88,7 @@ void Bullet::Update(float deltaTime)
     // 범위를 벗어나면 비활성화
     if (position.z > 50.0f) {
         active = false;
+        this->SetPosition(glm::vec3(1000, 1000, 1000));
     }
     // [To Server] Send PacketPlayerMove
     //char type = PACKET_BULLET_MOVE;

@@ -3,7 +3,7 @@
 #include "Camera.h"
 #include "ServerToClient.h"
 
-#define MAX_BULLETS 30
+#define MAX_BULLETS 3
 
 class Scene
 {

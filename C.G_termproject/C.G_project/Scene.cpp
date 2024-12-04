@@ -116,6 +116,7 @@ void Scene::BuildObject()
     for (int i = 0; i < MAX_BULLETS; ++i) {
         Bullet* bullet = new Bullet();
         bullet->num = i;
+        bullet->SetPosition(glm::vec3(1000, 1000, 1000));
         gameObjects.push_back(bullet);
     }
 
@@ -183,11 +184,11 @@ void Scene::Update(float deltaTime)
         obj->Update(deltaTime);
         Bullet* bullet = dynamic_cast<Bullet*>(obj);
         if (bullet && bullet->active) {  // active한 총알만 확인
-            cout << "\n=== 총알 위치 전송 정보 ===" << endl;
-            cout << "총알 번호: " << bullet->num << endl;
-            cout << "위치: (" << bullet->GetPosition().x << ", "
-                << bullet->GetPosition().y << ", "
-                << bullet->GetPosition().z << ")" << endl;
+            //cout << "\n=== 총알 위치 전송 정보 ===" << endl;
+            //cout << "총알 번호: " << bullet->num << endl;
+            //cout << "위치: (" << bullet->GetPosition().x << ", "
+            //    << bullet->GetPosition().y << ", "
+            //    << bullet->GetPosition().z << ")" << endl;
 
             // 총알 위치 정보를 서버로 전송
             PacketBulletMove bulletPacket;
@@ -195,6 +196,7 @@ void Scene::Update(float deltaTime)
             bulletPacket.type = PACKET_BULLET_MOVE;
             bulletPacket.pos = bullet->GetPosition();
             bulletPacket.num = bullet->num;
+            bulletPacket.active = bullet->active;
 
             // 패킷 타입 전송
             char type = PACKET_BULLET_MOVE;
@@ -211,7 +213,7 @@ void Scene::Update(float deltaTime)
                 continue;
             }
 
-            cout << "총알 위치 정보 전송 완료" << endl;
+            //cout << "총알 위치 정보 전송 완료" << endl;
         }
     }
 }

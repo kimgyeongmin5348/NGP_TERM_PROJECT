@@ -5,7 +5,7 @@ using namespace std;
 
 // 전역 변수 선언
 PacketPlayerMove Player[2];
-PacketBulletMove Bullet[2][30]; // 클라마다 30개
+PacketBulletMove Bullet[2][3]; // 클라마다 3개
 PacketCollideBB  bb;
 
 int nowID = 0;
@@ -154,32 +154,25 @@ void ProcessMove()
     ***********************/
     // 다른 클라이언트에게 전송
     for (int i = 0; i < 2; i++) {
-        if (clientSockets[i] != INVALID_SOCKET) {
-            // 전송 시도 로그
-            cout << "\n=== 클라이언트 " << i << "에게 총알 정보 전송 시도 ===" << endl;
-            char type = PACKET_BULLET_MOVE;
-            retval = send(clientSockets[i], &type, sizeof(char), 0);
-            if (retval == SOCKET_ERROR) {
-                cout << "총알 이동 타입 전송 실패: " << WSAGetLastError() << endl;
-                continue;
-            }
+        for (int bulletIndex = 0; bulletIndex < 3; bulletIndex++) {
+            if (clientSockets[i] != INVALID_SOCKET) {
+                if (Bullet[(i + 1) % 2][bulletIndex].active){
+                    char type = PACKET_BULLET_MOVE;
+                    retval = send(clientSockets[i], &type, sizeof(char), 0);
+                    if (retval == SOCKET_ERROR) {
+                        cout << "총알 이동 타입 전송 실패: " << WSAGetLastError() << endl;
+                        continue;
+                    }
 
-            // 각 총알에 대해 범위 체크 후 전송
-            for (int bulletIndex = 0; bulletIndex < 30; bulletIndex++) {
-                if (bulletIndex >= 0 && bulletIndex < 30 && i >= 0 && i < 2) {
                     retval = send(clientSockets[i], (char*)&Bullet[(i + 1) % 2][bulletIndex], sizeof(PacketBulletMove), 0);
                     if (retval == SOCKET_ERROR) {
                         cout << "총알 이동 패킷 전송 실패: " << WSAGetLastError() << endl;
                         continue;
                     }
-                }
-                else {
-                    cout << "총알 인덱스 범위 오류: " << bulletIndex << endl;
+
+                    cout << i << "에게 송신 " << Bullet[(i + 1) % 2][bulletIndex].num << "-" << Bullet[(i + 1) % 2][bulletIndex].pos << endl;
                 }
             }
-
-            // 전송 성공 로그
-            cout << "총알 정보 전송 완료 -> 클라이언트 " << i << endl;
         }
     }
 
@@ -199,7 +192,7 @@ void ColideBulletToObjects() {
     bool collision = false;
 
     for (int k = 0; k < 2; ++k) {
-        for (int i = 0; i < 30; ++i) {
+        for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < g_buildings.size(); ++j) {
                 if (g_buildings[j].pos.x - 0.6f < Bullet[k][i].pos.x &&
                     Bullet[k][i].pos.x < g_buildings[j].pos.x + 0.6f &&
@@ -207,11 +200,11 @@ void ColideBulletToObjects() {
                     Bullet[k][i].pos.z < g_buildings[j].pos.z + 1 &&
                     Bullet[k][i].pos.z > g_buildings[j].pos.z - 1) {
 
-                    cout << "충돌 발생!" << endl;
-                    cout << "건물 번호: " << j << ", 총알 번호: " << i << endl;
-                    cout << "충돌 위치: (" << Bullet[k][i].pos.x << ", "
-                        << Bullet[k][i].pos.y << ", "
-                        << Bullet[k][i].pos.z << ")" << endl;
+                    //cout << "충돌 발생!" << endl;
+                    //cout << "건물 번호: " << j << ", 총알 번호: " << i << endl;
+                    //cout << "충돌 위치: (" << Bullet[k][i].pos.x << ", "
+                    //    << Bullet[k][i].pos.y << ", "
+                    //    << Bullet[k][i].pos.z << ")" << endl;
 
                     bb.building_num = j;
                     bb.bullet_num = i;
@@ -254,7 +247,7 @@ void SendPacketMoveBuildings() {
 
     for (auto& building : g_buildings) {
         // z축으로만 이동
-        building.pos.z -= 0.3f;   // 건물 이동속도 조절
+        building.pos.z -= 0.05f;   // 건물 이동속도 조절
 
         // 위치 정보 출력 (디버깅용)
         //cout << "Building " << building.num << " Position: ("
@@ -363,12 +356,14 @@ DWORD WINAPI ProcessClient(LPVOID arg)
             }
 
             // 서버가 수신한 총알 정보 출력
-            cout << "\n=== 서버 수신 총알 정보 ===" << endl;
-            cout << "발신 클라이언트 ID: " << ClientNum << endl;
-            cout << "총알 번호: " << movebulletPacket.num << endl;
-            cout << "총알 위치: (" << movebulletPacket.pos.x << ", "
-                << movebulletPacket.pos.y << ", "
-                << movebulletPacket.pos.z << ")" << endl;
+            cout << "수신" << ClientNum << " - " << movebulletPacket.num << " - " << movebulletPacket.pos << endl;
+
+            //cout << "\n=== 서버 수신 총알 정보 ===" << endl;
+            //cout << "발신 클라이언트 ID: " << ClientNum << endl;
+            //cout << "총알 번호: " << movebulletPacket.num << endl;
+            //cout << "총알 위치: (" << movebulletPacket.pos.x << ", "
+            //    << movebulletPacket.pos.y << ", "
+            //    << movebulletPacket.pos.z << ")" << endl;
 
             // 총알 인덱스 범위 체크 추가
             if (movebulletPacket.num < 0 || movebulletPacket.num >= 30) {
