@@ -67,21 +67,6 @@ struct ReadyClientToServer
 	char id;
 };
 
-struct NotReadyClientToServer
-{
-	char size;
-	char type;
-	char id;
-};
-
-struct StateReady
-{
-	char size;
-	char type;
-	char id;
-	//char id;  <<- 이거 중복 오류 뜬다... 수정 필요
-};
-
 struct PacketAllReady
 {
 	char size;
@@ -97,14 +82,6 @@ struct PacketPlayerMove
 	char state;
 	char playerid[MAX_ID_SIZE];
 	char id;
-};
-
-struct PacketID
-{
-	char size;
-	char type;
-	char id[MAX_ID_SIZE];
-
 };
 
 struct PacketBuildingMove

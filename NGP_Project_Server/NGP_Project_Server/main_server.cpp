@@ -35,28 +35,7 @@ void ProcessMove();
 void ColidePlayerToObjects();
 void ColideBulletToObjects();
 void DeleteObjects();
-//void SendPacketMadebuildings();
 void SendPacketMoveBuildings();
-
-//void SaveID(const char* NewID) {
-//    strncpy(Player[nowID].playerid, NewID, MAX_ID_SIZE - 1);
-//    Player[nowID].playerid[MAX_ID_SIZE - 1] = '\0';
-//    nowID++;
-//    SetEvent(DataEvent);
-//    cout << "ID 저장 완료: " << NewID << endl;
-//}
-//
-//bool CheckID(const char* playerid) {
-//    // DataEvent 대기는 제거 (불필요한 동기화 제거)
-//    for (int i = 0; i < nowID; ++i) {
-//        if (strcmp(Player[i].playerid, playerid) == 0) {
-//            cout << "중복된 ID: " << playerid << endl;
-//            return false;
-//        }
-//    }
-//    cout << "사용 가능한 ID: " << playerid << endl;
-//    return true;
-//}
 
 
 // Lobby 관련 함수
