@@ -16,7 +16,6 @@ using namespace std;
 
 #define MAX_ID_SIZE 32
 
-
 #define ID_USE 3
 #define ID_NOT_USE 4
 #define CLIENT_READY 5
@@ -29,6 +28,7 @@ using namespace std;
 #define PACKET_ID 12
 #define PACKET_COLLIDE_BULLET_BUILDING 14
 #define PACKET_COLLIDE_PLAYER_BUILDING 15
+#define PACKET_GAME_OVER 16
 
 #define TCPPORT			4000
 
@@ -121,6 +121,13 @@ struct PacketCollidePB
 	char type;
 	int building_num;
 	char id[MAX_ID_SIZE];
+};
+
+struct PacketGameOver
+{
+	char size;
+	char type;
+	float score;
 };
 
 // 소켓 함수 오류 출력 후 종료
