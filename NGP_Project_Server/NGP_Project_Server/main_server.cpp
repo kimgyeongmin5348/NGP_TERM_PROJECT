@@ -194,8 +194,8 @@ void ColidePlayerToObjects()
                     Player[i].pos.x < (g_buildings[j].pos.x + 0.6f) &&
                     Player[i].pos.y < g_buildings[j].scale.y / 5 - 0.2f) {
 
-                    cout << g_buildings[j].pos << ", " << Player[i].pos << endl;
-
+                    pb.num = i;
+                        
                     for (int c = 0; c < 2; ++c) {
                         if (clientSockets[c] != INVALID_SOCKET) {
                             send(clientSockets[c], &pb.type, sizeof(char), 0);
