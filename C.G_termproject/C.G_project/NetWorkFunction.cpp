@@ -1,10 +1,10 @@
-#include "PacketDefine.h"
+ï»¿#include "PacketDefine.h"
 #include "ServerToClient.h"
 #include "Scene.h"
 
-// Àü¿ª º¯¼ö Á¤ÀÇ
+// ì „ì—­ ë³€ìˆ˜ ì •ì˜
 WSADATA wsa;
-SOCKET sock = INVALID_SOCKET;   // ÃÊ±âÈ­ Ãß°¡
+SOCKET sock = INVALID_SOCKET;   // ì´ˆê¸°í™” ì¶”ê°€
 SOCKADDR_IN serveraddr;
 bool isReady = false;
 bool isConnected = false;
@@ -13,41 +13,41 @@ int myID{};
 
 bool InitializeNetwork() {
 
-    // À©¼Ó ÃÊ±âÈ­
+    // ìœˆì† ì´ˆê¸°í™”
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
-        cout << "À©¼Ó ÃÊ±âÈ­ ½ÇÆĞ" << endl;
+        cout << "ìœˆì† ì´ˆê¸°í™” ì‹¤íŒ¨" << endl;
         return false;
     }
 
-    // ¼ÒÄÏ »ı¼º
+    // ì†Œì¼“ ìƒì„±
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == INVALID_SOCKET) {
-        cout << "¼ÒÄÏ »ı¼º ½ÇÆĞ: " << WSAGetLastError() << endl;
+        cout << "ì†Œì¼“ ìƒì„± ì‹¤íŒ¨: " << WSAGetLastError() << endl;
         WSACleanup();
         return false;
     }
 
-    // ¼­¹ö ÁÖ¼Ò ¼³Á¤
+    // ì„œë²„ ì£¼ì†Œ ì„¤ì •
     ZeroMemory(&serveraddr, sizeof(serveraddr));
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_addr.s_addr = inet_addr(SERVERIP);
     serveraddr.sin_port = htons(TCPPORT);
 
-    // ¼­¹ö ¿¬°á
+    // ì„œë²„ ì—°ê²°
     if (connect(sock, (SOCKADDR*)&serveraddr, sizeof(serveraddr)) == SOCKET_ERROR) {
-        cout << "¼­¹ö ¿¬°á ½ÇÆĞ: " << WSAGetLastError() << endl;
+        cout << "ì„œë²„ ì—°ê²° ì‹¤íŒ¨: " << WSAGetLastError() << endl;
         closesocket(sock);
         WSACleanup();
         return false;
     }
 
-    isConnected = true; // ¿¬°á ¼º°ø ½Ã »óÅÂ º¯°æ
-    cout << "¼­¹ö ¿¬°á ¼º°ø" << endl;
+    isConnected = true; // ì—°ê²° ì„±ê³µ ì‹œ ìƒíƒœ ë³€ê²½
+    cout << "ì„œë²„ ì—°ê²° ì„±ê³µ" << endl;
 
-    // ¼­¹ö¿Í Åë½ÅÇÒ ½º·¹µå »ı¼º
+    // ì„œë²„ì™€ í†µì‹ í•  ìŠ¤ë ˆë“œ ìƒì„±
     HANDLE hThread = CreateThread(NULL, 0, ProcessServer, NULL, 0, NULL);
     if (hThread == NULL) {
-        cout << "½º·¹µå »ı¼º ½ÇÆĞ" << endl;
+        cout << "ìŠ¤ë ˆë“œ ìƒì„± ì‹¤íŒ¨" << endl;
         return false;
     }
 
@@ -55,17 +55,17 @@ bool InitializeNetwork() {
     return true;
 }
 
-// ³×Æ®¿öÅ© Á¤¸®
+// ë„¤íŠ¸ì›Œí¬ ì •ë¦¬
 void CleanupNetwork() {
     closesocket(sock);
     WSACleanup();
     isConnected = false;
 }
 
-// ·Î±×ÀÎ ¿äÃ» ÇÔ¼ö
+// ë¡œê·¸ì¸ ìš”ì²­ í•¨ìˆ˜
 bool SendLoginRequest(const char* username, const char* password) {
     if (!isConnected) {
-        cout << "¼­¹ö¿¡ ¿¬°áµÇ¾î ÀÖÁö ¾Ê½À´Ï´Ù." << endl;
+        cout << "ì„œë²„ì— ì—°ê²°ë˜ì–´ ìˆì§€ ì•ŠìŠµë‹ˆë‹¤." << endl;
         return false;
     }
 
@@ -77,18 +77,18 @@ bool SendLoginRequest(const char* username, const char* password) {
     loginPacket.username[MAX_ID_SIZE - 1] = '\0';
     loginPacket.password[MAX_ID_SIZE - 1] = '\0';
 
-    // ÆĞÅ¶ Å¸ÀÔ Àü¼Û
+    // íŒ¨í‚· íƒ€ì… ì „ì†¡
     char type = PACKET_LOGIN_REQUEST;
     int retval = send(sock, &type, sizeof(char), 0);
     if (retval == SOCKET_ERROR) {
-        cout << "·Î±×ÀÎ ¿äÃ» Å¸ÀÔ Àü¼Û ½ÇÆĞ" << endl;
+        cout << "ë¡œê·¸ì¸ ìš”ì²­ íƒ€ì… ì „ì†¡ ì‹¤íŒ¨" << endl;
         return false;
     }
 
-    // ÆĞÅ¶ µ¥ÀÌÅÍ Àü¼Û
+    // íŒ¨í‚· ë°ì´í„° ì „ì†¡
     retval = send(sock, (char*)&loginPacket, sizeof(loginPacket), 0);
     if (retval == SOCKET_ERROR) {
-        cout << "·Î±×ÀÎ ÆĞÅ¶ Àü¼Û ½ÇÆĞ" << endl;
+        cout << "ë¡œê·¸ì¸ íŒ¨í‚· ì „ì†¡ ì‹¤íŒ¨" << endl;
         return false;
     }
 
@@ -125,7 +125,7 @@ void err_display(int errcode) {
         NULL, errcode,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (char*)&lpMsgBuf, 0, NULL);
-    printf("[¿À·ù] %s\n", (char*)lpMsgBuf);
+    printf("[ì˜¤ë¥˜] %s\n", (char*)lpMsgBuf);
     LocalFree(lpMsgBuf);
 }
 
@@ -135,7 +135,7 @@ int recvn(SOCKET s, char* buf, int len, int flags) {
         int retval = recv(s, buf + received, len - received, flags);
         if (retval == SOCKET_ERROR || retval == 0) {
             cerr << "recv error or connection closed" << endl;
-            return SOCKET_ERROR; // ¿¡·¯ ¶Ç´Â ¿¬°á Á¾·á
+            return SOCKET_ERROR; // ì—ëŸ¬ ë˜ëŠ” ì—°ê²° ì¢…ë£Œ
         }
         received += retval;
     }
@@ -149,22 +149,22 @@ void SendReadyClientToServer()
     readyPacket.type = CLIENT_READY;
     readyPacket.id = myID;
 
-    // ¸ÕÀú Å¸ÀÔ Àü¼Û
+    // ë¨¼ì € íƒ€ì… ì „ì†¡
     char type = CLIENT_READY;
     int retval = send(sock, (char*)&type, sizeof(unsigned char), 0);
     if (retval == SOCKET_ERROR) {
-        cout << "ÁØºñ »óÅÂ Å¸ÀÔ Àü¼Û ½ÇÆĞ" << endl;
+        cout << "ì¤€ë¹„ ìƒíƒœ íƒ€ì… ì „ì†¡ ì‹¤íŒ¨" << endl;
         return;
     }
 
-    // ±× ´ÙÀ½ ÆĞÅ¶ Àü¼Û
+    // ê·¸ ë‹¤ìŒ íŒ¨í‚· ì „ì†¡
     retval = send(sock, (char*)&readyPacket, sizeof(readyPacket), 0);
     if (retval == SOCKET_ERROR) {
-        cout << "ÁØºñ »óÅÂ ÆĞÅ¶ Àü¼Û ½ÇÆĞ" << endl;
+        cout << "ì¤€ë¹„ ìƒíƒœ íŒ¨í‚· ì „ì†¡ ì‹¤íŒ¨" << endl;
         return;
     }
 
-    cout << "ÁØºñ »óÅÂ Àü¼Û ¿Ï·á" << endl;
+    cout << "ì¤€ë¹„ ìƒíƒœ ì „ì†¡ ì™„ë£Œ" << endl;
     isReady = true;
 }
 
@@ -185,13 +185,13 @@ void SendPlayerMove(const glm::vec3& pos, int state) {
 
 void SendBulletMove(const glm::vec3& bulletPos, int bulletIndex) {
     if (sock == INVALID_SOCKET) {
-        cout << "¼­¹ö¿¡ ¿¬°áµÇ¾î ÀÖÁö ¾Ê½À´Ï´Ù." << endl;
+        cout << "ì„œë²„ì— ì—°ê²°ë˜ì–´ ìˆì§€ ì•ŠìŠµë‹ˆë‹¤." << endl;
         return;
     }
 
-    // ÃÑ¾Ë ÀÎµ¦½º ¹üÀ§ Ã¼Å© Ãß°¡
+    // ì´ì•Œ ì¸ë±ìŠ¤ ë²”ìœ„ ì²´í¬ ì¶”ê°€
     if (bulletIndex < 0 || bulletIndex >= 30) {
-        cout << "Àß¸øµÈ ÃÑ¾Ë ÀÎµ¦½º: " << bulletIndex << endl;
+        cout << "ì˜ëª»ëœ ì´ì•Œ ì¸ë±ìŠ¤: " << bulletIndex << endl;
         return;
     }
 
@@ -204,34 +204,34 @@ void SendBulletMove(const glm::vec3& bulletPos, int bulletIndex) {
     char type = PACKET_BULLET_MOVE;
     int retval = send(sock, &type, sizeof(char), 0);
     if (retval == SOCKET_ERROR) {
-        cout << "ÃÑ¾Ë ÀÌµ¿ Å¸ÀÔ Àü¼Û ½ÇÆĞ: " << WSAGetLastError() << endl;
+        cout << "ì´ì•Œ ì´ë™ íƒ€ì… ì „ì†¡ ì‹¤íŒ¨: " << WSAGetLastError() << endl;
         return;
     }
 
     retval = send(sock, (char*)&bulletPacket, sizeof(bulletPacket), 0);
     if (retval == SOCKET_ERROR) {
-        cout << "ÃÑ¾Ë ÀÌµ¿ ÆĞÅ¶ Àü¼Û ½ÇÆĞ: " << WSAGetLastError() << endl;
+        cout << "ì´ì•Œ ì´ë™ íŒ¨í‚· ì „ì†¡ ì‹¤íŒ¨: " << WSAGetLastError() << endl;
         return;
     }
 }
 
-// ¼­¹ö·ÎºÎÅÍ ÆĞÅ¶À» ¹Ş¾Æ Ã³¸®ÇÏ´Â ½º·¹µå ÇÔ¼ö
+// ì„œë²„ë¡œë¶€í„° íŒ¨í‚·ì„ ë°›ì•„ ì²˜ë¦¬í•˜ëŠ” ìŠ¤ë ˆë“œ í•¨ìˆ˜
 DWORD WINAPI ProcessServer(LPVOID arg) {
     while (isConnected) {
-       /* if (sock == INVALID_SOCKET) {
-            std::cout << "¼ÒÄÏÀÌ À¯È¿ÇÏÁö ¾Ê½À´Ï´Ù." << std::endl;
-            break;
-        }*/
+        /* if (sock == INVALID_SOCKET) {
+             std::cout << "ì†Œì¼“ì´ ìœ íš¨í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤." << std::endl;
+             break;
+         }*/
 
-        // 1. ¸ÕÀú ÆĞÅ¶ Å¸ÀÔ¸¸ ¼ö½Å
+         // 1. ë¨¼ì € íŒ¨í‚· íƒ€ì…ë§Œ ìˆ˜ì‹ 
         unsigned char type;
         int retval = recv(sock, (char*)&type, sizeof(type), 0);
         if (retval <= 0) {
-            cout << "¼­¹ö¿ÍÀÇ ¿¬°áÀÌ ²÷¾îÁ³½À´Ï´Ù." << endl;
+            cout << "ì„œë²„ì™€ì˜ ì—°ê²°ì´ ëŠì–´ì¡ŒìŠµë‹ˆë‹¤." << endl;
             break;
         }
 
-        // 2. ÆĞÅ¶ Å¸ÀÔ¿¡ µû¸¥ Ã³¸®
+        // 2. íŒ¨í‚· íƒ€ì…ì— ë”°ë¥¸ ì²˜ë¦¬
         switch (type) {
         case PACKET_LOGIN_RESPONSE: {
             PacketLoginResponse loginResponse;
@@ -243,14 +243,14 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             ReadyClientToServer packet;
             retval = recvn(sock, (char*)&packet, sizeof(ReadyClientToServer), 0);
             if (retval == SOCKET_ERROR) break;
-            cout << "ÇÃ·¹ÀÌ¾î " << (int)packet.id << " ÁØºñ¿Ï·á" << endl;
+            cout << "í”Œë ˆì´ì–´ " << (int)packet.id << " ì¤€ë¹„ì™„ë£Œ" << endl;
             break;
-        }    
+        }
         case PACKET_BUILDING_MOVE: {
             PacketBuildingMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(PacketBuildingMove), 0);
             if (retval == SOCKET_ERROR) break;
-            // ¼­¹ö·ÎºÎÅÍ ¹ŞÀº °Ç¹° À§Ä¡ Á¤º¸·Î ¾À ¾÷µ¥ÀÌÆ®
+            // ì„œë²„ë¡œë¶€í„° ë°›ì€ ê±´ë¬¼ ìœ„ì¹˜ ì •ë³´ë¡œ ì”¬ ì—…ë°ì´íŠ¸
             Scene::GetInstance()->UpdateBuilding(packet.num, packet.scale, packet.pos);
             break;
         }
@@ -261,7 +261,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
                 err_display("recvn() - PACKET_PLAYER_MOVE");
                 break;
             }
-            // »ó´ë ÇÃ·¹ÀÌ¾î Update
+            // ìƒëŒ€ í”Œë ˆì´ì–´ Update
             Scene::GetInstance()->UpdatePlayerPosition(packet.id, packet.pos);
             break;
         }
@@ -269,9 +269,9 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             PacketBulletMove packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
-            //cout << "¼ö½Å" << packet.num << " " << packet.pos << endl;
+            //cout << "ìˆ˜ì‹ " << packet.num << " " << packet.pos << endl;
 
-            // ÃÑ¾Ë ÀÌµ¿ Ã³¸®
+            // ì´ì•Œ ì´ë™ ì²˜ë¦¬
             Scene::GetInstance()->UpdateOtherBulletPosition(packet.num, packet.pos);
             break;
         }
@@ -279,7 +279,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             PacketCollideBB packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
-            // ÃÑ¾Ë-°Ç¹° Ãæµ¹ Ã³¸®
+            // ì´ì•Œ-ê±´ë¬¼ ì¶©ëŒ ì²˜ë¦¬
             Scene::GetInstance()->ProcessBulletBuildingCollision(packet.bullet_num, packet.building_num);
             break;
         }
@@ -287,7 +287,7 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             PacketCollidePB packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
-            // ÇÃ·¹ÀÌ¾î-°Ç¹° Ãæµ¹ Ã³¸®
+            // í”Œë ˆì´ì–´-ê±´ë¬¼ ì¶©ëŒ ì²˜ë¦¬
             Scene::GetInstance()->ProcessPlayerBuildingCollision(packet.num);
             break;
         }
@@ -295,9 +295,16 @@ DWORD WINAPI ProcessServer(LPVOID arg) {
             PacketAllReady packet;
             retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
             if (retval == SOCKET_ERROR) break;
+            Scene::GetInstance()->StartScoreCount();
+        }
+        case PACKET_GAME_OVER: {
+            PacketGameOver packet;
+            retval = recvn(sock, (char*)&packet, sizeof(packet), 0);
+            if (retval == SOCKET_ERROR) break;
+            Scene::GetInstance()->ProcessGameOver(packet.score);
         }
         default:
-            //cout << "¾Ë ¼ö ¾ø´Â ÆĞÅ¶ Å¸ÀÔ: " << (int)type << endl;
+            //cout << "ì•Œ ìˆ˜ ì—†ëŠ” íŒ¨í‚· íƒ€ì…: " << (int)type << endl;
             break;
         }
     }

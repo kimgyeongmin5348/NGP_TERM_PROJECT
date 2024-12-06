@@ -20,12 +20,13 @@ public:
     void BuildObject();
     void Render();
     void Update(float deltaTime);
+    void UpdateCurrentTime(float deltaTime);
     void Resize(int w, int h);
 
     void UpdatePlayerPosition(int playerID, const glm::vec3& newPos);
-
     void UpdateBuilding(int buildingNum, glm::vec3& scale, const glm::vec3& newPos);
     void UpdateOtherBulletPosition(int bulletNum, const glm::vec3& newPos);
+
     void ProcessBulletBuildingCollision(int BulletNum, int BuildingNum);
     void ProcessPlayerBuildingCollision(int num);
 
@@ -34,8 +35,10 @@ public:
     }
 
     void KeyDown(unsigned char key);
-
     void KeyUp(unsigned char key);
+
+    void StartScoreCount() { startTime = currentTime; }
+    void ProcessGameOver(float otherScore);
 
 public:
     GLuint VAO[3], VBO[6];
@@ -58,4 +61,9 @@ private:
     Camera* camera{ nullptr };
     bool isReady{ false };
     std::unordered_map<unsigned char, bool> keyStates;
+
+    float currentTime;
+    float startTime;
+    float score;
+    bool alive = true;
 };

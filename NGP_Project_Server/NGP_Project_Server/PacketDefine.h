@@ -37,6 +37,7 @@ using namespace std;
 #define PACKET_BULLET_MOVE 11
 #define PACKET_COLLIDE_BULLET_BUILDING 14
 #define PACKET_COLLIDE_PLAYER_BUILDING 15
+#define PACKET_GAME_OVER 16
 
 #define TCPPORT			4000
 
@@ -114,6 +115,13 @@ struct PacketCollidePB
 	char type;
 	int num;	// 플레이어 번호
 	char id[MAX_ID_SIZE];
+};
+
+struct PacketGameOver
+{
+	char size;
+	char type;
+	float score;
 };
 
 // 소켓 함수 오류 출력 후 종료

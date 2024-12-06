@@ -1,11 +1,11 @@
-#pragma once
-#define _CRT_SECURE_NO_WARNINGS // ±¸Çü C ÇÔ¼ö »ç¿ë ½Ã °æ°í ²ô±â
-#define _WINSOCK_DEPRECATED_NO_WARNINGS // ±¸Çü ¼ÒÄÏ API »ç¿ë ½Ã °æ°í ²ô
+ï»¿#pragma once
+#define _CRT_SECURE_NO_WARNINGS // ï¿½ï¿½ï¿½ï¿½ C ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+#define _WINSOCK_DEPRECATED_NO_WARNINGS // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ API ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½
 #include "stdafx.h"
 #include "Scene.h"
 
-#include <winsock2.h> // À©¼Ó2 ¸ÞÀÎ Çì´õ
-#include <ws2tcpip.h> // À©¼Ó2 È®Àå Çì´õ
+#include <winsock2.h> // ï¿½ï¿½ï¿½ï¿½2 ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+#include <ws2tcpip.h> // ï¿½ï¿½ï¿½ï¿½2 È®ï¿½ï¿½ ï¿½ï¿½ï¿½
 
 #include <tchar.h> // _T(), ...
 #include <stdio.h> // printf(), ...
@@ -25,11 +25,12 @@ using namespace std;
 #define PACKET_BULLET_MOVE 11
 #define PACKET_COLLIDE_BULLET_BUILDING 14
 #define PACKET_COLLIDE_PLAYER_BUILDING 15
+#define PACKET_GAME_OVER 16
 
 #define TCPPORT			4000
 
 
-// ·Î±×ÀÎ ¿äÃ» ÆÐÅ¶ ±¸Á¶Ã¼ Ãß°¡
+// ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½Ã» ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½Ã¼ ï¿½ß°ï¿½
 struct PacketLoginRequest {
 	char size;
 	char type;
@@ -37,7 +38,7 @@ struct PacketLoginRequest {
 	char password[MAX_ID_SIZE];
 };
 
-// ·Î±×ÀÎ ÀÀ´ä ÆÐÅ¶ ±¸Á¶Ã¼
+// ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½Ã¼
 struct PacketLoginResponse {
 	char size;
 	char type;
@@ -76,7 +77,7 @@ struct PacketBuildingMove
 	glm::vec3 pos;
 	glm::vec3 scale;
 	bool is_broken;
-	int num; // ºôµù ¹øÈ£
+	int num; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È£
 };
 
 struct PacketBulletMove
@@ -84,7 +85,7 @@ struct PacketBulletMove
 	char size;
 	char type;
 	glm::vec3 pos;
-	int num; // ÃÑ¾Ë ¹øÈ£
+	int num; // ï¿½Ñ¾ï¿½ ï¿½ï¿½È£
 	bool active;
 };
 
@@ -104,11 +105,18 @@ struct PacketCollidePB
 	char id[MAX_ID_SIZE];
 };
 
-// ¼ÒÄÏ ÇÔ¼ö ¿À·ù Ãâ·Â ÈÄ Á¾·á
+struct PacketGameOver
+{
+	char size;
+	char type;
+	float score;
+};
+
+// ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 void err_quit(const char* msg);
-// ¼ÒÄÏ ÇÔ¼ö ¿À·ù Ãâ·Â
+// ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 void err_display(const char* msg);
-// ¼ÒÄÏ ÇÔ¼ö ¿À·ù Ãâ·Â
+// ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 void err_display(int errcode);
 
 int recvn(SOCKET s, char* buf, int len, int flags);

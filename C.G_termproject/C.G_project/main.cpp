@@ -98,7 +98,6 @@ int main(int argc, char** argv) {
         }
     }
 
-
     // 6. 종료 처리
     game.Shutdown();
     CleanupNetwork();

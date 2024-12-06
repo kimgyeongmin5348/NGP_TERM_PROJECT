@@ -34,6 +34,7 @@ void GameFramework::TimerCallback(int value)
 {
     float currentTime = static_cast<float>(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
     Scene::GetInstance()->Update(currentTime);
+    Scene::GetInstance()->UpdateCurrentTime(currentTime);
     glutPostRedisplay();
     glutTimerFunc(16, TimerCallback, 0); // 타이머를 다시 등록
 }
@@ -47,5 +48,3 @@ void GameFramework::Shutdown()
 {
     delete scene;
 }
-
-// test;;
